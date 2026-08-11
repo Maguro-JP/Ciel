@@ -59,6 +59,25 @@
    `dist` `build` `corpus` などのディレクトリ
 4. **プレースホルダ判定** — `YOUR_…` `xxx` `<token>` `${VAR}` `{{ }}`
    `changeme` `dummy` `example` 等を含む値は自動で除外
+5. **役割名の判定** — `user` `password` `host` `dbname` `scheme` のような
+   「形式を説明するための語」が値の位置にあれば例示とみなす。
+   ドキュメントで接続文字列の書式を説明する行を拾わないため
+
+### URL の扱い
+
+`scheme://user:pass@host` 形式は、**認証情報の部分だけ**を見て判断する。
+
+```
+postgres://user:password@host:5432/dbname          → 例示（役割名）
+postgres://admin:s3cr3tP4ss@db.internal:5432/app   → 検出  # secret-leak-check: ignore
+https://deploy:8Kf2mQxZ7wLp@artifacts.example.net  → 検出  # secret-leak-check: ignore
+```
+
+ホスト名やパスまで含めてエントロピーを測ると、**長いだけの例示が実物に見える**。
+実際、このスキル自身のドキュメントが誤検知の1件目だった。
+
+上の2行に付いている `# secret-leak-check: ignore` は、この抑止機能そのものの実例。
+**検出される例を文書に書くと、その文書が検出される。** 抑止マーカーはこのために要る。
 
 抑止を足す前に、**それが本当に安全な値か確認する**。
 

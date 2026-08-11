@@ -48,6 +48,14 @@ PLACEHOLDER = re.compile(
     r"placeholder|example|sample|dummy|changeme|redacted|<[^>]+>|\$\{[^}]+\}|"
     r"\{\{[^}]+\}\}|foo|bar|test|fake|abc123|000+|111+|aaa+)")
 
+# ドキュメントで形式を説明するときの役割名。値の位置にこれが出たら例示である。
+DOC_WORDS = re.compile(
+    r"(?i)\b(user(name)?|pass(wd|word)?|host(name)?|localhost|scheme|domain|"
+    r"dbname|myuser|mypass|someone|admin:admin)\b")
+
+# URL の認証情報部分だけを取り出す（scheme://ここ@host）
+URL_CRED = re.compile(r"^[a-z][a-z0-9+.\-]*://([^/\s@]+)@", re.I)
+
 SKIP_DIRS = {".git", "node_modules", "vendor", "dist", "build", "__pycache__",
              ".venv", "venv", ".next", "target", "corpus"}
 SKIP_SUFFIX = {".lock", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".pdf",
@@ -64,7 +72,20 @@ def entropy(s: str) -> float:
 
 
 def is_placeholder(val: str) -> bool:
-    return bool(PLACEHOLDER.fullmatch(val.strip())) or bool(PLACEHOLDER.search(val)) and entropy(val) < 3.5
+    v = val.strip()
+    if PLACEHOLDER.fullmatch(v):
+        return True
+    # URL は認証情報の部分だけで判断する。ホスト名やパスまで含めて
+    # エントロピーを測ると、長いだけの例示が実物に見えてしまう。
+    m = URL_CRED.match(v)
+    if m:
+        cred = m.group(1)
+        if DOC_WORDS.search(cred) or PLACEHOLDER.fullmatch(cred):
+            return True
+        return entropy(cred) < 2.5
+    if DOC_WORDS.search(v) and entropy(v) < 3.8:
+        return True
+    return bool(PLACEHOLDER.search(v)) and entropy(v) < 3.5
 
 
 def load_ignores() -> list:
