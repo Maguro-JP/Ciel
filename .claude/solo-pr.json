@@ -1,0 +1,8 @@
+{
+  "auto_merge": true,
+  "merge_method": "squash",
+  "delete_branch": true,
+  "no_checks": "proceed",
+  "protected_paths": [".github/workflows/"],
+  "acknowledged": []
+}
