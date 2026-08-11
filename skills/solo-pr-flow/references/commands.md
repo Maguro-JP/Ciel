@@ -10,6 +10,8 @@
 - [後片付け](#後片付け)
 - [判定に使う値](#判定に使う値)
 - [自動マージ機能を使う場合](#自動マージ機能を使う場合)
+- [追加した停止条件の判定材料](#追加した停止条件の判定材料)
+- [acknowledged の書き方](#acknowledged-の書き方)
 
 ## 停止条件の判定材料をどう取るか
 
@@ -150,3 +152,85 @@ gh pr merge <n> --squash --auto --delete-branch
 
 ただし**リポジトリ設定で auto-merge が有効**かつ**ブランチ保護ルールが必要**。
 個人リポジトリでは無効なことが多いので、使えなければ通常のマージに切り替える。
+
+## 追加した停止条件の判定材料
+
+### B6: 自分以外が作った issue / PR
+
+```bash
+gh issue list --state open --json author --jq '[.[].author.login] | unique'
+gh pr    list --state open --json author --jq '[.[].author.login] | unique'
+```
+
+MCP なら `list_issues` / `list_pull_requests` の作成者を見る。
+自分以外の login が出たら停止。
+
+### C4: リリース / タグ
+
+```bash
+gh release list --limit 1
+gh api repos/<owner>/<repo>/tags --jq 'length'
+```
+
+MCP なら `list_releases` / `list_tags`。1件でもあれば停止。
+
+### C5, C6, D4: リポジトリのフラグ
+
+`search_repositories`（`minimal_output: false`）の
+`has_pages` / `has_discussions` / `is_template` を見る。
+リポジトリのメタデータ取得と同じ1回の呼び出しで済む。
+
+### F 系: 差分の内容
+
+変更ファイル一覧と差分本体から判定する。
+
+```bash
+gh pr diff <n> --name-only     # F1, F3, F4, F5, F6, F7
+gh pr diff <n>                 # F2（秘密情報の走査）
+gh pr view <n> --json additions,deletions,changedFiles   # F8
+```
+
+| 条件 | 見るもの |
+|---|---|
+| F1 | パスが `protected_paths` の要素で始まるか |
+| F2 | 追加行に `sk-ant-` `ghp_` `AKIA` `-----BEGIN .* PRIVATE KEY-----` 等 |
+| F3 | `LICENSE` / `LICENSE.*` / `COPYING` |
+| F4 | `.github/` 配下（`protected_paths` に含まれない分） |
+| F5 | `package.json` `package-lock.json` `yarn.lock` `pnpm-lock.yaml` `requirements.txt` `poetry.lock` `Cargo.lock` `go.mod` `go.sum` `Gemfile.lock` |
+| F6 | `Dockerfile` `.npmrc` `pyproject.toml` の publish 設定、`vercel.json` `netlify.toml` 等のデプロイ設定 |
+| F7 | `migrations/` `migrate/` 配下、`*.sql` |
+| F8 | `changedFiles >= 100` または `deletions >= 1000` |
+
+リポジトリに検証スクリプトがあるなら、F2 はそれを再利用する
+（Ciel なら `./scripts/validate.sh` の secret scan）。
+
+## acknowledged の書き方
+
+停止条件を「今後は許容する」と決めたときだけ追記する。**観測値を必ず一緒に記録する。**
+
+```json
+{
+  "condition": "C1",
+  "observed": { "stargazers_count": 1 },
+  "note": "自分の自己Star",
+  "decided_at": "2026-08-11"
+}
+```
+
+次回の判定では `observed` と現在値を比べる。
+
+- `stargazers_count` が 1 のまま → 許容が有効。止まらない
+- 2 になった → **許容は失効**。再び停止して報告する
+
+一覧型（コミット著者など）は配列で記録し、記録に無い人物が現れたら失効:
+
+```json
+{
+  "condition": "B4",
+  "observed": { "authors": ["Maguro-JP", "dependabot[bot]"] },
+  "note": "bot のコミットのみ",
+  "decided_at": "2026-08-11"
+}
+```
+
+F 系は記録しても次回また止まる。差分は毎回別物なので、前回の判断を根拠にできない。
