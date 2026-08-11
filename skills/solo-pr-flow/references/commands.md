@@ -2,7 +2,76 @@
 
 環境によって使える道具が違う。手元にある方を使う。
 
-## 状態の取得
+## 目次
+
+- [停止条件の判定材料をどう取るか](#停止条件の判定材料をどう取るか)
+- [PR の状態の取得](#pr-の状態の取得)
+- [マージ](#マージ)
+- [後片付け](#後片付け)
+- [判定に使う値](#判定に使う値)
+- [自動マージ機能を使う場合](#自動マージ機能を使う場合)
+
+## 停止条件の判定材料をどう取るか
+
+リポジトリ側の判定材料は**1〜3回の呼び出しでまとめて**取る。1条件ずつ往復しない。
+
+### リポジトリのメタデータ（B1, B2, C1〜C3, D1〜D3 をまとめて満たす）
+
+MCP なら `search_repositories` に `repo:<owner>/<name>` を渡し、
+**`minimal_output: false`** にする。true だと必要なフィールドが落ちる。
+
+CLI なら:
+
+```bash
+gh repo view <owner>/<repo> --json \
+  isArchived,isFork,isDisabled,stargazerCount,forkCount,watchers,owner,viewerPermission,defaultBranchRef
+```
+
+取れるフィールドと対応する停止条件:
+
+| フィールド | 停止条件 |
+|---|---|
+| `permissions.admin` / `viewerPermission` | B1（admin でなければ停止） |
+| `owner.type` == `"Organization"` | B2 |
+| `stargazers_count` >= 2 | C1 |
+| `forks_count` >= 1 | C2 |
+| `watchers_count` >= 2 | C3 |
+| `archived` | D1 |
+| `fork` | D2 |
+| `disabled` | D3 |
+| `default_branch` | E3 の判定に使う |
+
+### コラボレーター（B3）
+
+```bash
+gh api repos/<owner>/<repo>/collaborators --jq 'length'
+```
+
+MCP なら `list_repository_collaborators`。**2件以上なら停止。**
+権限不足で 403 が返ることがある。**その場合は停止条件 A（情報が取れない）に該当する。**
+
+### コミット著者（B4）
+
+```bash
+gh api "repos/<owner>/<repo>/commits?per_page=100" --jq '[.[].author.login] | unique'
+```
+
+MCP なら `list_commits` に `perPage: 100`, `fields: ["sha","author"]`。
+bot（`login` が `*[bot]`、`github-actions` など）は除いて数える。**2人以上なら停止。**
+
+### CODEOWNERS（B5）
+
+次の3か所を見る。1つでも存在すれば停止。
+
+```
+.github/CODEOWNERS
+CODEOWNERS
+docs/CODEOWNERS
+```
+
+ローカルに clone があるならファイルの存在を見るだけでよい。
+
+## PR の状態の取得
 
 | 欲しい情報 | GitHub CLI | MCP (github) |
 |---|---|---|
@@ -10,6 +79,7 @@
 | チェック状況 | `gh pr checks <n>` | `pull_request_read` method=`get_check_runs` |
 | レビュー | `gh pr view <n> --json reviews` | `pull_request_read` method=`get_reviews` |
 | 変更ファイル | `gh pr diff <n> --name-only` | `pull_request_read` method=`get_files` |
+| PR の作成者 | `gh pr view <n> --json author` | `pull_request_read` method=`get` の `user.login` |
 
 一度に必要な分をまとめて取る。1項目ずつ往復しない。
 
