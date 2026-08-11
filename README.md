@@ -24,7 +24,7 @@
 ```
 skills/          公開スキル本体（1スキル = 1ディレクトリ）
 templates/       新規スキル用のひな形
-scripts/         検証スクリプト
+scripts/         検証・コーパス収集/解析スクリプト
 docs/            設計方針・運用ルール
 ```
 
@@ -47,6 +47,7 @@ description: いつこのスキルを使うか。トリガー条件を具体的�
 - 補助ファイルは `references/` `scripts/` `assets/` に置き、SKILL.md から参照する
 
 詳しくは [docs/GUIDELINES.md](docs/GUIDELINES.md)。
+公開スキル271本を実測した観察記録は [docs/OBSERVATIONS.md](docs/OBSERVATIONS.md)。
 
 ## 使い方
 
