@@ -3,6 +3,13 @@
   "merge_method": "squash",
   "delete_branch": true,
   "no_checks": "proceed",
-  "protected_paths": [".github/workflows/"],
+  "draft_is_default": true,
+  "bootstrap": true,
+  "protected_paths": [
+    ".github/workflows/"
+  ],
+  "diff_rules": {
+    "added": "notice"
+  },
   "acknowledged": []
 }

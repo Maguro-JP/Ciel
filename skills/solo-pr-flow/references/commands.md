@@ -193,6 +193,7 @@ gh pr view <n> --json additions,deletions,changedFiles   # F8
 | 条件 | 見るもの |
 |---|---|
 | F1 | パスが `protected_paths` の要素で始まるか |
+| status | `added` / `modified` / `removed` の区別。`gh pr diff --name-status`、MCP は `get_files` の `status` |
 | F2 | 追加行に `sk-ant-` `ghp_` `AKIA` `-----BEGIN .* PRIVATE KEY-----` 等 |
 | F3 | `LICENSE` / `LICENSE.*` / `COPYING` |
 | F4 | `.github/` 配下（`protected_paths` に含まれない分） |
@@ -234,3 +235,30 @@ gh pr view <n> --json additions,deletions,changedFiles   # F8
 ```
 
 F 系は記録しても次回また止まる。差分は毎回別物なので、前回の判断を根拠にできない。
+
+## F1 の bootstrap 判定
+
+「既定ブランチに workflow が1つも無い」ことを確認してから適用する。
+**PR ブランチではなく既定ブランチを見る。**
+
+```bash
+gh api "repos/<owner>/<repo>/contents/.github/workflows?ref=<default-branch>" --jq 'length'
+```
+
+404 または 0 件なら bootstrap の条件を満たす。1件でもあれば通常どおり F1 で停止する。
+
+MCP なら `get_file_contents` に `.github/workflows` と既定ブランチの ref を渡す。
+**取得に失敗したら停止条件 A に該当**。bootstrap を適用してはいけない。
+
+## draft の扱い
+
+`draft_is_default: true` は「この利用者は常に draft で PR を作る」という宣言。
+このとき draft は「未完成」の signal ではないので E1 では停止せず、マージ前に draft を外す。
+
+```bash
+gh pr ready <n>
+```
+
+MCP なら `update_pull_request` で `draft: false`。
+
+`draft_is_default: false`（既定）なら draft は従来どおり停止条件。
