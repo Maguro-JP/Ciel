@@ -66,6 +66,14 @@ $EDITOR skills/my-new-skill/SKILL.md
 ./scripts/validate.sh
 ```
 
+## 収録スキル
+
+| スキル | 用途 |
+|---|---|
+| [`skill-audit`](skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化」の3観点で診断する |
+| [`solo-pr-flow`](skills/solo-pr-flow/) | 個人開発の PR をCI確認からマージ・後片付けまで通す。停止条件つき |
+| [`secret-leak-check`](skills/secret-leak-check/) | 機密情報の混入を走査し、漏洩時の対応順序まで案内する |
+
 ## 貢献
 
 [CONTRIBUTING.md](CONTRIBUTING.md) を読んでから PR を送ってください。
