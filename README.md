@@ -71,8 +71,10 @@ $EDITOR skills/my-new-skill/SKILL.md
 | スキル | 用途 |
 |---|---|
 | [`skill-audit`](skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化」の3観点で診断する |
+| [`workspace-policy`](skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する。規約を読んで選択肢を絞る |
 | [`solo-pr-flow`](skills/solo-pr-flow/) | 個人開発の PR をCI確認からマージ・後片付けまで通す。停止条件つき |
 | [`secret-leak-check`](skills/secret-leak-check/) | 機密情報の混入を走査し、漏洩時の対応順序まで案内する |
+| [`ci-triage`](skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
 
 ## 個人設定
 

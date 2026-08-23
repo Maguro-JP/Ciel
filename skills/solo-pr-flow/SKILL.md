@@ -1,6 +1,6 @@
 ---
 name: solo-pr-flow
-description: 個人開発リポジトリで PR を作成してからマージ・後片付けまでを、毎回の確認なしに最後まで進めるとき。PR を作った直後、「マージして」「CIが通ったらマージ」「PRの後片付け」「ブランチ消して」といった依頼、CI 完了の通知を受けたときに使う。そのリポジトリで初めて使うときは自動マージの可否を必ず利用者に尋ね、以降は尋ねない。停止条件に該当したときは自動マージせず報告する。他人が関わるリポジトリ、fork、アーカイブ済み、CODEOWNERS があるリポジトリでは使わない。
+description: 個人開発リポジトリで PR を作成してからマージ・後片付けまでを、毎回の確認なしに最後まで進めるとき。PR を作った直後、「マージして」「CIが通ったらマージ」「PRの後片付け」「ブランチ消して」といった依頼、CI 完了の通知を受けたときに使う。そのリポジトリで初めて使うときは workspace-policy で方針を決めてから動き、以降は尋ねない。停止条件に該当したときは自動マージせず報告する。他人が関わるリポジトリ、fork、アーカイブ済み、CODEOWNERS があるリポジトリでは使わない。
 ---
 
 # Solo PR Flow
@@ -22,23 +22,21 @@ description: 個人開発リポジトリで PR を作成してからマージ・
 第3の門  該当なし          → 尋ねずにマージする
 ```
 
-### 第1の門: 初回は必ず尋ねる
+### 第1の門: 方針が決まっているか
 
-リポジトリ直下に `.claude/solo-pr.json` が**無い**なら、それが初回。
+`.claude/policy/<利用者名>.json` を読む。利用者名は GitHub の login。
 
-**この時点では、他の条件がどれだけ揃っていても自動マージしてはいけない。** 必ず尋ねる。
+**無い、または失効している場合は、ここで `workspace-policy` に渡す。**
+このスキルは自分で可否を尋ねない。方針を決めるのはあちらの役目で、
+リポジトリの規約を読んだうえで決める必要があるため。
 
-> このリポジトリで PR を自動マージしますか?
-> 「はい」なら `.claude/solo-pr.json` を作り、以降は毎回の確認なしで
-> マージ・ブランチ削除まで進めます。停止条件に該当したときだけ止めて報告します。
+失効の判定は `evidence.policy_digests` と現在の規約ファイルの突き合わせ。
+判定の詳細は `workspace-policy` にある。
 
-- **はい** → `assets/solo-pr.json` を元に `.claude/solo-pr.json` を作ってコミットする。
-  そのうえで第2の門へ進む
-- **いいえ** → `auto_merge: false` で作る。以降このリポジトリでは判定と報告だけ行い、
-  マージは毎回利用者が行う
-- **答えが曖昧** → 作らない。今回は手動。次回また尋ねる
+方針が読めたら、次を確認してから第2の門へ進む。
 
-ファイルがあれば初回ではない。**二度と可否は尋ねない。**
+- `auto_merge` が false → 判定と報告だけ行い、マージはしない
+- `human_review_required` が true → 自動マージしない（停止条件 B7）
 
 ### 第2の門: 停止条件
 
@@ -55,7 +53,7 @@ description: 個人開発リポジトリで PR を作成してからマージ・
   3. 止める
 ```
 
-利用者が **2** を選んだら `.claude/solo-pr.json` の `acknowledged` に記録する。
+利用者が **2** を選んだら `.claude/policy/<利用者名>.json` の `acknowledged` に記録する。
 **観測値ごと記録し、値がさらに動いたら再び止める**（下記）。
 
 利用者が **3** を選んだら、そこで終わる。理由を書き足したりしない。
@@ -98,6 +96,10 @@ description: 個人開発リポジトリで PR を作成してからマージ・
 | B4 | コミット著者が2人以上（bot を除く） | 直近100件のコミット |
 | B5 | CODEOWNERS がある | `.github/CODEOWNERS` / `CODEOWNERS` / `docs/CODEOWNERS` |
 | B6 | 自分以外が作った issue / PR がある | open な issue と PR の作成者 |
+| B7 | 規約が人のレビューやマージを求めている | `human_review_required` が true。根拠は規約ファイルの記述 |
+
+B7 は設定で外せない。リポジトリの規約が人の関与を求めているなら、
+リポジトリが誰のものであっても自動マージしない。
 
 ### C. 他人が見ている
 
@@ -127,12 +129,14 @@ description: 個人開発リポジトリで PR を作成してからマージ・
 | E2 | PR の作成者が自分（またはこのセッションの作業）でない | 他人の PR は絶対にマージしない |
 | E3 | base が既定ブランチでない | 意図を確認する |
 | E4 | コンフリクトあり | 解決して push。一意に決まらないときだけ尋ねる |
-| E5 | CI が失敗 | 直して push。直せないなら理由を1〜2行で報告 |
+| E5 | CI が失敗 | `ci-triage` に渡す。落ちたステップまで特定してから直す |
 | E6 | CI が実行中 / queued | **待つ。ポーリングしない。** 完了通知で起きて再判定 |
+| E6b | `cancelled` のチェックがある | 失敗ではない。より新しい実行を探す。詳細は `ci-triage` |
 | E7 | チェックが1つも無い | `no_checks` の設定に従う（既定 `proceed`） |
 | E8 | CHANGES_REQUESTED のレビューがある | 指摘に対応する |
 | E9 | 自分以外のレビューコメントが未解決 | 対応してから |
 | E10 | PR が閉じられている / 既にマージ済み | 何もしない |
+| E11 | 開いている PR の数が `max_open_prs` を超えている | 先に既存の PR を片付ける |
 
 ### F. 差分の内容
 
@@ -171,39 +175,43 @@ F2・F7・F8 は新規でも停止する。秘密情報は新規かどうかと�
 
 ---
 
-## 設定 `.claude/solo-pr.json`
+## 設定 `.claude/policy/<利用者名>.json`
+
+`workspace-policy` が作る。このスキルは読むだけで、`acknowledged` 以外は書き換えない。
 
 ```json
 {
+  "version": 1,
+  "user": "Maguro-JP",
+  "repo": "Maguro-JP/Ciel",
   "auto_merge": true,
   "merge_method": "squash",
   "delete_branch": true,
-  "no_checks": "proceed",
-  "draft_is_default": false,
+  "draft_is_default": true,
   "bootstrap": true,
+  "max_open_prs": null,
+  "human_review_required": false,
+  "no_checks": "proceed",
   "protected_paths": [".github/workflows/"],
   "diff_rules": { "added": "notice" },
-  "acknowledged": [
-    {
-      "condition": "C1",
-      "observed": { "stargazers_count": 1 },
-      "note": "自分の自己Star",
-      "decided_at": "2026-08-11"
-    }
-  ]
+  "policy_checks": [],
+  "acknowledged": []
 }
 ```
 
 | キー | 既定 | 意味 |
 |---|---|---|
-| `auto_merge` | `true` | false なら判定と報告だけ |
+| `auto_merge` | `false` | false なら判定と報告だけ |
 | `merge_method` | `"squash"` | `squash` / `merge` / `rebase` |
 | `delete_branch` | `true` | マージ後にリモートブランチを削除 |
+| `draft_is_default` | `false` | true なら draft で停止せず、外して進む |
+| `bootstrap` | `true` | 既定ブランチに workflow が皆無のとき、最初の CI 追加を F1 から外す |
+| `max_open_prs` | `null` | 同時に開いてよい PR の本数。`null` は制限なし |
+| `human_review_required` | `false` | true なら自動マージしない（B7） |
 | `no_checks` | `"proceed"` | チェックが1つも無いとき `proceed` / `ask` |
-| `draft_is_default` | `false` | true なら「常に draft で PR を作る運用」とみなし、E1 で停止せず draft を外して進む |
-| `bootstrap` | `true` | 既定ブランチに workflow が皆無のとき、最初の CI 追加を F1 の停止対象から外す（一度入れば自動失効） |
 | `protected_paths` | `[".github/workflows/"]` | ここに触れる差分は必ず確認 |
-| `diff_rules.added` | `"notice"` | 新規追加ファイルの扱い。`"stop"` にすると新規でも全部止まる |
+| `diff_rules.added` | `"notice"` | 新規追加ファイルの扱い。`"stop"` で新規も止まる |
+| `policy_checks` | `[]` | 規約を検査する CI の名前。落ちてもコードを直さない |
 | `acknowledged` | `[]` | すり合わせ済みの停止条件 |
 
 ### `acknowledged` の効き方
@@ -229,7 +237,7 @@ F 系だけは常に止まる。「前回 LICENSE を変えてよかった」は
 
 ## 原則
 
-- **初回は必ず尋ねる。** 他の条件がどれだけ揃っていても例外はない
+- **方針が無ければ `workspace-policy` に渡す。** 自分で可否を尋ねない
 - **2回目以降は可否を尋ねない。** それがこのスキルの存在理由
 - **停止条件に該当したら、条件名を挙げて報告する。** 黙って進めない、黙って止まらない
 - **確認できなかった項目は該当扱い。** 分からないなら止まる
@@ -240,6 +248,12 @@ F 系だけは常に止まる。「前回 LICENSE を変えてよかった」は
 - **CI 待ちで sleep やポーリングをしない。** 完了通知で起きて再判定する
 - **main へ force push しない。** どんな状況でもしない
 - 「たぶん大丈夫」で進めない。根拠が無いのは A1 に該当する
+
+## 他のスキルとの関係
+
+- 方針を決めるのは `workspace-policy`。このスキルは読むだけ
+- チェックが落ちた原因の特定は `ci-triage` が行う（E5、E6b）
+- 差分の秘密情報の走査（F2）は `secret-leak-check` を使う
 
 ## 判定の順序
 

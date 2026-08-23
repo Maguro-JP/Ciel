@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "user": "Maguro-JP",
+  "repo": "Maguro-JP/Ciel",
+  "decided_at": "2026-08-23",
+  "auto_merge": true,
+  "merge_method": "squash",
+  "delete_branch": true,
+  "draft_is_default": true,
+  "bootstrap": true,
+  "max_open_prs": null,
+  "branch_prefix": null,
+  "human_review_required": false,
+  "no_checks": "proceed",
+  "protected_paths": [
+    ".github/workflows/"
+  ],
+  "diff_rules": {
+    "added": "notice"
+  },
+  "policy_checks": [],
+  "acknowledged": [],
+  "evidence": {
+    "policy_digests": {
+      "CLAUDE.md": "e69679dffef44cdc",
+      "CONTRIBUTING.md": "4a62dc38974eeef3",
+      ".github/pull_request_template.md": "96caab4113d046db"
+    },
+    "note": "規約に人の関与を求める記述なし。inspect.py で確認済み"
+  }
+}
