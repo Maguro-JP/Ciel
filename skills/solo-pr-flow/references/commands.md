@@ -207,7 +207,7 @@ gh pr view <n> --json additions,deletions,changedFiles   # F8
 
 ## acknowledged の書き方
 
-停止条件を「今後は許容する」と決めたときだけ追記する。**観測値を必ず一緒に記録する。**
+停止条件を「今後は許容する」と決めたときだけ `.claude/policy/<利用者名>.json` に追記する。**観測値を必ず一緒に記録する。**
 
 ```json
 {
