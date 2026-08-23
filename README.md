@@ -74,6 +74,7 @@ $EDITOR skills/my-new-skill/SKILL.md
 | [`workspace-policy`](skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する。規約を読んで選択肢を絞る |
 | [`solo-pr-flow`](skills/solo-pr-flow/) | 個人開発の PR をCI確認からマージ・後片付けまで通す。停止条件つき |
 | [`secret-leak-check`](skills/secret-leak-check/) | 機密情報の混入を走査し、漏洩時の対応順序まで案内する |
+| [`ci-triage`](skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
 
 ## 個人設定
 
