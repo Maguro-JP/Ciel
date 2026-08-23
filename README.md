@@ -23,7 +23,7 @@
 
 ```
 skills/          公開スキル本体（1スキル = 1ディレクトリ）
-templates/       新規スキル用のひな形
+templates/       新規スキル用のひな形、個人設定のひな形
 scripts/         検証・コーパス収集/解析スクリプト
 docs/            設計方針・運用ルール
 ```
@@ -73,6 +73,18 @@ $EDITOR skills/my-new-skill/SKILL.md
 | [`skill-audit`](skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化」の3観点で診断する |
 | [`solo-pr-flow`](skills/solo-pr-flow/) | 個人開発の PR をCI確認からマージ・後片付けまで通す。停止条件つき |
 | [`secret-leak-check`](skills/secret-leak-check/) | 機密情報の混入を走査し、漏洩時の対応順序まで案内する |
+
+## 個人設定
+
+言語や応答の書き方のような、常に効いてほしい好みはスキルではなく
+`~/.claude/CLAUDE.md` に置きます。ひな形は
+[templates/personal-CLAUDE.md](templates/personal-CLAUDE.md)。
+
+```bash
+cat templates/personal-CLAUDE.md >> ~/.claude/CLAUDE.md
+```
+
+`~/.claude/` に置いたものはリポジトリに入らないので、共同開発者に影響しません。
 
 ## 貢献
 
