@@ -34,7 +34,7 @@ SKILL.md は発動するたびに読み込まれます。長いほど毎回コ�
 ## 3. ディレクトリ構成
 
 ```
-skills/<skill-name>/
+.claude/.claude/skills/<skill-name>/
 ├── SKILL.md          必須
 ├── references/       必要に応じて読む長い資料
 ├── scripts/          実行するスクリプト

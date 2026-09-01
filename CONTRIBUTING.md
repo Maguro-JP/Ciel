@@ -12,7 +12,7 @@ PR を送る前に、差分に以下が含まれていないか必ず確認し�
 
 ## スキルを追加する
 
-1. `templates/skill-template` をコピーして `skills/<name>/` を作る
+1. `templates/skill-template` をコピーして `.claude/skills/<name>/` を作る
 2. `SKILL.md` の frontmatter を埋める
    - `name`: ディレクトリ名と一致。小文字・数字・ハイフンのみ
    - `description`: **いつ発動すべきか**。トリガーになる単語や状況を具体的に

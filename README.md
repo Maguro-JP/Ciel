@@ -22,7 +22,7 @@
 ## 構成
 
 ```
-skills/          公開スキル本体（1スキル = 1ディレクトリ）
+.claude/skills/  スキル本体（1スキル = 1ディレクトリ）。ここに置くと Ciel でも有効になる
 templates/       新規スキル用のひな形、個人設定のひな形
 scripts/         検証・コーパス収集/解析スクリプト
 docs/            設計方針・運用ルール
@@ -30,7 +30,7 @@ docs/            設計方針・運用ルール
 
 ## スキルの形
 
-各スキルは `skills/<skill-name>/SKILL.md` を持ちます。冒頭は YAML frontmatter：
+各スキルは `.claude/skills/<skill-name>/SKILL.md` を持ちます。冒頭は YAML frontmatter：
 
 ```markdown
 ---
@@ -53,16 +53,18 @@ description: いつこのスキルを使うか。トリガー条件を具体的�
 
 ```bash
 git clone https://github.com/Maguro-JP/Ciel.git
-cp -r Ciel/skills/<skill-name> ~/.claude/skills/
+./Ciel/scripts/install.sh <skill-name> ~/               # 自分の PC の全プロジェクトで使う
+./Ciel/scripts/install.sh <skill-name> /path/to/repo    # そのリポジトリで使う（要コミット）
 ```
 
-プロジェクト単位で使うなら `.claude/skills/` へ。
+スマホや Web のセッションで使うなら、リポジトリの `.claude/skills/` に入れてコミットします。
+`~/.claude/` に置いたものはその機械の中だけで、リモートのセッションには引き継がれません。
 
 ## 新しいスキルを作る
 
 ```bash
-cp -r templates/skill-template skills/my-new-skill
-$EDITOR skills/my-new-skill/SKILL.md
+cp -r templates/skill-template .claude/skills/my-new-skill
+$EDITOR .claude/skills/my-new-skill/SKILL.md
 ./scripts/validate.sh
 ```
 
@@ -70,11 +72,12 @@ $EDITOR skills/my-new-skill/SKILL.md
 
 | スキル | 用途 |
 |---|---|
-| [`skill-audit`](skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化」の3観点で診断する |
-| [`workspace-policy`](skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する。規約を読んで選択肢を絞る |
-| [`solo-pr-flow`](skills/solo-pr-flow/) | 個人開発の PR をCI確認からマージ・後片付けまで通す。停止条件つき |
-| [`secret-leak-check`](skills/secret-leak-check/) | 機密情報の混入を走査し、漏洩時の対応順序まで案内する |
-| [`ci-triage`](skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
+| [`skill-audit`](.claude/skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化」の3観点で診断する |
+| [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する。規約を読んで選択肢を絞る |
+| [`solo-pr-flow`](.claude/skills/solo-pr-flow/) | 個人開発の PR をCI確認からマージ・後片付けまで通す。停止条件つき |
+| [`secret-leak-check`](.claude/skills/secret-leak-check/) | 機密情報の混入を走査し、漏洩時の対応順序まで案内する |
+| [`auto-dev`](.claude/skills/auto-dev/) | 自律的に開発を進める。時間制限と優先指示を受け取り、止まる条件を持つ |
+| [`ci-triage`](.claude/skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
 
 ## 個人設定
 
