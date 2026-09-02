@@ -140,9 +140,15 @@ cd /path/to/repo && git add .claude/skills && git commit -m "Ciel のスキル�
 凍結済み・fork・書き込み権限の無いリポジトリは対象外です。明示的に外したいものは
 Ciel の `.claude/sync-exclude.txt` に書きます。
 
-定期実行はローカルの cron が一番安上がりです。判断が要らないので、
-セッションを起こす必要がありません。詳しくは
-[skill-sync の配り方](../.claude/skills/skill-sync/references/distribution.md)。
+自動で取りに行かせるなら、workflow を置きます。
+
+```bash
+Ciel/scripts/install.sh --sync /path/to/repo
+```
+
+毎週土曜 09:00（日本時間）に Ciel を見て、差分があるときだけ `ciel-sync` ブランチで
+PR を出します。鍵は持ちません。開いている同期 PR は常に最大1本です。
+詳しくは [skill-sync の配り方](../.claude/skills/skill-sync/references/distribution.md)。
 
 ## トークンと CI の消費を抑える
 
