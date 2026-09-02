@@ -47,6 +47,7 @@ description: いつこのスキルを使うか。トリガー条件を具体的�
 - 補助ファイルは `references/` `scripts/` `assets/` に置き、SKILL.md から参照する
 
 詳しくは [docs/GUIDELINES.md](docs/GUIDELINES.md)。
+使い方とスキル一覧は [docs/USAGE.md](docs/USAGE.md)。
 公開スキル271本を実測した観察記録は [docs/OBSERVATIONS.md](docs/OBSERVATIONS.md)。
 
 ## 使い方

@@ -14,5 +14,7 @@
   "evidence": {
     "policy_digests": {},
     "note": ""
-  }
+  },
+  "loop_interval": null,
+  "push_policy": "batch"
 }

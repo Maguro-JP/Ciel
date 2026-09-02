@@ -135,6 +135,8 @@ scripts/inspect.py --json     # 機械が読む形
 | `max_open_prs` | 同時に開いてよい PR の本数。`null` は制限なし |
 | `branch_prefix` | 枝の接頭辞。`null` は指定なし |
 | `human_review_required` | 人のレビューが要るか。true なら `auto_merge` は必ず false |
+| `loop_interval` | `auto-dev` のループ間隔。`null` は自動 |
+| `push_policy` | `batch` / `never` / `each`。既定は `batch` |
 | `policy_checks` | 規約を検査する CI の名前。落ちてもコードを直さない |
 
 ## 原則
