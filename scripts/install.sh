@@ -11,8 +11,18 @@
 # 置いても発動しない。~/.claude/ はその機械の中でしか効かないので、
 # スマホや Web のセッションで使うならリポジトリに入れてコミットする。
 set -euo pipefail
+CALLER_PWD="$PWD"
 cd "$(dirname "$0")/.."
 SRC=".claude/skills"
+
+# 行き先は呼び出し元の cwd を基準に解決する。ここで cd した後に
+# 相対パスを使うと Ciel の中を指してしまう。
+resolve() {
+  case "$1" in
+    /*|~*) printf '%s' "$1" ;;
+    *)     printf '%s/%s' "$CALLER_PWD" "$1" ;;
+  esac
+}
 
 list() {
   echo "置けるスキル:"
@@ -29,7 +39,7 @@ list() {
 
 if [ "$1" = "--sync" ]; then
   [ $# -lt 2 ] && { echo "行き先を指定してください" >&2; exit 1; }
-  dest="${2%/}"
+  dest="$(resolve "${2%/}")"
   mkdir -p "$dest/.github/workflows"
   cp templates/ciel-sync.yml "$dest/.github/workflows/ciel-sync.yml"
   echo "置きました: $dest/.github/workflows/ciel-sync.yml"
@@ -43,11 +53,11 @@ fi
 if [ "$1" = "--all" ]; then
   [ $# -lt 2 ] && { echo "行き先を指定してください" >&2; exit 1; }
   names=$(ls "$SRC")
-  dest="$2"
+  dest="$(resolve "$2")"
 else
   [ $# -lt 2 ] && { echo "行き先を指定してください" >&2; exit 1; }
   names="$1"
-  dest="$2"
+  dest="$(resolve "$2")"
 fi
 
 target="${dest%/}/.claude/skills"
