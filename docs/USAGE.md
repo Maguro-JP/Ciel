@@ -70,6 +70,7 @@ git add .claude/skills && git commit -m "Ciel のスキルを取り込む"
 | `secret-leak-check` | 機密情報の混入を走査し、漏洩時の対応順序を案内する | 「秘密情報入ってない?」「公開前に確認」 |
 | `workspace-policy` | リポジトリでの進め方を一度だけ決めて記録する | 初めて PR を作る前、「設定して」 |
 | `skill-audit` | 既存スキルを診断する | 「このスキル発動しない」 |
+| `skill-sync` | Ciel のスキルを取り込む。差分だけ入れ替える | 「スキルを入れて」「最新にして」 |
 
 依存関係があります。
 
@@ -128,12 +129,20 @@ cd /path/to/Ciel && git pull
 cd /path/to/repo && git add .claude/skills && git commit -m "Ciel のスキルを更新"
 ```
 
-**自動で取り込む仕組みは意図的に置いていません。** GitHub Actions で定期的に
-同期させると実行時間を消費しますし、勝手にスキルが入れ替わると、
-何が効いているのか分からなくなります。
+`skill-sync` を使うと、差分があるものだけ入れ替わります。同じなら何も出ません。
 
-どうしても自動化するなら、月1回の `schedule` で PR を作るだけにして、
-マージは人が決める形にしてください。
+```bash
+git -C Ciel pull
+Ciel/.claude/skills/skill-sync/scripts/sync.py /path/to/repo --apply
+cd /path/to/repo && git add .claude/skills && git commit -m "Ciel のスキルを更新"
+```
+
+凍結済み・fork・書き込み権限の無いリポジトリは対象外です。明示的に外したいものは
+Ciel の `.claude/sync-exclude.txt` に書きます。
+
+定期実行はローカルの cron が一番安上がりです。判断が要らないので、
+セッションを起こす必要がありません。詳しくは
+[skill-sync の配り方](../.claude/skills/skill-sync/references/distribution.md)。
 
 ## トークンと CI の消費を抑える
 
