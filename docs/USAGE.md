@@ -48,10 +48,20 @@ git add .claude/skills && git commit -m "Ciel のスキルを取り込む"
 **自分で打つ。** `/` に続けてスキル名を入れます。
 
 ```
-/auto-dev 2h テストを先に通して
+/auto-dev E=1d L=1h テストを先に通して
 /ci-triage
 /secret-leak-check
 ```
+
+これは PC のターミナル版だけで使えます。スマホや Web の画面では
+「認識されないコマンドです」と出ます。その場合は普通の文で頼みます。
+
+```
+auto-dev を使って。E=1d L=1h、TODO の空欄を優先
+ci-triage で CI の失敗を見て
+```
+
+スキル名を文中に書けば、description の条件に当たって読み込まれます。
 
 **Claude が判断して発動する。** description の条件に当てはまると自動で読み込まれます。
 「CI 落ちてる」と言えば `ci-triage` が、「公開して大丈夫?」と言えば
