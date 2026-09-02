@@ -27,7 +27,7 @@ front_value() {
 
 echo "== skills =="
 shopt -s nullglob
-dirs=(skills/*/)
+dirs=(.claude/skills/*/)
 if [ ${#dirs[@]} -eq 0 ]; then
   echo "  (スキルなし)"
 fi
