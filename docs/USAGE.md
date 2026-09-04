@@ -150,14 +150,15 @@ cd /path/to/repo && git add .claude/skills && git commit -m "Ciel のスキル�
 凍結済み・fork・書き込み権限の無いリポジトリは対象外です。明示的に外したいものは
 Ciel の `.claude/sync-exclude.txt` に書きます。
 
-自動で取りに行かせるなら、workflow を置きます。
+自動で配るのは Raphael（private）の役目です。毎週土曜 09:00（日本時間）に
+Ciel を読んで、差分のあるリポジトリに `ciel-sync` ブランチで PR を出し、
+本人しか見ていないリポジトリならマージまで進めます。
 
-```bash
-Ciel/scripts/install.sh --sync /path/to/repo
-```
+各リポジトリに workflow を置く必要はありません。以前はその形でしたが、
+同じことをするジョブがリポジトリの数だけ動くため、Raphael の1本に集約しました。
 
-毎週土曜 09:00（日本時間）に Ciel を見て、差分があるときだけ `ciel-sync` ブランチで
-PR を出します。鍵は持ちません。開いている同期 PR は常に最大1本です。
+Ciel に鍵は置きません。Ciel は public なので、全リポジトリへ書ける PAT を
+置くと被害範囲が最大になります。鍵は private の Raphael にだけあります。
 詳しくは [skill-sync の配り方](../.claude/skills/skill-sync/references/distribution.md)。
 
 ## トークンと CI の消費を抑える
