@@ -26,6 +26,7 @@
 
 ## 変更する前に
 
+- 作業を引き受けたら、まず `.claude/skills/work-style/SKILL.md` を読む。
 - スキルを足す・直したら `./scripts/validate.sh` を通す。
 - 秘密情報が入っていないか `.claude/skills/secret-leak-check/scripts/scan.py --diff` で見る。
 - 詳しい設計方針は [docs/GUIDELINES.md](docs/GUIDELINES.md)。
