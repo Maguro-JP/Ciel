@@ -73,6 +73,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 
 | スキル | 用途 |
 |---|---|
+| [`work-style`](.claude/skills/work-style/) | 仕事の進め方。確認してから動く、一つずつ、動かしてから完了と言う、確かめていないことは言わない |
 | [`skill-sync`](.claude/skills/skill-sync/) | Ciel のスキルをリポジトリに取り込む。差分があるものだけ入れ替える |
 | [`skill-audit`](.claude/skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化」の3観点で診断する |
 | [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する。規約を読んで選択肢を絞る |
