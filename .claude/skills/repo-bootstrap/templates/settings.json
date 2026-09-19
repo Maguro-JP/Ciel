@@ -5,7 +5,37 @@
         "hooks": [
           {
             "type": "command",
+            "command": ".claude/hooks/lang-rule.sh"
+          },
+          {
+            "type": "command",
             "command": "cat .claude/skills/work-style/SKILL.md 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/lang-rule.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/lang-check.sh",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/test.sh",
+            "timeout": 600
           }
         ]
       }
@@ -18,17 +48,6 @@
             "type": "command",
             "command": ".claude/hooks/check.sh",
             "timeout": 120
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/test.sh",
-            "timeout": 600
           }
         ]
       }
