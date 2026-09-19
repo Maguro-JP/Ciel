@@ -75,6 +75,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 |---|---|
 | [`work-style`](.claude/skills/work-style/) | 仕事の進め方。確認してから動く、一つずつ、動かしてから完了と言う、確かめていないことは言わない |
 | [`verify-before-done`](.claude/skills/verify-before-done/) | 完了前の検証。動かした出力を貼る、本番の前に1件で試す、予約と結果を区別する |
+| [`repo-bootstrap`](.claude/skills/repo-bootstrap/) | リポジトリ初期設定。CLAUDE.md、フック入り settings.json、検査とテストのフック、スキル、最小 CI を一度で置く |
 | [`skill-sync`](.claude/skills/skill-sync/) | Ciel のスキルをリポジトリに取り込む。差分があるものだけ入れ替える |
 | [`skill-audit`](.claude/skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化」の3観点で診断する |
 | [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する。規約を読んで選択肢を絞る |
