@@ -78,7 +78,7 @@ ci-triage で CI の失敗を見て
 | `verify-before-done` | 動かした出力を貼る。本番の前に1件で試す。予約と結果を区別する | 「できました」と言う前、本番に当てる前 |
 | `repo-bootstrap` | CLAUDE.md、フック、スキル、最小 CI を一度で置く | 新規リポジトリ、「初期設定して」 |
 | `auto-dev` | 自律的に開発を進める。時間制限と優先指示を受け取る | 「自動で進めて」「あとは任せる」 |
-| `solo-pr-flow` | PR をマージ・後片付けまで通す。停止条件つき | PR を作った直後、「マージして」 |
+| `solo-pr-flow` | 自分のリポジトリなら尋ねずにマージする。止まるのは他人が関わる・規約・CI 失敗・秘密情報のとき | PR を作った直後、「マージして」 |
 | `ci-triage` | チェックの失敗を、落ちたステップまで特定する | 「CI が落ちた」、チェック完了の通知 |
 | `secret-leak-check` | 機密情報の混入を走査し、漏洩時の対応順序を案内する | 「秘密情報入ってない?」「公開前に確認」 |
 | `workspace-policy` | リポジトリでの進め方を一度だけ決めて記録する | 初めて PR を作る前、「設定して」 |
@@ -88,7 +88,7 @@ ci-triage で CI の失敗を見て
 依存関係があります。
 
 ```
-auto-dev ──┬─> solo-pr-flow ──┬─> workspace-policy   方針を読む
+auto-dev ──┬─> solo-pr-flow ──┬─> workspace-policy   方針を読む（あれば）
            │                  ├─> ci-triage          CI の失敗を見る
            │                  └─> secret-leak-check   差分の秘密情報を見る
            └─> ci-triage

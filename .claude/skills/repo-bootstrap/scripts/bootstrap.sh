@@ -6,6 +6,8 @@
 # 置くもの:
 #   CLAUDE.md                 無ければ置く。あれば触らない
 #   .claude/settings.json     フック。無ければ置く。あれば触らない
+#   .claude/hooks/lang-rule.sh  言語ルールを開始時と毎回の入力で差し込む
+#   .claude/hooks/lang-check.sh 応答に韓国語が混ざったら止める
 #   .claude/hooks/check.sh    編集のたびに走る検査。lint と型検査
 #   .claude/hooks/test.sh     止まる前に走るテスト
 #   .claude/skills/           Ciel のスキル一式
@@ -90,6 +92,11 @@ write_hook() {  # $1=ファイル名 $2=見出し $3...=コマンド
   } > "$f"
   chmod +x "$f"; placed+=(".claude/hooks/$name（${*:-コマンド未検出}）")
 }
+# 言語ルールの差し込みと、応答の韓国語混入の検査。中身は固定なのでコピーする
+for h in lang-rule.sh lang-check.sh; do
+  if [ -f "$dest/.claude/hooks/$h" ]; then kept+=(".claude/hooks/$h（既にある）")
+  else cp "$tpl/hooks/$h" "$dest/.claude/hooks/$h"; chmod +x "$dest/.claude/hooks/$h"; placed+=(".claude/hooks/$h"); fi
+done
 write_hook check.sh "編集のたびに走る検査" "${checks[@]+"${checks[@]}"}"
 write_hook test.sh  "止まる前に走るテスト"  "${tests[@]+"${tests[@]}"}"
 
