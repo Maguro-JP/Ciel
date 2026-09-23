@@ -1,11 +1,13 @@
 ---
-name: dev-cycle
-description: 長期の自律開発を、日次・週次・月次の周期で評価し、報告し、計画するとき。「日次報告」「週次レビュー」「月次計画」「今日の分をまとめて」「今週を振り返って」「来月の計画を立てて」と言われたとき、Routine で `dev-cycle daily` `weekly` `monthly` が起きたとき、長期開発の定期実行を設定したいときに使う。周ごとの作業そのものは auto-dev が行い、このスキルはその積み上げを評価して次を決める。単発の作業や、その場の修正には使わない。
+name: long-dev
+description: 長期の自律開発。プロダクトを時間とともに良くしていくための原則と、日次・週次・月次の周期で評価し、報告し、計画する手順。「日次報告」「週次レビュー」「月次計画」「今日の分をまとめて」「今週を振り返って」「来月の計画を立てて」と言われたとき、Routine で `long-dev daily` `weekly` `monthly` が起きたときに使う。定期実行の設定そのものは scheduler。周ごとの作業そのものは auto-dev が行い、このスキルはその積み上げを評価して次を決める。単発の作業や、その場の修正には使わない。
 ---
 
-# 開発の周期
+# 長期開発
 
-長期の自律開発を、3つの周期で回す。
+プロダクトを時間とともに良くしていく。判断の土台は `references/principles.md`。
+作業量ではなくプロダクトが良くなることが目的で、「変更不要」は失敗ではない。
+先に principles.md を読む。周期はその上で回す。
 
 | 周期 | 役目 | 起きる時刻（既定） |
 |---|---|---|
@@ -13,12 +15,9 @@ description: 長期の自律開発を、日次・週次・月次の周期で評�
 | weekly | 1週間を評価し、来週の計画と価値改善を1つ決める。PR を整理する | 月曜 09:00 JST |
 | monthly | 前月を総括し、今月の目標を週単位に分解する | 1日 09:00 JST |
 
-判断の土台は `auto-dev/references/principles.md`。
-作業量ではなくプロダクトが良くなることが目的で、「変更不要」は失敗ではない。
-
 ## 引数
 
-`dev-cycle daily` `dev-cycle weekly` `dev-cycle monthly`。
+`long-dev daily` `long-dev weekly` `long-dev monthly`。
 無ければ、今日が1日なら monthly、月曜なら weekly、それ以外は daily。
 
 ## 共通の約束
@@ -113,20 +112,10 @@ AI 精度:
 完了条件: 
 ```
 
-## 定期実行の設定
+## 定期実行
 
-Routine（cron）で起こす。時刻は UTC で書く。JST 09:00 は UTC 00:00。
-分は必ず 0 にする。切りの悪い時刻に起こさない。
-
-| 周期 | cron（UTC） | プロンプト |
-|---|---|---|
-| daily | `0 0 * * *` | `dev-cycle daily` |
-| weekly | `0 0 * * 1` | `dev-cycle weekly` |
-| monthly | `0 0 1 * *` | `dev-cycle monthly` |
-
+Routine で起こすなら `scheduler` を使う。既定は daily 毎日 09:00 JST、weekly 月曜、monthly 1日。
 1日が月曜なら monthly だけ動かす。monthly が weekly を含む。
-1回の起動は1セッション分のトークンを使う。daily を止めたいときは Routine を無効にするだけでよい。
-設定の手順と、セッションが持つ権限の注意は `references/schedule.md`。
 
 ## やらないこと
 
@@ -137,7 +126,8 @@ Routine（cron）で起こす。時刻は UTC で書く。JST 09:00 は UTC 00:0
 
 ## 他のスキルとの関係
 
-- 周ごとの作業: `auto-dev`。原則は `auto-dev/references/principles.md`
+- 周ごとの作業: `auto-dev`。原則は `references/principles.md`
+- 定期実行の設定: `scheduler`
 - PR のマージと後片付け: `solo-pr-flow`
 - CI が落ちたとき: `ci-triage`
 - 失敗の記録: `lessons`。自分の判定の誤りはここ、プロダクトの問題は `docs/knowledge/problems.md`
