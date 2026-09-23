@@ -77,7 +77,8 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`verify-before-done`](.claude/skills/verify-before-done/) | 完了前の検証。動かした出力を貼る、本番の前に1件で試す、予約と結果を区別する |
 | [`repo-bootstrap`](.claude/skills/repo-bootstrap/) | リポジトリ初期設定。CLAUDE.md、フック入り settings.json、検査とテストのフック、スキル、最小 CI を一度で置く |
 | [`lessons`](.claude/skills/lessons/) | 失敗の記録。場面・起きたこと・判定の誤り・次から の4行で残し、開始時にフックが読み直す |
-| [`dev-cycle`](.claude/skills/dev-cycle/) | 長期開発の周期。日次・週次・月次で評価と報告と計画を回す。auto-dev の積み上げを評価する側 |
+| [`long-dev`](.claude/skills/long-dev/) | 長期開発。プロダクトを良くする原則と、日次・週次・月次の評価・報告・計画 |
+| [`scheduler`](.claude/skills/scheduler/) | スケジューリング。Routine の作成・一覧・停止、cron の決まり、費用 |
 | [`skill-sync`](.claude/skills/skill-sync/) | Ciel のスキルをリポジトリに取り込む。差分があるものだけ入れ替える |
 | [`skill-audit`](.claude/skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化」の3観点で診断する |
 | [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する。規約を読んで選択肢を絞る |
