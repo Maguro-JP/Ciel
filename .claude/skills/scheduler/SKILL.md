@@ -40,6 +40,12 @@ scripts/check.sh <owner>/<repo> <branch-part>
 | `persistent_session_id` にリポジトリ無しのセッション | 作った側のリポジトリ | 対象と違うリポジトリで動く |
 | `persistent_session_id` にリポジトリを渡して作ったセッション | 対象リポジトリ、auto | clone、変更、commit、push、PR 作成、マージまで通った（AdaptiveAIStudio #33、起こしてから5分） |
 
+結びつけ先のセッションをアーカイブすると、Routine は止まらず、次に起きるときに黙って
+新しい空のセッション（リポジトリ無し）に結びつけ直される。仕事はせず、status は緑のまま。
+2026-09-24 に Daikenja で確かめた。だから結びつけ先のセッションは消してはいけない。
+セッションの寿命に依存したくないなら、画面（claude.ai/code/routines）からリポジトリを
+選んで作る。それが公式の形で、毎回新しい clone で始まる。
+
 status が緑でも仕事をしたとは限らない。このアカウントの「動いているように見えた」Routine
 （DigiMon、RuleCrawler）は、9時間走って1つもコミットを残していなかった。
 動いたかはリポジトリ側で見る。
