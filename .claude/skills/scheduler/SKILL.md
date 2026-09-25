@@ -39,6 +39,7 @@ scripts/check.sh <owner>/<repo> <branch-part>
 | `create_new_session_on_fire` | `sources: []`、`mcp_servers: []` | リポジトリ無し。clone も push もできず、承認待ちか無言で終わる。status は緑のまま |
 | `persistent_session_id` にリポジトリ無しのセッション | 作った側のリポジトリ | 対象と違うリポジトリで動く |
 | `persistent_session_id` にリポジトリを渡して作ったセッション | 対象リポジトリ、auto | clone、変更、commit、push、PR 作成、マージまで通った（AdaptiveAIStudio #33、起こしてから5分） |
+| 同上を約20時間放置したあと、定刻（cron）で起こす | 対象リポジトリ、auto | 09:04 JST に起きて日報の PR #39 を作りマージし、10:03 JST に long-dev が再開した（2026-09-25） |
 
 結びつけ先のセッションをアーカイブすると、Routine は止まらず、次に起きるときに黙って
 新しい空のセッション（リポジトリ無し）に結びつけ直される。仕事はせず、status は緑のまま。
@@ -49,11 +50,6 @@ scripts/check.sh <owner>/<repo> <branch-part>
 status が緑でも仕事をしたとは限らない。このアカウントの「動いているように見えた」Routine
 （DigiMon、RuleCrawler）は、9時間走って1つもコミットを残していなかった。
 動いたかはリポジトリ側で見る。
-
-## 確かめていないこと
-
-- 結びつけたセッションが数日放置で回収されたあとも、定刻に起きて clone し直すか。公式は「期限切れのセッションは開き直すと会話を復元して新しい容器を作る」と書いている。Routine から起きる場合も同じかは、最初の定刻の起動で見る
-分かったら、この節を消して上の表に足す。
 
 ## 決まり
 
