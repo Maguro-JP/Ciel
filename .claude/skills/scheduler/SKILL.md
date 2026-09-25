@@ -117,7 +117,7 @@ Routine から起きたセッションは、最初に `git remote -v` を出す�
 
 | 名前 | cron（UTC） | プロンプト |
 |---|---|---|
-| `long-dev` | `0 1 * * *` | <owner/repo> で long-dev E=23h を実行する。翌朝 09:00 JST まで回す |
+| `long-dev` | `0 1 * * *` | <owner/repo> で long-dev。止まっていれば再開、回っていればそのまま続ける |
 | `dev-report daily` | `0 0 * * *` | <owner/repo> で dev-report daily を実行する。日報を書く。開発はしない |
 | `dev-report weekly` | `0 0 * * 1` | <owner/repo> で dev-report weekly を実行する。週報と来週の計画。PR を整理する |
 | `dev-report monthly` | `0 0 1 * *` | <owner/repo> で dev-report monthly を実行する。月報と今月の週ごとの計画 |
