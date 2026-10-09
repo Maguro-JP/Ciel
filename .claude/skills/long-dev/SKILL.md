@@ -14,8 +14,8 @@ long-dev は、auto-dev と報告を毎日起こす Routine を作るスキル�
 | L= と E= | 自分で使う | auto-dev にそのまま渡す |
 
 周の間隔（`L=`）と1日に回す長さ（`E=`）で、リポジトリごとに1日に使うトークンを決められる。
-PR は1日1本にまとめる（`PR=daily`）。検証は手元で行い、GitHub Actions は使わない。
-周ごとに PR を出して Actions を回すと、月の枠が数日で尽きる。
+検証は手元で行う。PR の出し方と CI の扱いは、リポジトリの区分（公開か非公開か、個人か仕事か）で決まる
+（`auto-dev/references/verification.md`）。private の個人のリポジトリで周ごとに PR を出すと、Actions の月の枠が数日で尽きる。
 長期開発の中身を auto-dev と分けていると、止まる条件や間隔の扱いが二重になり、片方だけ直して食い違う。
 
 ## 引数
@@ -44,8 +44,8 @@ PR は1日1本にまとめる（`PR=daily`）。検証は手元で行い、GitHu
 ```
 <owner/repo> の long-dev。今日の日付（JST）で次を順にやる。
 1. 報告: 昨日の作業ブランチの上で書く。1日なら dev-report monthly、月曜なら dev-report weekly、それ以外は dev-report daily
-2. まとめ: 昨日の作業と報告を1本の PR にし、手元の検証を通して solo-pr-flow でマージする（CI は回さない）
-3. 開発: main から新しい作業ブランチを切り、auto-dev L=<L> E=<E> PR=daily <優先の指示>
+2. まとめ: 昨日の作業ブランチに未マージのものがあれば、報告と一緒に1本の PR にし、手元の検証を通して solo-pr-flow でマージする
+3. 開発: main から新しい作業ブランチを切り、auto-dev L=<L> E=<E> <優先の指示>（PR の出し方は区分で決まる）
 回っている auto-dev があれば止めて、この指定で回し直す。
 ```
 
