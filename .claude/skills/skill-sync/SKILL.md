@@ -54,10 +54,10 @@ Ciel/.claude/skills/skill-sync/scripts/sync.py <対象のパス>
 差分があれば一覧を出して 1 を返す。
 
 ```
-Ciel と違うもの:
-  無い  auto-dev
-  古い  ci-triage
---apply を付けると入る。
+Ciel → NetVision の .claude/skills/（見るだけ）
+  入っていない   auto-dev
+  Ciel より古い  ci-triage
+--apply で Ciel から入れる。
 ```
 
 ### 3. 反映する
