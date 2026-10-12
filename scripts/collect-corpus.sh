@@ -17,15 +17,15 @@ REPOS=(
 for r in "${REPOS[@]}"; do
   n="${r//\//_}"
   if [ -d "$n" ]; then
-    echo "skip $r (取得済み)"
+    echo "取得済み: $r"
     continue
   fi
   if git clone --depth 1 -q "https://github.com/$r.git" "$n" 2>/dev/null; then
-    printf '%-34s %4s skills\n' "$r" "$(find "$n" -name SKILL.md | wc -l)"
+    printf '%-34s %4s 個\n' "$r" "$(find "$n" -name SKILL.md | wc -l)"
   else
-    printf '%-34s FAILED\n' "$r"
+    printf '%-34s 失敗\n' "$r"
   fi
 done
 
 echo
-echo "合計 $(find . -name SKILL.md | wc -l) skills"
+echo "合計 $(find . -name SKILL.md | wc -l) 個"

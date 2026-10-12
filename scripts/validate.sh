@@ -6,8 +6,8 @@ cd "$(dirname "$0")/.."
 
 errors=0
 warns=0
-err()  { printf '  \033[31mERROR\033[0m  %s\n' "$1"; errors=$((errors+1)); }
-warn() { printf '  \033[33mWARN \033[0m  %s\n' "$1"; warns=$((warns+1)); }
+err()  { printf '  \033[31m誤り\033[0m  %s\n' "$1"; errors=$((errors+1)); }
+warn() { printf '  \033[33m注意\033[0m  %s\n' "$1"; warns=$((warns+1)); }
 
 # ---- frontmatter の値を取り出す ----
 front_value() {
@@ -25,7 +25,7 @@ front_value() {
   ' "$1"
 }
 
-echo "== skills =="
+echo "== スキル =="
 shopt -s nullglob
 dirs=(.claude/skills/*/)
 if [ ${#dirs[@]} -eq 0 ]; then
@@ -77,7 +77,7 @@ done
 
 # ---- 秘密情報の簡易スキャン ----
 echo
-echo "== secret scan =="
+echo "== 秘密情報 =="
 patterns=(
   'sk-ant-[A-Za-z0-9_-]{20,}'
   'sk-[A-Za-z0-9]{32,}'
@@ -98,7 +98,7 @@ done
 if [ "$hit" -eq 1 ]; then
   err "秘密情報らしき文字列を検出。コミット前に必ず取り除くこと"
 else
-  echo "  クリーン"
+  echo "  検出なし"
 fi
 
 if [ -f .env ]; then
@@ -106,5 +106,5 @@ if [ -f .env ]; then
 fi
 
 echo
-echo "errors: $errors  warns: $warns"
+echo "誤り $errors  注意 $warns"
 [ "$errors" -eq 0 ]

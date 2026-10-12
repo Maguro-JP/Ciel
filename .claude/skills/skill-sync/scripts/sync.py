@@ -130,16 +130,15 @@ def main():
     if not add and not upd:
         return 0          # 差分なし。何も言わない
 
-    verb = "入れました" if a.apply else "入っていません"
+    print("入れたもの:" if a.apply else "Ciel と違うもの:")
     for n in add:
-        print(f"  追加 {n}  ({verb})")
-    verb = "更新しました" if a.apply else "古いままです"
+        print(f"  {'追加' if a.apply else '無い'}  {n}")
     for n in upd:
-        print(f"  更新 {n}  ({verb})")
+        print(f"  {'更新' if a.apply else '古い'}  {n}")
     if not a.apply:
-        print(f"\n反映するには --apply を付けて実行します。")
+        print("--apply を付けると入る。")
     elif SELF in add + upd:
-        print(f"\n{SELF} 自身を更新しました。次回から新しい方が動きます。")
+        print(f"{SELF} 自身も更新した。この実行は古い方で動いた。次の実行から新しい方になる。")
     return 0 if a.apply else 1
 
 

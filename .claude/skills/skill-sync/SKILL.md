@@ -54,8 +54,10 @@ Ciel/.claude/skills/skill-sync/scripts/sync.py <対象のパス>
 差分があれば一覧を出して 1 を返す。
 
 ```
-  追加 auto-dev  (入っていません)
-  更新 ci-triage  (古いままです)
+Ciel と違うもの:
+  無い  auto-dev
+  古い  ci-triage
+--apply を付けると入る。
 ```
 
 ### 3. 反映する
