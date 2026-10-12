@@ -87,10 +87,14 @@ patterns=(
   'AIza[0-9A-Za-z_-]{30,}'
   'xox[baprs]-[A-Za-z0-9-]{10,}'
   '-----BEGIN [A-Z ]*PRIVATE KEY-----'
+  # public なので、個人を指すものも止める。メール、セッション・Routine の ID
+  '[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.(com|net|org|jp|email|io|dev|me)\b'
+  '(session|trig|env|cse)_01[A-Za-z0-9]{20,}'
+  'claude\.ai/code/session_'
 )
 hit=0
 for p in "${patterns[@]}"; do
-  if out=$(grep -rInE --exclude-dir=.git --exclude=validate.sh "$p" . 2>/dev/null); then
+  if out=$(grep -rInE --exclude-dir=.git --exclude=validate.sh --exclude=patterns.md "$p" . 2>/dev/null); then
     echo "$out" | while IFS= read -r l; do echo "  $l"; done
     hit=1
   fi

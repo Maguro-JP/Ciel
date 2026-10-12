@@ -29,6 +29,7 @@
 - 作業を引き受けたら、まず `.claude/skills/work-style/SKILL.md` を読む。
 - スキルを足す・直したら `./scripts/validate.sh` を通す。
 - 秘密情報が入っていないか `.claude/skills/secret-leak-check/scripts/scan.py --diff` で見る。
+- public なので、非公開リポジトリの名前、メールアドレス、セッションや Routine の ID、費用の数字を書かない。例や記録は `<owner>/<repo>`「あるリポジトリ」のように伏せる。`validate.sh` がメールと ID を検査する。
 - 詳しい設計方針は [docs/GUIDELINES.md](docs/GUIDELINES.md)。
 
 ## 完了と言う前に
