@@ -18,7 +18,7 @@ description: セッションをフィードバック専用に整えるとき。`
 
 1. 題目を1つに決める。引数があればそれ。無ければセッションの題名とこれまでの作業から絞る
 2. 成果物の形と判定を決める。これまでに出していたもの（絵、PR）をそのまま成果物の形にする。判定が決められなければ、最初の成果物を見せたときに `❔` で1行聞く
-3. 枝は今のものを使い続ける。他のセッションと同じ枝に push していたら、自分の分を `claude/fb-<題目の英小文字>-<YYYYMMDD>` に移す
+3. 枝は今のものを使い続ける。他のセッションと同じ枝に push していたら、自分の分を `claude/FB-<題目の英小文字>-<YYYYMMDD>`（work-style「名前の付け方」） に移す
 4. 記録の場所を決める。そのリポジトリの記録の決まりに従う。無ければ `docs/knowledge/feedback/<題目>.md`
 5. 目印を置く。`.claude/feedback-session` に題目を1行書き、`.git/info/exclude` に `.claude/feedback-session` を足す（コミットしない）。目印のあるセッションでは Stop フック `scripts/gate.sh` が、返答の中の文が ★ ↩ ❕ ❔ で始まる3行以内でなければ差し戻す。指示だけでは了解の返事や経過が混ざり続けたので、最後に機械で見る。フックは起動時に読まれるので、途中から目印を置いたセッションでは次に開き直したときから効く
 6. 返事は `❕ <題目>: <成果物の形>。判定は <1行>` の1行だけ。そのまま次の成果物に取りかかる
@@ -56,7 +56,7 @@ description: セッションをフィードバック専用に整えるとき。`
 
 ## 枝と PR
 
-- push するのは自分の枝だけ。他の題目の枝、auto-dev の `claude/dev-` の枝には触らない
+- push するのは自分の枝だけ。他の題目の枝、auto-dev の `claude/DEV-` の枝には触らない
 - 成果物ごとにコミットして push する
 - ★ を出した回と、記録（docs/knowledge/ など）を書いた回は、その回のうちに main を取り込み、手元の検証を通して PR にし、`solo-pr-flow` でマージする。溜めない。本開発（auto-dev）は main からしか受け取れないので、main に入らない発見は無いのと同じ
 - 複数の題目が同じファイルを直すときは、先に main に入れた方が勝ち。あとの方が取り込んで直す。重なると分かっている題目は、並列にせず順に回す
@@ -92,7 +92,7 @@ PR をマージし、束ねる側がいれば下の「セッション間の連�
 
 ```
 create_session(
-  title="<repo> <題目> フィードバック",
+  title="FB <repo> <題目>",
   source_url="https://github.com/<owner>/<repo>",
   permission_mode="auto",
   tags=["feedback-session:auto"],
@@ -101,7 +101,7 @@ create_session(
 
 ```
 <owner>/<repo> の feedback-session <題目>。成果物: <形1行>。判定: <1行>。
-.claude/skills/feedback-session/SKILL.md に従う。枝は claude/fb-<題目>-<YYYYMMDD>。
+.claude/skills/feedback-session/SKILL.md に従う。枝は claude/FB-<題目>-<YYYYMMDD>。PR の題は「FB <題目>: <1行>」。
 終わったら束ねる側（session_id <束ねる側の id>）に「セッション間の連絡」の形で ★ <題目> PR #N <1行> を送る。
 ```
 
