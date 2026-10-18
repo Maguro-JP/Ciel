@@ -29,6 +29,8 @@
 - 作業を引き受けたら、まず `.claude/skills/work-style/SKILL.md` を読む。
 - スキルを足す・直したら `./scripts/validate.sh` を通す。
 - 秘密情報が入っていないか `.claude/skills/secret-leak-check/scripts/scan.py --diff` で見る。
+- 人に見せてよいものか `.claude/skills/content-audit/scripts/audit.py --diff` で見る。名前、メール、ID、費用、内部の場所、不快な表現を拾う。
+- 文章を書いたら `.claude/skills/ja-proofread/scripts/proofread.py --diff` を通す。字の混入と英語の出だしは直してからコミットする。
 - public なので、非公開リポジトリの名前、メールアドレス、セッションや Routine の ID、費用の数字を書かない。例や記録は `<owner>/<repo>`「あるリポジトリ」のように伏せる。`validate.sh` がメールと ID を検査する。
 - 詳しい設計方針は [docs/GUIDELINES.md](docs/GUIDELINES.md)。
 
