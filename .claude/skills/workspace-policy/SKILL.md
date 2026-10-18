@@ -119,7 +119,7 @@ scripts/inspect.py --json     # 機械が読む形
 |---|---|
 | 要約が一致 | 記録をそのまま使う。尋ねない |
 | 要約が違う | 規約が書き換わっている。手順2からやり直す |
-| 記録に無い規約ファイルが増えた | 同じくやり直す |
+| 記録にない規約ファイルが増えた | 同じくやり直す |
 | `version` が違う | 同じくやり直す |
 
 規約が変わったのに古い判断で自動化を続けるのが、いちばん危ない。
@@ -138,7 +138,7 @@ scripts/inspect.py --json     # 機械が読む形
 | `loop_interval` | `auto-dev` のループ間隔。`null` は自動 |
 | `push_policy` | `batch` / `never` / `each`。デフォルトは `batch` |
 | `policy_checks` | 規約を検査する CI の名前。落ちてもコードを直さない |
-| `kind` | `personal`（個人）か `work`（仕事）。無ければ個人。CI と PR の出し方が変わる |
+| `kind` | `personal`（個人）か `work`（仕事）。なければ個人。CI と PR の出し方が変わる |
 | `pr_window` | PR を出してよい時間。例 `"Mon-Fri 10:00-18:00 JST"`。`null` はいつでも |
 | `pr_per_day` | 1日に出してよい PR の数。`null` は区分のデフォルト |
 | `ci_on_claude_prs` | `claude/` のブランチの PR で CI を回すか。`null` は区分のデフォルト |

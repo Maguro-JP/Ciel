@@ -32,7 +32,7 @@ description: 機密情報が漏れていないか調べるとき。「秘密情�
 
 ### 2. スキャンする
 
-手元に `gitleaks` か `trufflehog` があるならそれを使う。無ければ同梱の
+手元に `gitleaks` か `trufflehog` があるならそれを使う。なければ同梱の
 `scripts/scan.py` を使う。
 
 ```bash

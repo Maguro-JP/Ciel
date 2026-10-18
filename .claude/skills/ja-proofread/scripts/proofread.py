@@ -7,6 +7,8 @@
   proofread.py --stdin              標準入力の文（会話の返事、コミットメッセージ、PR の本文）
   --strict                          注意でも終了コード 1 にする
   --no-textlint                     textlint を使わない（入っていれば自動で使う。scripts/setup-textlint.sh）
+  --no-ai                           AI っぽさの目印（scripts/ai_habits.py）を数えない
+  --doc-type business|article|manual  AI っぽさのしきい値（既定 business）
 
 重大: 外国語の字の混入、助詞の重複、英語の出だし。見た目が壊れて見えるもの。終了コード 1
 注意: ら抜き、二重敬語、翻訳調、勝手な訳語、句読点、長い文、文体の混在。読む人が引っかかるもの
@@ -113,6 +115,28 @@ def textlint_bin():
     return (b, d / ".textlintrc.json") if b.exists() else (None, None)
 
 
+# ---- AI っぽさ（natural-japanese-writing の check.py） ------------------------
+# 文書ごとに、太字・ダッシュ・否定対比・頻出語・語尾の偏り・文の長さの揃いすぎを数える。判定ではなく目印。
+def ai_habits(files, doc_type="business"):
+    script = Path(__file__).resolve().parent / "ai_habits.py"
+    out = []
+    for name, p in files:
+        try:
+            r = subprocess.run([sys.executable, "-I", str(script), str(p), "--json", "--type", doc_type],
+                               capture_output=True, text=True, errors="replace", timeout=60)
+            d = json.loads(r.stdout or "{}")
+        except (subprocess.TimeoutExpired, json.JSONDecodeError, OSError):
+            continue
+        star = d.get("star_total", 0)
+        flags = d.get("flags", [])
+        dense = d.get("dense_paragraphs", [])
+        if star or flags or dense:
+            words = "、".join(f"{k.lstrip('★')} {v['count']}" for k, v in d.get("words", {}).items() if k.startswith("★"))
+            marks = "、".join(f"{k.lstrip('★')} {v}" for k, v in d.get("marks", {}).items() if k.startswith("★"))
+            out.append((name, star, flags, [f"段落{x['paragraph']}（{x['hits']}種）" for x in dense], "、".join(x for x in (words, marks) if x)))
+    return out
+
+
 def run_textlint(files, only_lines=None):
     """files: [(表示名, 実体のパス)]。only_lines: {表示名: {行番号}} で差分の行だけに絞る。
     返り値は (sev, rule, loc, hit, fix) の列。"""
@@ -149,6 +173,7 @@ class Proof:
         self.tone = defaultdict(lambda: {"敬体": 0, "常体": 0})
         self.lines = 0
         self.textlint = False
+        self.habits = []
 
     # 1文書
     def document(self, name, text):
@@ -264,6 +289,9 @@ class Proof:
         high = sum(1 for f in self.findings if f[0] == "high")
         med = sum(1 for f in self.findings if f[0] == "medium")
         print(f"\n  重大 {high} / 注意 {med} / 表記 {n_style}（{self.lines} 行）")
+        for name, star, flags, dense, detail in self.habits:
+            print(f"  -- [AI っぽさ] {name}: ★ {star}" + (f"（{detail}）" if detail else "") + ("。" + "。".join(flags) if flags else "")
+                  + (f"。重なった段落: {', '.join(dense)}" if dense else "") + "。natural-japanese-writing の check.py")
         if not self.textlint:
             print("  textlint は入っていない（scripts/setup-textlint.sh で入る。ら抜き・助詞の重複・冗長表現を形態素解析で見る）")
         if high + med + n_style == 0:
@@ -319,6 +347,8 @@ def main():
     ap.add_argument("--stdin", action="store_true")
     ap.add_argument("--strict", action="store_true")
     ap.add_argument("--no-textlint", action="store_true")
+    ap.add_argument("--no-ai", action="store_true")
+    ap.add_argument("--doc-type", choices=["business", "article", "manual"], default="business")
     a = ap.parse_args()
     p = Proof()
     tl_files, tl_lines = [], None
@@ -355,6 +385,8 @@ def main():
     if tl_files and not a.no_textlint:
         found, p.textlint = run_textlint(tl_files, tl_lines)
         p.findings.extend(found)
+    if tl_files and not a.no_ai:
+        p.habits = ai_habits(tl_files, a.doc_type)
     return p.report(label, a.strict)
 
 

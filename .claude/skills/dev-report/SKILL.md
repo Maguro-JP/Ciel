@@ -18,14 +18,14 @@ description: 日報・週報・月報を書くとき。「日報」「週報」�
 ## 引数
 
 `dev-report daily` `dev-report weekly` `dev-report monthly`。
-無ければ、今日が1日なら monthly、月曜なら weekly、それ以外は daily。
+なければ、今日が1日なら monthly、月曜なら weekly、それ以外は daily。
 1日が月曜なら monthly だけ書く。monthly が weekly を含む。
 
 ## 共通の約束
 
 - 調べるのは git の履歴、`docs/knowledge/`、`docs/reports/` の前回分。コードは必要なところだけ
 - 報告は `docs/reports/` に残す。`daily/YYYY-MM-DD.md` `weekly/YYYY-Www.md` `monthly/YYYY-MM.md`（日付は JST）
-- 報告のためにコードを変えない。変更が無かった日は無かったと書く
+- 報告のためにコードを変えない。変更がなかった日はなかったと書く
 - 会話に出すのは `★ <日報|週報|月報> <日付>: <PR か docs/reports/ の URL>` の1行だけ。報告の中身を会話に貼らない
 - 週報の PR 整理だけは書き込みを伴う。`solo-pr-flow` の判定に従う
 
@@ -63,7 +63,7 @@ Actions: 走った回数と、そのうち手元でできたはずのもの。�
 2. 未解決の問題を洗い出し、Critical / High / Medium / Low に分ける
 3. 来週の計画を決める。最低1つ、ユーザーに価値のある新機能か、はっきりした価値改善を入れる。無理な機能追加はしない。既存の改善や精度向上の方が価値が高いならそちら
 4. PR を整理する。検証済みで問題なければマージ。不要なブランチと PR を消す
-5. Actions の使用量を見て、無駄が無かったか確かめる
+5. Actions の使用量を見て、無駄がなかったか確かめる
 
 報告の形。
 
@@ -120,7 +120,7 @@ long-dev の Routine では、報告を書いたあと同じ起動の中で auto
 
 ## 他のスキルとの関係
 
-- 終わりの無い自律開発: `long-dev`。原則は `long-dev/references/principles.md`
+- 終わりのない自律開発: `long-dev`。原則は `long-dev/references/principles.md`
 - サイクルごとの作業: `auto-dev`
 - 定期実行の設定: `scheduler`
 - PR の整理: `solo-pr-flow`
