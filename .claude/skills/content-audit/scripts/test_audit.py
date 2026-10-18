@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """audit.py の自己試験。仕込んだ値を拾い、拾ってはいけない例を拾わないことを見る。
 
-  python3 -I .claude/skills/public-audit/scripts/test_audit.py
+  python3 -I .claude/skills/content-audit/scripts/test_audit.py
 """
 import os, subprocess, sys, tempfile, textwrap, unittest
 from pathlib import Path
@@ -41,6 +41,7 @@ class Fixture(unittest.TestCase):
             引数は "$1" と ${{2}}、版は 1.2.3、例示の網は 192.0.2.10 と 203.0.113.5
             時刻 0 15 * * 5、日付 2026-10-18、ループバック 127.0.0.1
             接続の例 postgres://user:password@host:5432/dbname
+            バカンスの予定、カスタム設定、「まとめて」と言われたら、コードのせいだと疑った
             """))
         (d / "bad.md").write_text(textwrap.dedent(f"""\
             担当: {EMAIL}
@@ -51,7 +52,9 @@ class Fixture(unittest.TestCase):
             社内は 10.20.30.40 と build.corp.internal、外は 8.8.4.4
             資料 https://docs.google.com/document/d/abc/edit と https://x.slack.com/archives/C01/p1
             今月は $12.50、先月は 1,200円、合計 $3,400
-            ignored: {EMAIL} public-audit: ignore
+            ignored: {EMAIL} content-audit: ignore
+            「お前の作ったものは全部やり直しだ」と言われた。利用者が怒ったので直した
+            レビューで無能と言われた。遅れたのは利用者のせい。初歩的なミスをする素人
             """))
         (d / "svc.pem").write_text("x")
         (d / ".env").write_text("A=1")
@@ -78,7 +81,8 @@ class Fixture(unittest.TestCase):
         for name in ["メールアドレス", "セッションの URL", "セッション・Routine の ID", "利用者名入りのパス",
                      "郵便番号・住所", "電話番号", "私有アドレス", "内部ホスト名", "グローバルアドレス",
                      "非公開サービスへのリンク", "費用の数字", "認証情報のファイル", ".env の実体",
-                     "データの持ち出し", "画像・動画・PDF"]:
+                     "データの持ち出し", "画像・動画・PDF",
+                     "人への罵倒・侮蔑", "人の発言の引用", "感情・叱責の描写", "責任を人に向ける表現", "見下し・皮肉"]:
             self.assertIn(name, out, f"{name} を拾っていない\n{out}")
         self.assertIn("まだ止められる", out)
 
@@ -99,13 +103,13 @@ class Fixture(unittest.TestCase):
         _, out = audit(self.d, "--tree")
         self.assertEqual(out.count("bad.md:1（"), 1)      # 1行目は拾う
         self.assertNotIn("bad.md:9（", out)                # ignore の行は拾わない
-        (self.d / ".publicallow").write_text("path:dump.sql\n8\\.8\\.4\\.4\n")
+        (self.d / ".contentallow").write_text("path:dump.sql\n8\\.8\\.4\\.4\n")
         try:
             _, out2 = audit(self.d, "--tree")
             self.assertNotIn("dump.sql", out2)
             self.assertNotIn("グローバルアドレス", out2)
         finally:
-            (self.d / ".publicallow").unlink()
+            (self.d / ".contentallow").unlink()
 
     def test_names_list(self):
         _, out = audit(self.d, "--tree")
@@ -135,7 +139,7 @@ class Fixture(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("コミットメッセージ", out)                # 同じ値でも場所は並ぶ
         self.assertIn("secret.key（消したが履歴に残る）", out)
-        self.assertIn("すでに公開", out)
+        self.assertIn("すでに共有", out)          # origin が無いので public か分からない
         self.assertIn("著者 t", out)
         self.assertNotIn("著者のメールアドレス", out)     # noreply は個人を指さない
 

@@ -1,30 +1,32 @@
 #!/usr/bin/env python3
-"""公開リポジトリに出してよいものか調べる。鍵ではなく「名前・連絡先・ID・費用・内部の場所」を見る。
+"""人に見られる前に、中身を精査する。鍵ではなく「名前・連絡先・ID・費用・内部の場所・不快な表現」を見る。
 
-  audit.py --tree                    作業ツリー
+  audit.py --tree                    作業ツリー（追跡していないファイルも）
   audit.py --diff [<base>..<head>]   差分（省略時は未コミットの変更）
   audit.py --history                 全コミット（追加行、コミットメッセージ、著者、消したファイル）
   audit.py --github <owner/repo>     GitHub 側（説明・Issue と PR の本文とコメント・リリース・設定）
   audit.py --all <owner/repo>        上の全部
 
   --names <file>   非公開の名前の一覧（1行1つ。owner/repo か名前だけ）。リポジトリの外に置く。
-                   省略時は $PUBLIC_AUDIT_NAMES、無ければ ~/.config/public-audit/names.txt
+                   省略時は $CONTENT_AUDIT_NAMES、無ければ ~/.config/content-audit/names.txt
   --show           値を伏せずに出す（手元の端末で自分だけが見るとき）
 
+private でも人は読む（共同作業者、レビュー担当、将来の公開、画面の共有）。範囲は public に限らない。
 検出（重大・注意）があれば終了コード 1。情報だけなら 0。
-誤検知は行末に `public-audit: ignore`、または .publicallow に1行ずつ
+誤検知は行末に `content-audit: ignore`、または .contentallow に1行ずつ
 （正規表現は値に対して、`path:<glob>` はファイルに対して）。
 鍵やトークンは secret-leak-check の scan.py が見る。ここでは重ねて見ない。
 """
 import argparse, json, os, re, subprocess, sys
 from pathlib import Path
 
-IGNORE_MARK = "public-audit: ignore"
+IGNORE_MARK = "content-audit: ignore"
 
 # ---- 行のルール ------------------------------------------------------------
-# (名前, 正規表現, 深刻度)。深刻度: high=公開リポジトリに置かない / medium=人が見て決める
+# (名前, 正規表現, 深刻度)。深刻度: high=人に見せない / medium=人が見て決める
 # セッション URL を ID より先に置く。1つの箇所を2件に数えないため（重なりは先勝ち）。
 RULES = [
+    # 機密・個人を指すもの
     ("セッションの URL",       r"claude\.ai/code/session_[A-Za-z0-9]+", "high"),
     ("セッション・Routine の ID", r"\b(?:session|cse|trig|env|ccpool)_01[A-Za-z0-9]{20,}\b", "high"),
     # 直前が : や / なら URL の認証情報（secret-leak-check の領分）なので拾わない
@@ -39,6 +41,13 @@ RULES = [
     ("非公開サービスへのリンク", r"https?://(?:(?:docs|drive|sheets|sites)\.google\.com|(?:www\.)?notion\.so|[a-z0-9-]+\.slack\.com/archives|(?:www\.)?figma\.com/(?:file|design|board)|[a-z0-9-]+\.atlassian\.net|[a-z0-9-]+\.sharepoint\.com)/\S+", "medium"),
     ("費用の数字",             r"(?<![\w$\"'`{(])[$¥€£]\s?(?:\d{1,3}(?:,\d{3})+|\d+\.\d{1,2}|\d{2,})(?![\w}])", "medium"),
     ("費用の数字",             r"(?<![\w.])\d[\d,]*(?:\.\d+)?\s?(?:円|ドル|USD|JPY|EUR)(?![\w])", "medium"),
+    # 読む人が不快になるもの。一覧は短く保ち、網羅はしない。最後は読む人の目（references/checklist.md）
+    ("人への罵倒・侮蔑",       r"(?:クソ|糞|死ね|殺す|黙れ|ふざけ(?:る|んな)|やがって|ざまあ|バカ(?![ァ-ヶー])|馬鹿|アホ(?![ァ-ヶー])|阿呆|無能|低能|役立たず|クズ(?![ァ-ヶー])|間抜け|マヌケ|ポンコツ|キチガイ|気違い|土人|ブス(?![ァ-ヶー])|デブ(?![ァ-ヶー])|ハゲ(?![ァ-ヶー])|カス(?![ァ-ヶー]))", "medium"),
+    # 「〜と言われたとき」のような条件（発動の語の列挙）は引用ではないので拾わない
+    ("人の発言の引用",         r"「[^」\n]{8,}」(?:と|って)(?:言われ|言った|怒られ|叱られ|返され|言い放)(?!たとき|たら|れば|ても|るとき)", "medium"),
+    ("感情・叱責の描写",       r"(?:利用者|ユーザー?|相手|客|上司|担当者?|レビュアー|彼|彼女)が(?:怒|キレ|不機嫌|イライラ|呆れ|激怒)|(?:怒られ|叱られ|怒鳴|ブチ切れ|激怒|キレられ)", "medium"),
+    ("責任を人に向ける表現",   r"(?:利用者|ユーザー?|相手|客|上司|担当者?|チーム|レビュアー|彼|彼女|あいつ|あの人)の?せい|(?:利用者|ユーザー?|相手|客)が[^。\n]{0,12}(?:しなかった|言わなかった|分かっていな|理解していな|読んでいな)(?:から|ので|ため|せい)", "medium"),
+    ("見下し・皮肉",           r"(?:初歩的な(?:ミス|誤り|質問)|素人(?:考え|仕事|)|話にならな|お察し|程度の低|頭が悪|理解力がな|センスがな|言うまでもなく当然)", "medium"),
 ]
 
 # 値がこれなら出さない。公開前提のもの、例示、容器の中の既定の名前
@@ -81,6 +90,8 @@ SKIP_NAMES = {"package-lock.json", "yarn.lock", "pnpm-lock.yaml", "poetry.lock",
 BINARY_SUFFIX = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".pdf", ".woff", ".woff2",
                  ".ttf", ".zip", ".gz", ".tar", ".mp4", ".mov", ".sqlite", ".sqlite3", ".db", ".p12", ".pfx", ".jks"}
 
+STILL = "まだ止められる"
+
 
 def run(cmd, check=False):
     r = subprocess.run(cmd, capture_output=True, text=True, errors="replace")
@@ -104,7 +115,7 @@ class Allow:
     def __init__(self):
         self.values = [re.compile(p) for p in ALLOW_DEFAULT]
         self.paths = []
-        p = Path(".publicallow")
+        p = Path(".contentallow")
         if p.exists():
             for l in p.read_text(errors="replace").splitlines():
                 l = l.strip()
@@ -130,7 +141,7 @@ class Allow:
 
 def load_names(arg, self_repo):
     """非公開の名前の一覧。見つからなければ None（検査しなかった、と報告する）。"""
-    cands = [arg, os.environ.get("PUBLIC_AUDIT_NAMES"), str(Path.home() / ".config/public-audit/names.txt")]
+    cands = [arg, os.environ.get("CONTENT_AUDIT_NAMES"), str(Path.home() / ".config/content-audit/names.txt")]
     src = next((c for c in cands if c and Path(c).expanduser().exists()), None)
     if not src:
         return None, None
@@ -140,7 +151,7 @@ def load_names(arg, self_repo):
         if not l or l.startswith("#"):
             continue
         if self_repo and l.lower() in (self_repo.lower(), self_repo.split("/")[-1].lower()):
-            continue  # 調べているリポジトリ自身は公開なので除く
+            continue  # 調べているリポジトリ自身の名前は読む人が知っている
         full = re.escape(l)
         pats.append(re.compile(rf"(?<![\w-]){full}(?![\w-])", re.I))
         if "/" in l:
@@ -156,10 +167,29 @@ def self_repo_name():
     return m.group(1) if m else None
 
 
+def repo_visibility(repo):
+    """True=public / False=private / None=分からない。履歴の「すでに見える」の意味を決めるために見る。"""
+    if not repo:
+        return None
+    try:
+        meta = json.loads(run(["gh", "api", f"repos/{repo}"], check=True))
+        return not meta.get("private", True)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def seen_state(public):
+    if public is True:
+        return "すでに公開（push 済みなら誰でも読める）"
+    if public is False:
+        return "すでに共有（push 済みなら共同作業者に見える。public にすれば誰でも）"
+    return "すでに共有（push 済みなら。public なら誰でも）"
+
+
 # ---- 走査 -------------------------------------------------------------------
 class Audit:
-    def __init__(self, allow, names, show):
-        self.allow, self.names, self.show = allow, names, show
+    def __init__(self, allow, names, show, public=None):
+        self.allow, self.names, self.show, self.public = allow, names, show, public
         self.findings = []   # (sev, where, locs, name, value, state)。同じ値は1件にまとめ、場所を並べる
         self.infos = []      # (where, text)
         self.seen = {}
@@ -219,7 +249,7 @@ class Audit:
         for f in files:
             if self.allow.path_skip(f):
                 continue
-            self.scan_filename(f, "作業ツリー", "まだ止められる")
+            self.scan_filename(f, "作業ツリー", STILL)
             if Path(f).suffix.lower() in BINARY_SUFFIX:
                 continue
             try:
@@ -227,7 +257,7 @@ class Audit:
             except (OSError, IsADirectoryError):
                 continue
             for i, line in enumerate(text.splitlines(), 1):
-                self.scan_line(line, "作業ツリー", f"{f}:{i}", "まだ止められる")
+                self.scan_line(line, "作業ツリー", f"{f}:{i}", STILL)
 
     # 差分
     def diff(self, rng):
@@ -237,18 +267,18 @@ class Audit:
             if line.startswith("+++ b/"):
                 path = line[6:]
                 if not self.allow.path_skip(path):
-                    self.scan_filename(path, "差分", "まだ止められる")
+                    self.scan_filename(path, "差分", STILL)
             elif line.startswith("@@"):
                 m = re.search(r"\+(\d+)", line)
                 ln = int(m.group(1)) if m else 0
             elif line.startswith("+") and not line.startswith("+++"):
                 if not self.allow.path_skip(path):
-                    self.scan_line(line[1:], "差分", f"{path}:{ln}", "まだ止められる")
+                    self.scan_line(line[1:], "差分", f"{path}:{ln}", STILL)
                 ln += 1
 
     # 履歴
     def history(self):
-        state = "すでに公開（push 済みなら）"
+        state = seen_state(self.public)
         # 追加行
         for sha in run(["git", "rev-list", "--all"]).split():
             path = "?"
@@ -269,7 +299,7 @@ class Audit:
             a = authors.setdefault((an, ae), {"n": 0, "tz": set()})
             a["n"] += 1
             a["tz"].add(tz)
-            for i, line in enumerate(body.splitlines(), 1):
+            for line in body.splitlines():
                 self.scan_line(line, "履歴", f"{sha[:8]}:コミットメッセージ", state)
         for (an, ae), a in sorted(authors.items(), key=lambda x: -x[1]["n"]):
             shown = ae if self.show or self.allow.value_ok(ae) else redact(ae)
@@ -292,7 +322,8 @@ class Audit:
             self.unchecked.append(f"GitHub 側（{repo}）: gh api が使えなかった。{str(e)[:120]}")
             return None
         public = not meta.get("private", True)
-        state = "すでに公開" if public else "まだ非公開（公開すると見える）"
+        self.public = public
+        state = "すでに公開" if public else "すでに共有（public にすれば誰でも）"
         for k in ("description", "homepage"):
             if meta.get(k):
                 self.scan_line(str(meta[k]), where, f"リポジトリの {k}", state)
@@ -340,14 +371,14 @@ class Audit:
             wf = json.loads(run(["gh", "api", f"repos/{repo}/actions/workflows"], check=True))
             names = [w.get("path", "") for w in wf.get("workflows", [])]
             if names:
-                self.infos.append((where, f"Actions のログは公開リポジトリでは誰でも読める。workflow {len(names)} 本: {', '.join(names)}。env や設定を echo していないか人が見る"))
+                self.infos.append((where, f"Actions のログは public なら誰でも読める。workflow {len(names)} 本: {', '.join(names)}。env や設定を echo していないか人が見る"))
         except Exception:  # noqa: BLE001
             self.unchecked.append("GitHub 側 actions/workflows: 読めなかった")
         return public
 
     # 報告
     def report(self, labels):
-        print(f"== public-audit: {' / '.join(labels)} ==")
+        print(f"== content-audit: {' / '.join(labels)} ==")
         order = {"high": 0, "medium": 1, "info": 2}
         mark = {"high": "!!", "medium": " ?", "info": "--"}
         jp = {"high": "重大", "medium": "注意", "info": "情報"}
@@ -372,14 +403,14 @@ class Audit:
             print(f"  ?? [確かめていない] {u}")
         high = sum(1 for f in fs if f[0] == "high")
         med = sum(1 for f in fs if f[0] == "medium")
-        stop = sum(1 for f in fs if f[0] != "info" and f[5].startswith("まだ"))
-        gone = sum(1 for f in fs if f[0] != "info" and f[5].startswith("すでに"))
+        stop = sum(1 for f in fs if f[0] != "info" and f[5] == STILL)
+        gone = sum(1 for f in fs if f[0] != "info" and f[5] != STILL)
         print(f"\n  重大 {high} / 注意 {med} / 情報 {len(images) + len(self.infos)}")
-        print(f"  まだ止められる {stop} / すでに公開 {gone}（履歴と GitHub 側のもの。消しても fork やキャッシュに残る）")
+        print(f"  まだ止められる {stop} / すでに見える {gone}（履歴と GitHub 側のもの。消しても clone や fork、キャッシュに残る）")
         if not self.names:
-            print("  非公開の名前は検査していない（--names か ~/.config/public-audit/names.txt が無い）")
+            print("  非公開の名前は検査していない（--names か ~/.config/content-audit/names.txt が無い）")
         if high + med == 0:
-            print("  このルールでは検出されなかった。人にしか分からないもの（人名、内部の決定、未公開の計画）は references/checklist.md で見る")
+            print("  このルールでは検出されなかった。人にしか分からないもの（人名、内部の決定、読む人の立場で不快なもの）は references/checklist.md で見る")
         return 1 if high + med else 0
 
 
@@ -398,12 +429,13 @@ def main():
     allow = Allow()
     self_repo = a.github or a.all or self_repo_name()
     names, src = load_names(a.names, self_repo)
-    au = Audit(allow, names, a.show)
+    public = repo_visibility(self_repo) if (a.history or a.all) else None
+    au = Audit(allow, names, a.show, public)
     labels = []
     if a.all:
+        au.github(a.all); labels.append(f"GitHub {a.all}")   # 先に見て、履歴の「すでに見える」の意味を決める
         au.tree(); labels.append("作業ツリー")
         au.history(); labels.append("履歴")
-        au.github(a.all); labels.append(f"GitHub {a.all}")
     elif a.history:
         au.history(); labels.append("履歴（全コミット）")
     elif a.github:

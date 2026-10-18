@@ -1,0 +1,5 @@
+# content-audit の許可。正規表現は検出した値に、path: はファイルに当たる。
+# 検出される例を書いた文書は、その文書が検出される。語の一覧と例の表、試験の仕込みは拾わせない。
+path:.claude/skills/content-audit/scripts/audit.py
+path:.claude/skills/content-audit/scripts/test_audit.py
+path:.claude/skills/content-audit/references/checklist.md
