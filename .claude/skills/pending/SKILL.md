@@ -29,14 +29,14 @@ description: 自律開発が脇に置いた判断待ち（docs/reports/pending.m
 - 答えはユーザーの言葉のまま書く。選択肢の記号だけなら「A」でよい。言い換えない
 
 マージしたあと、紐づけ先のセッションに知らせる。知らせなくても翌朝のサイクルで取り込まれるが、
-すぐ進めたいときは一回きりの Routine で送る（`scheduler`）。
+すぐ進めたいときは1回きりの Routine で送る（`scheduler`）。
 
 ```
 create_trigger(name="判断待ちの答え（<repo>）", run_once_at=<数分後>, persistent_session_id=<long-dev のセッション>,
   prompt="docs/reports/pending.md の判断待ち <番号> に答えが入った。git fetch origin <デフォルトブランチ> して取り込み、その件を進める。")
 ```
 
-送った一回きりの Routine は、実行されたあと一覧に残る。次に見たときに消す（`scheduler` の「掃除する」）。
+送った1回きりの Routine は、実行されたあと一覧に残る。次に見たときに消す（`scheduler` の「掃除する」）。
 
 ## 決まり
 

@@ -13,7 +13,7 @@ description: 日報・週報・月報を書くとき。「日報」「週報」�
 | weekly | 1週間を評価し、来週の計画と価値改善を1つ決める。PR を整理する | 月曜 09:00 JST |
 | monthly | 前月を総括し、今月の目標を週単位に分解する | 1日 09:00 JST |
 
-判断の土台は `long-dev/references/principles.md`。作業量ではなくプロダクトが良くなることが目的。
+判断の土台は `long-dev/references/principles.md`。目的は作業量ではなく、プロダクトを良くすること。
 
 ## 引数
 
