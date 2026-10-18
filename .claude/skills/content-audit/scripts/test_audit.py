@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""audit.py の自己試験。仕込んだ値を拾い、拾ってはいけない例を拾わないことを見る。
+"""audit.py の自己テスト。仕込んだ値を拾い、拾ってはいけない例を拾わないことを見る。
 
   python3 -I .claude/skills/content-audit/scripts/test_audit.py
 """
@@ -9,7 +9,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 AUDIT = HERE / "audit.py"
 
-# 仕込む値は組み立てて作る。この試験ファイル自身が validate.sh や audit.py に拾われないため
+# 仕込む値は組み立てて作る。このテストファイル自身が validate.sh や audit.py に拾われないため
 EMAIL = "taro" + "@" + "example-corp" + ".jp"
 SESS = "session_01" + "A" * 22
 OK1 = "noreply" + "@" + "example.com"                 # 返信不可は拾わない
@@ -38,7 +38,7 @@ class Fixture(unittest.TestCase):
         (d / "ok.md").write_text(textwrap.dedent(f"""\
             連絡は {OK1} か {OK2} へ
             設定は settings.local.json、作業は /home/user/work/ と /home/runner/x/
-            引数は "$1" と ${{2}}、版は 1.2.3、例示の網は 192.0.2.10 と 203.0.113.5
+            引数は "$1" と ${{2}}、版は 1.2.3、例示用のアドレスは 192.0.2.10 と 203.0.113.5
             時刻 0 15 * * 5、日付 2026-10-18、ループバック 127.0.0.1
             接続の例 postgres://user:password@host:5432/dbname
             バカンスの予定、カスタム設定、「まとめて」と言われたら、コードのせいだと疑った
@@ -46,15 +46,15 @@ class Fixture(unittest.TestCase):
         (d / "bad.md").write_text(textwrap.dedent(f"""\
             担当: {EMAIL}
             {URL}
-            起こすのは trig_01{'B' * 22} の方
+            起動するのは trig_01{'B' * 22} の方
             端末の /Users/hanako.sato/src/ と C:\\Users\\Hanako\\Documents\\
             〒100-0001 東京都、電話 03-1234-5678
             社内は 10.20.30.40 と build.corp.internal、外は 8.8.4.4
             資料 https://docs.google.com/document/d/abc/edit と https://x.slack.com/archives/C01/p1
             今月は $12.50、先月は 1,200円、合計 $3,400
             ignored: {EMAIL} content-audit: ignore
-            「お前の作ったものは全部やり直しだ」と言われた。利用者が怒ったので直した
-            レビューで無能と言われた。遅れたのは利用者のせい。初歩的なミスをする素人
+            「お前の作ったものは全部やり直しだ」と言われた。ユーザーが怒ったので直した
+            レビューで無能と言われた。遅れたのはユーザーのせい。初歩的なミスをする素人
             """))
         (d / "svc.pem").write_text("x")
         (d / ".env").write_text("A=1")
@@ -78,7 +78,7 @@ class Fixture(unittest.TestCase):
         code, out = audit(self.d, "--tree")
         self.assertEqual(code, 1, out)
         self.assertNotIn("names.txt（", out)   # 一覧のファイル自身は拾わない
-        for name in ["メールアドレス", "セッションの URL", "セッション・Routine の ID", "利用者名入りのパス",
+        for name in ["メールアドレス", "セッションの URL", "セッション・Routine の ID", "ユーザー名入りのパス",
                      "郵便番号・住所", "電話番号", "私有アドレス", "内部ホスト名", "グローバルアドレス",
                      "非公開サービスへのリンク", "費用の数字", "認証情報のファイル", ".env の実体",
                      "データの持ち出し", "画像・動画・PDF",

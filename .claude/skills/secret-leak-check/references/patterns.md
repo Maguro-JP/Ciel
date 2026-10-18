@@ -38,7 +38,7 @@
 変数名が `secret` `token` `password` `api_key` `credential` 等を含み、
 値が16文字以上・エントロピー 3.6 以上のとき `medium` で報告する。
 
-形式の決まっていない自社トークンや DB パスワードを拾うための網。
+形式の決まっていない自社トークンや DB パスワードを拾うためのルール。
 そのぶん誤検知も出るので、必ず1件ずつ確認する。
 
 ## 誤検知の抑止
@@ -54,7 +54,7 @@
    tests/fixtures/*
    docs/examples/**
    ```
-3. **既定の除外** — `.example` / `.sample` 付きファイル、ロックファイル
+3. **デフォルトの除外** — `.example` / `.sample` 付きファイル、ロックファイル
    （`package-lock.json` `go.sum` 等）、バイナリ、`node_modules` `vendor`
    `dist` `build` `corpus` などのディレクトリ
 4. **プレースホルダ判定** — `YOUR_…` `xxx` `<token>` `${VAR}` `{{ }}`
