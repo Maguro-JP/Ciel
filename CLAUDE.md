@@ -12,6 +12,11 @@
   - コード、識別子、ファイル名、コマンド、設定のキー
   - ツールやサービスの名前、エラーメッセージの原文
   - 引用したドキュメントの原文
+- 技術用語は、開発者の間で通る語をそのまま使う（ブランチ、マージ、コミット、プロキシ、コンテナ、
+  デプロイ、テスト、スキャン、フック、ゲート、ユーザー）。自分で訳語を作らない。
+  「枝」「門」「容器」「走査」のような訳語は、読む人には伝わらない。 <!-- ja-proofread: ignore -->
+  対応表は `.claude/skills/ja-proofread/references/glossary.md`。
+- 1行でも、助詞のある文として読める日本語で書く。電報のような羅列や、矢印だけでつないだ書き方にしない。
 
 ## 応答の書き方
 
@@ -30,7 +35,7 @@
 - スキルを足す・直したら `./scripts/validate.sh` を通す。
 - 秘密情報が入っていないか `.claude/skills/secret-leak-check/scripts/scan.py --diff` で見る。
 - 人に見せてよいものか `.claude/skills/content-audit/scripts/audit.py --diff` で見る。名前、メール、ID、費用、内部の場所、不快な表現を拾う。
-- 文章を書いたら `.claude/skills/ja-proofread/scripts/proofread.py --diff` を通す。字の混入と英語の出だしは直してからコミットする。
+- 文章を書いたら `.claude/skills/ja-proofread/scripts/proofread.py --diff` を通す。文字の混入と英語の出だしは直してからコミットする。
 - public なので、非公開リポジトリの名前、メールアドレス、セッションや Routine の ID、費用の数字を書かない。例や記録は `<owner>/<repo>`「あるリポジトリ」のように伏せる。`validate.sh` がメールと ID を検査する。
 - 詳しい設計方針は [docs/GUIDELINES.md](docs/GUIDELINES.md)。
 

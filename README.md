@@ -84,9 +84,9 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`skill-audit`](.claude/skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化」の3観点で診断する |
 | [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する。規約を読んで選択肢を絞る |
 | [`solo-pr-flow`](.claude/skills/solo-pr-flow/) | 自分のリポジトリの PR を、尋ねずにマージから後片付けまで通す。止まる条件は少なく、止まるときは条件名を挙げる |
-| [`secret-leak-check`](.claude/skills/secret-leak-check/) | 機密情報の混入を走査し、漏洩時の対応順序まで案内する |
+| [`secret-leak-check`](.claude/skills/secret-leak-check/) | 機密情報の混入をスキャンし、漏洩時の対応順序まで案内する |
 | [`content-audit`](.claude/skills/content-audit/) | 人に見られる前に中身を精査する。名前・連絡先・ID・費用・内部の場所・履歴の著者・Issue や PR の本文と、読む人が不快になる表現。private でも使う。鍵は secret-leak-check |
-| [`ja-proofread`](.claude/skills/ja-proofread/) | 日本語の精度を上げる。外国語の字の混入、翻訳調、ら抜き、表記ゆれ、長い文を機械で拾い、残りは読み直しの観点で直す |
+| [`ja-proofread`](.claude/skills/ja-proofread/) | 日本語の精度を上げる。外国語の文字の混入、翻訳調、ら抜き、表記ゆれ、長い文を機械で拾い、残りは読み直しの観点で直す |
 | [`auto-dev`](.claude/skills/auto-dev/) | 自律的に開発を進める。時間制限と優先指示を受け取り、止まる条件を持つ |
 | [`ci-triage`](.claude/skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
 
