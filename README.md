@@ -85,6 +85,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する。規約を読んで選択肢を絞る |
 | [`solo-pr-flow`](.claude/skills/solo-pr-flow/) | 自分のリポジトリの PR を、尋ねずにマージから後片付けまで通す。止まる条件は少なく、止まるときは条件名を挙げる |
 | [`secret-leak-check`](.claude/skills/secret-leak-check/) | 機密情報の混入を走査し、漏洩時の対応順序まで案内する |
+| [`public-audit`](.claude/skills/public-audit/) | 公開リポジトリに出してよいものかを精査する。名前・連絡先・ID・費用・内部の場所・履歴の著者・Issue や PR の本文まで。鍵は secret-leak-check |
 | [`auto-dev`](.claude/skills/auto-dev/) | 自律的に開発を進める。時間制限と優先指示を受け取り、止まる条件を持つ |
 | [`ci-triage`](.claude/skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
 

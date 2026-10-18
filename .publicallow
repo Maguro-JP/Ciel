@@ -1,0 +1,3 @@
+# public-audit の許可。正規表現は検出した値に、path: はファイルに当たる。
+# 試験の仕込み（偽の電話番号や住所）は拾わせない。
+path:.claude/skills/public-audit/scripts/test_audit.py

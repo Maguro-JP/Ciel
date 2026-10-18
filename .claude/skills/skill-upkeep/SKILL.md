@@ -17,6 +17,7 @@ description: 走っているセッションを観察して、使われている�
 - `list_triggers` で Routine を見る。起きたのに成果が無いもの、一回きりのまま残っているもの
 - 各リポジトリ（Routine の結びつけ先）で、この1週間の PR の題と、`.claude/skills/lessons/LESSONS.md` に増えた項目、`docs/reports/pending.md` の答え待ちを読む
 - 利用者がこの1週間に直させたこと（Ciel の git log と lessons）
+- Ciel に `public-audit` の `--all` を当て、公開してはいけないものが増えていないか見る。見つかったら伏せる PR を先に出す
 
 止まっているセッション（IDLE で次の起床が無い）があれば、`patrol` の判定に従って一回きりの Routine で起こす。
 
