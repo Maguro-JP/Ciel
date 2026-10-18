@@ -6,13 +6,14 @@
   proofread.py --tree               追跡している .md .txt .rst
   proofread.py --stdin              標準入力の文（会話の返事、コミットメッセージ、PR の本文）
   --strict                          注意でも終了コード 1 にする
+  --no-textlint                     textlint を使わない（入っていれば自動で使う。scripts/setup-textlint.sh）
 
 重大: 外国語の字の混入、助詞の重複、英語の出だし。見た目が壊れて見えるもの。終了コード 1
 注意: ら抜き、二重敬語、翻訳調、勝手な訳語、句読点、長い文、文体の混在。読む人が引っかかるもの
 表記: 開く漢字、送り仮名、ゆれ。まとめて数える。決まりは references/rules.md と、そのリポジトリの CLAUDE.md
 コードブロック、表の行、`コード`、URL は見ない。行末に `ja-proofread: ignore` があればその行も見ない。
 """
-import argparse, re, subprocess, sys
+import argparse, json, os, re, subprocess, sys, tempfile
 from collections import defaultdict
 from pathlib import Path
 
@@ -42,6 +43,12 @@ RULES = [
     ("翻訳調",           r"という(?:こと|もの)(?:が|を|は|に|で)", "medium", "「という〜」を削る"),
     ("翻訳調",           r"(?:に|と)(?:関して|関する|おいて|おける)(?![ぁ-ん])", "medium", "「で」「の」に"),
     ("翻訳調",           r"(?:非常に|極めて|大変)(?=[ぁ-ん一-龥])", "medium", "数字か事実に置き換えるか、削る"),
+    ("翻訳調",           r"を可能に(?:し|する|なり)|することが可能(?:です|だ|である|にな)", "medium", "「〜できる」「〜できるようにする」に"),
+    ("翻訳調",           r"する必要があ(?:る|り)|ことが重要(?:です|だ|である)", "medium", "「〜する」「〜してください」に。理由は1文"),
+    ("翻訳調",           r"と(?:思われ|考えられ)(?:ます|る)|ように見え(?:ます|る)", "medium", "事実か推測かを書く。推測なら「確かめていない」"),
+    ("翻訳調",           r"(?:することを|することが|ことを|ことが)(?:推奨|お勧め|おすすめ)", "medium", "「〜してください」に"),
+    ("翻訳調",           r"(?:基本的に|原則として)(?=[、,])", "medium", "例外を書かないなら削る"),
+    ("矢印でつないだ羅列", r"→[^→\n]*→", "medium", "文にする。「AをBに変えて、Cになった」（references/translationese.md）"),
 ]
 
 # 勝手な訳語。開発者の間で通る語に戻す。対応表は references/glossary.md。(正規表現, 使う語)
@@ -97,6 +104,41 @@ def run(cmd):
     return subprocess.run(cmd, capture_output=True, text=True, errors="replace").stdout
 
 
+# ---- textlint（入っていれば使う） ---------------------------------------------
+# 形態素解析で見るので、ら抜き・助詞の重複・冗長表現・弱い表現を正規表現より正しく拾う。
+# 置き場所はリポジトリの外（scripts/setup-textlint.sh）。無ければ黙って正規表現だけで動く。
+def textlint_bin():
+    d = Path(os.environ.get("CIEL_TEXTLINT_DIR") or Path.home() / ".cache/ciel-textlint")
+    b = d / "node_modules/.bin/textlint"
+    return (b, d / ".textlintrc.json") if b.exists() else (None, None)
+
+
+def run_textlint(files, only_lines=None):
+    """files: [(表示名, 実体のパス)]。only_lines: {表示名: {行番号}} で差分の行だけに絞る。
+    返り値は (sev, rule, loc, hit, fix) の列。"""
+    b, cfg = textlint_bin()
+    if not b:
+        return [], False
+    out = []
+    try:
+        r = subprocess.run([str(b), "--config", str(cfg), "--format", "json", *[str(p) for _, p in files]],
+                           capture_output=True, text=True, errors="replace", timeout=180)
+        data = json.loads(r.stdout or "[]")
+    except (subprocess.TimeoutExpired, json.JSONDecodeError, OSError):
+        return [], True
+    names = {str(p): n for n, p in files}
+    for item in data:
+        name = names.get(item.get("filePath", ""), item.get("filePath", ""))
+        for m in item.get("messages", []):
+            ln = m.get("line", 0)
+            if only_lines is not None and ln not in only_lines.get(name, set()):
+                continue
+            rule = (m.get("ruleId") or "").split("/")[-1]
+            text = (m.get("message") or "").splitlines()[0][:60]
+            out.append(("medium", f"textlint {rule}", f"{name}:{ln}", text, "textlint の指摘"))
+    return out, True
+
+
 class Proof:
     def __init__(self):
         self.findings = []            # (sev, name, loc, hit, fix)
@@ -106,6 +148,7 @@ class Proof:
         self.parens = {"半角": [], "全角": []}
         self.tone = defaultdict(lambda: {"敬体": 0, "常体": 0})
         self.lines = 0
+        self.textlint = False
 
     # 1文書
     def document(self, name, text):
@@ -162,6 +205,15 @@ class Proof:
         if not measure:
             return
         doc = loc.rsplit(":", 1)[0]
+        sents = [x.strip() for x in re.split(r"(?<=[。！？])", line) if x.strip()]
+        # 体言止めが3つ続く行（「検査は通過。マージは完了。次は配布。」）は電報に見える
+        nounstop = [x for x in sents if re.search(f"[一-龥ァ-ヶー][。！？]$", x) and not re.search(r"(?:する|した|いる|ある|です|ます|ない|れる|せる|った|んだ)[。！？]$", x)]
+        if len(sents) >= 3 and len(nounstop) >= 3:
+            self.findings.append(("medium", "体言止めの連発", loc, "。".join(x[:8] for x in nounstop[:3]) + "…", "述語のある文にする（references/translationese.md）"))
+        # 同じ文末が3つ続く（「〜ました。〜ました。〜ました。」）
+        ends = [x[-3:] for x in sents if len(x) >= 3]
+        if len(ends) >= 3 and any(ends[i] == ends[i + 1] == ends[i + 2] for i in range(len(ends) - 2)):
+            self.findings.append(("medium", "文末の繰り返し", loc, "…" + ends[0], "文をつなぐか、言い方を変える"))
         for sent in re.split(r"(?<=[。！？])", line):
             s = sent.strip()
             if not s:
@@ -212,6 +264,8 @@ class Proof:
         high = sum(1 for f in self.findings if f[0] == "high")
         med = sum(1 for f in self.findings if f[0] == "medium")
         print(f"\n  重大 {high} / 注意 {med} / 表記 {n_style}（{self.lines} 行）")
+        if not self.textlint:
+            print("  textlint は入っていない（scripts/setup-textlint.sh で入る。ら抜き・助詞の重複・冗長表現を形態素解析で見る）")
         if high + med + n_style == 0:
             print("  このルールでは引っかからなかった。意味と流れは references/rules.md の観点で読み直す")
         return 1 if high or (strict and (med or n_style)) else 0
@@ -264,18 +318,28 @@ def main():
     ap.add_argument("--tree", action="store_true")
     ap.add_argument("--stdin", action="store_true")
     ap.add_argument("--strict", action="store_true")
+    ap.add_argument("--no-textlint", action="store_true")
     a = ap.parse_args()
     p = Proof()
+    tl_files, tl_lines = [], None
     if a.stdin:
-        p.document("入力", sys.stdin.read())
+        text = sys.stdin.read()
+        p.document("入力", text)
         label = "標準入力"
+        tmp = Path(tempfile.mkdtemp()) / "input.md"
+        tmp.write_text(text)
+        tl_files = [("入力", tmp)]
     elif a.diff is not None:
+        tl_lines = {}
         for path, lines in iter_diff(a.diff or None).items():
             ctx = line_context(path)
+            if Path(path).exists():
+                tl_files.append((path, Path(path)))
             for ln, text in lines:
                 kind = ctx.get(ln)
                 if kind == "skip":
                     continue
+                tl_lines.setdefault(path, set()).add(ln)
                 p.lines += 1
                 p.line(URL.sub(" ", CODE_SPAN.sub(" ", text)), f"{path}:{ln}", measure=kind != "front")
         label = f"差分 {a.diff or 'HEAD'}"
@@ -286,7 +350,11 @@ def main():
                 p.document(f, Path(f).read_text(errors="replace"))
             except (OSError, IsADirectoryError):
                 continue
+            tl_files.append((f, Path(f)))
         label = f"{len(files)} ファイル"
+    if tl_files and not a.no_textlint:
+        found, p.textlint = run_textlint(tl_files, tl_lines)
+        p.findings.extend(found)
     return p.report(label, a.strict)
 
 
