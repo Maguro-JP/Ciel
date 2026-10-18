@@ -95,7 +95,7 @@
 
 ## 会話の返事の形
 
-マーク（★ ↩ ❕ ❔）の後ろは、です・ます の文で書く。1行でも文にする。
+マーク（★ ↩ ❕ ❔）の後ろは、です・ますの文で書く。1行でも文にする。
 
 | 前 | 後 |
 |---|---|
@@ -119,5 +119,5 @@
 | This skill enables parallel development by splitting sessions per topic. | このスキルはトピックごとにセッションを分けることによって並列開発を可能にします。 | トピックごとにセッションを分けるので、並列で開発できます。 |
 | Make sure to run the tests before pushing. | push する前にテストを実行することを確認してください。 | push する前に、テストを走らせてください。 |
 | It is recommended that you rotate the key first. | 最初に鍵をローテートすることが推奨されます。 | 先に鍵をローテートしてください。 |
-| The check failed because the file was not found. | ファイルが見つからなかったため、チェックは失敗しました。 | ファイルが無かったので、チェックが落ちました。 |
+| The check failed because the file was not found. | ファイルが見つからなかったため、チェックは失敗しました。 | ファイルがなかったので、チェックが落ちました。 |
 | You might want to consider adding a test. | テストを追加することを検討したいかもしれません。 | テストを足すとよいです。 |
