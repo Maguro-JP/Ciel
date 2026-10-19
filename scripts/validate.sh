@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Ciel skill validator — 構造チェックと秘密情報の簡易スキャン
 set -uo pipefail
+# ${#var} は locale が C だとバイト数になり、日本語の description が3倍に数えられる。文字数で数える
+if locale -a 2>/dev/null | grep -qiE '^C\.utf-?8$'; then export LC_ALL=C.UTF-8; fi
 
 cd "$(dirname "$0")/.."
 
@@ -63,6 +65,9 @@ for dir in "${dirs[@]}"; do
 
   if [ -n "$fm_desc" ] && [ "${#fm_desc}" -lt 40 ]; then
     warn "$name: description が短い（${#fm_desc}文字）。発動条件を具体的に書く"
+  fi
+  if [ -n "$fm_desc" ] && [ "${#fm_desc}" -gt 300 ]; then
+    warn "$name: description が長い（${#fm_desc}文字）。全スキル分が毎ターン読まれるので、発動の語だけに絞る（token-efficiency）"
   fi
 
   lines=$(wc -l < "$file")

@@ -31,7 +31,7 @@ RULES = [
     ("ハングルの混入",   r"[가-힯ᄀ-ᇿ㄰-㆏]+", "high", "日本語の字に"),
     ("中国語の字の混入", f"[{SIMPLIFIED}]+", "high", "日本語の字に（簡体字）"),
     ("旧字体・繁体字",   f"[{TRADITIONAL}]+", "medium", "日本語の字に。固有名詞なら残す"),
-    ("助詞の重複",       r"(?<!も)のの(?![ぁ-ん])|をを|にに(?![ぁ-ん])|がが|でで(?![ぁ-ん])", "high", "1つにする"),
+    ("助詞の重複",       r"(?<!も)のの(?![ぁ-ん])|をを|にに(?![ぁ-ん])|がが|(?<!ま)でで(?![ぁ-ん])", "high", "1つにする"),
     ("英語の出だし",     r"^\s*(?:Now|Let me|Let's|First|Sure|Okay|OK|Here(?:'s| is)|I'll|I've|I am|Great|Certainly|Alright)\b", "high", "日本語で書き出す"),
     ("強調の記号",       r"\*\*[^*\n]+\*\*", "medium", "記号で強調しない。見出しか文で示す"),
     ("全角の英数字",     r"[Ａ-Ｚａ-ｚ０-９]+", "medium", "半角に"),
@@ -293,7 +293,7 @@ class Proof:
             print(f"  -- [AI っぽさ] {name}: ★ {star}" + (f"（{detail}）" if detail else "") + ("。" + "。".join(flags) if flags else "")
                   + (f"。重なった段落: {', '.join(dense)}" if dense else "") + "。natural-japanese-writing の check.py")
         if not self.textlint:
-            print("  textlint は入っていない（scripts/setup-textlint.sh で入る。ら抜き・助詞の重複・冗長表現を形態素解析で見る）")
+            print("  textlint は入っていない（scripts/setup-textlint.sh で入る。形態素解析の規則が増える）")
         if high + med + n_style == 0:
             print("  このルールでは引っかからなかった。意味と流れは references/rules.md の観点で読み直す")
         return 1 if high or (strict and (med or n_style)) else 0
