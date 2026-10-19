@@ -87,6 +87,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`secret-leak-check`](.claude/skills/secret-leak-check/) | 機密情報の混入をスキャンし、漏洩時の対応順序まで案内する |
 | [`content-audit`](.claude/skills/content-audit/) | 人に見られる前に中身を精査する。名前・連絡先・ID・費用・内部の場所・履歴の著者・Issue や PR の本文と、読む人が不快になる表現。private でも使う。鍵は secret-leak-check |
 | [`ja-proofread`](.claude/skills/ja-proofread/) | 日本語の精度を上げる。外国語の文字の混入、翻訳調、ら抜き、表記ゆれ、長い文を機械で拾い、残りは読み直しの観点で直す |
+| [`token-efficiency`](.claude/skills/token-efficiency/) | トークンと文脈を節約する。毎ターンの決まりをフックで差し込み、読み直しと再実行を見つけ、リポジトリが常時読ませる量を測る |
 | [`auto-dev`](.claude/skills/auto-dev/) | 自律的に開発を進める。時間制限と優先指示を受け取り、止まる条件を持つ |
 | [`ci-triage`](.claude/skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
 

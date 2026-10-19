@@ -30,6 +30,15 @@
             "command": ".claude/hooks/skill-nudge.sh"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/skills/token-efficiency/hooks/efficiency_core.py",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "Stop": [
@@ -46,6 +55,15 @@
             "timeout": 15
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/skills/token-efficiency/hooks/session_report.py",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -55,6 +73,16 @@
           {
             "type": "command",
             "command": ".claude/hooks/pr-nudge.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Edit|Write|MultiEdit|NotebookEdit|Grep|Glob|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/skills/token-efficiency/hooks/trajectory_guard.py",
             "timeout": 10
           }
         ]
