@@ -75,6 +75,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 |---|---|
 | [`work-style`](.claude/skills/work-style/) | 仕事の進め方。確認してから動く、一つずつ、動かしてから完了と言う、確かめていないことは言わない |
 | [`verify-before-done`](.claude/skills/verify-before-done/) | 完了前の検証。動かした出力を貼る、本番の前に1件で試す、予約と結果を区別する |
+| [`follow-instructions`](.claude/skills/follow-instructions/) | 指示に従う。ユーザーの一言を、スキル・チェック・自分の判断より上に置く。訂正は1文で認めて言われた通りに直し、代案は直したあとに1行だけ。フックがセッション内の指示を毎ターン差し込む |
 | [`repo-bootstrap`](.claude/skills/repo-bootstrap/) | リポジトリ初期設定。CLAUDE.md、フック入り settings.json、検査とテストのフック、スキル、最小 CI を一度で置く |
 | [`lessons`](.claude/skills/lessons/) | 失敗の記録。場面・起きたこと・判定の誤り・次から の4行で残し、開始時にフックが読み直す |
 | [`long-dev`](.claude/skills/long-dev/) | 終わりのない自律開発。プロダクトを良くする原則に従い、auto-dev を期限無しで回し続ける |
