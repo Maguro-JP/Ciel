@@ -80,7 +80,17 @@ for dir in "${dirs[@]}"; do
   done
 done
 
-# ---- 秘密情報の簡易スキャン ----
+# ---- フックの煙テスト ----
+# フックは全リポジトリに配られ、毎ターン動く。1本壊れると全部のセッションが止まるので、無害な入力で1回ずつ動かす。
+echo
+echo "== フック =="
+for s in .claude/settings.json .claude/skills/repo-bootstrap/templates/settings.json; do
+  [ -f "$s" ] || continue
+  out="$(python3 scripts/hooks-smoke.py "$s" 2>&1)"; code=$?
+  printf '%s\n' "$out" | grep -E '^  NG' || true
+  if [ "$code" -ne 0 ]; then err "$s のフックが無害な入力で失敗する（python3 scripts/hooks-smoke.py $s で見る）"; else echo "  $s: $(printf '%s\n' "$out" | tail -1)"; fi
+done
+
 echo
 echo "== 秘密情報 =="
 patterns=(
