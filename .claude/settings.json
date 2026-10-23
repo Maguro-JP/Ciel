@@ -91,6 +91,15 @@
             "timeout": 15
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/skills/verify-before-done/hooks/done_check.py",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "PostToolUse": [
