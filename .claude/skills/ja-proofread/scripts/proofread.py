@@ -217,7 +217,8 @@ class Proof:
                 self.style[fix].append(f"{loc} {m.group(0)}")
         for group in VARIANTS:
             for form in group:
-                if form in line:
+                # 「ユーザ」は「ユーザー」の一部でもあるので、長音が続くものは短い形に数えない
+                if re.search(re.escape(form) + "(?!ー)", line):
                     self.variants[group[0]][form].append(loc)
         if re.search(f"[{JA}][A-Za-z0-9]", line):
             self.spacing["空けない"].append(loc)
