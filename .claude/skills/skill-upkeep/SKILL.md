@@ -20,6 +20,7 @@ description: 走っているセッションを観察して、使われている�
 - Ciel に `content-audit` の `--all` と `ja-proofread` の `--tree` を当て、見せてはいけないものと壊れた日本語が増えていないか見る。見つかったら直す PR を先に出す
 
 止まっているセッション（IDLE で次の実行がない）があれば、`patrol` の判定に従って1回きりの Routine で起動する。
+週の上限（`rate_limit_info.status` が `rejected`）で止まったものは起こさない。枠の使い道はユーザーが決める（patrol）。
 
 ### 2. 教訓の収穫
 
