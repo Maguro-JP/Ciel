@@ -63,7 +63,7 @@
 ## 変更する前に
 
 - 作業を引き受けたら、まず `.claude/skills/work-style/SKILL.md` を読む。
-- スキルを足す・直したら `./scripts/validate.sh` を通す。
+- スキルやフックを足す・直したら `./scripts/validate.sh` を通す。フックは無害な入力で1回ずつ動かされる。
 - 秘密情報が入っていないか `.claude/skills/secret-leak-check/scripts/scan.py --diff` で見る。
 - 人に見せてよいものか `.claude/skills/content-audit/scripts/audit.py --diff` で見る。名前、メール、ID、費用、内部の場所、不快な表現を拾う。
 - 文章を書いたら `.claude/skills/ja-proofread/scripts/proofread.py --diff` を通す。文字の混入と英語の出だしは直してからコミットする。
