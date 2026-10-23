@@ -139,6 +139,8 @@ git log --oneline -10
 - main を取り込む（`git fetch origin && git merge origin/main`）。feedback-session など別のセッションの発見は main 経由でしか届かない
 - 前のサイクルのあとで main に入った `docs/knowledge/` と `docs/reports/pending.md` の差分。`git log -p <前のサイクルのコミット>..origin/main -- docs/knowledge docs/reports/pending.md` で読み、そのサイクルの作業を選ぶ
 - ユーザーからの指示が届いていれば、それを最優先にする。判断待ちに回さない（work-style「人が決める」）
+- `docs/reports/deliverables.md`（成果物の表）。無ければ finish-first に従って作る（README の未着手、issue、優先指示から1〜3行、完成条件は仮）。
+  あれば先頭の未完成の行が今の成果物で、その「残り」がこのサイクルの作業の候補
 - 直近のコミットで何をしていたか（前のサイクルの続きがあるか）
 - README と、そこに書かれた未着手の項目
 - `TODO` `FIXME` `HACK` のコメント
