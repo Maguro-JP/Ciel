@@ -36,7 +36,8 @@ description: 日報・週報・月報を書くとき。「日報」「週報」�
 3. 今日の優先を1〜3個決めて書く。開発はここではしない。続けて実行される `auto-dev` がこれを読む
 4. 分かったことがあれば `docs/knowledge/` に足す
 5. `docs/reports/pending.md` の判断待ちを読み、答えの付いていないものを日報に載せる
-6. 日報を書く
+6. `docs/reports/deliverables.md` があれば、先頭の未完成の成果物と「残り」を日報に1行載せる（finish-first）
+7. 日報を書く
 
 報告の形。
 
