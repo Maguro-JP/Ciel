@@ -104,9 +104,9 @@ def main() -> int:
     bare = claim and not evidence
     corrected = bool(CORRECTION.search(user or ""))
     # 引用（「…」）とコード（`…`）の中の語は、反論ではなく説明なので外してから見る
-    def bare(l: str) -> str:
+    def strip_quotes(l: str) -> str:
         return re.sub(r"「[^」]*」|`[^`]*`", "", l)
-    pushback = [l for l in lines if PUSHBACK.search(bare(l)) and "権限" not in l] if corrected else []
+    pushback = [l for l in lines if PUSHBACK.search(strip_quotes(l)) and "権限" not in l] if corrected else []
     record(d.get("session_id", ""), {"lines": len(lines), "questions": questions, "outside_marks": outside,
                                      "claim": claim, "claim_without_evidence": bare, "corrected": corrected, "pushback": len(pushback)})
     reasons = []
