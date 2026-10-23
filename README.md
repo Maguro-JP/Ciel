@@ -77,6 +77,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`verify-before-done`](.claude/skills/verify-before-done/) | 完了前の検証。動かした出力を貼る、本番の前に1件で試す、予約と結果を区別する。Stop フックが、根拠の無い完了の言い方と 2 つ以上の ❔ を差し戻す |
 | [`follow-instructions`](.claude/skills/follow-instructions/) | 指示に従う。ユーザーの一言を、スキル・チェック・自分の判断より上に置く。訂正は1文で認めて言われた通りに直し、代案は直したあとに1行だけ。フックがセッション内の指示を毎ターン差し込む |
 | [`finish-first`](.claude/skills/finish-first/) | 成果物を1つずつ完成させる。完成条件を先に書き、未完成があるうちは新しいものを始めず、戻せる判断はデフォルトで進め、完成は動かした出力で判定する。フックが今の成果物を毎ターン差し込む |
+| [`desktop-app`](.claude/skills/desktop-app/) | アプリはウィンドウで開き、機能は画面に置く。CLI ではなく GUI、ブラウザ起動ではなくアプリケーション。包み方の選び方と完成条件の書き方。フックがブラウザ起動と CLI の入口を知らせる |
 | [`repo-bootstrap`](.claude/skills/repo-bootstrap/) | リポジトリ初期設定。CLAUDE.md、フック入り settings.json、検査とテストのフック、スキル、最小 CI を一度で置く |
 | [`lessons`](.claude/skills/lessons/) | 失敗の記録。場面・起きたこと・判定の誤り・次から の4行で残し、開始時にフックが読み直す |
 | [`long-dev`](.claude/skills/long-dev/) | 終わりのない自律開発。プロダクトを良くする原則に従い、auto-dev を期限無しで回し続ける |

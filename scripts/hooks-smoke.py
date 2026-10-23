@@ -5,7 +5,7 @@
 止まるか、毎ターン誤った差し戻しを受ける。配る前にここで捕まえる。
 無害な入力（普通の依頼、根拠のある返答、マーカー無し）で exit 0 以外か、Traceback が出たら誤り。
 
-使い方: python3 scripts/hooks-smoke.py [settings.json のパス]（既定は .claude/settings.json）
+使い方: python3 scripts/hooks-smoke.py [--root <リポジトリ>] [settings.json のパス]（既定は .claude/settings.json）
 """
 
 import json
@@ -38,7 +38,11 @@ def inputs(tmp: Path):
 
 
 def main() -> int:
-    settings = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / ".claude" / "settings.json"
+    global ROOT
+    args = [a for a in sys.argv[1:]]
+    if "--root" in args:  # 別のリポジトリ（配布先）のフックを、そのリポジトリを作業場所にして動かす
+        i = args.index("--root"); ROOT = Path(args[i + 1]).resolve(); del args[i:i + 2]
+    settings = Path(args[0]) if args else ROOT / ".claude" / "settings.json"
     hooks = json.loads(settings.read_text(encoding="utf-8")).get("hooks", {})
     bad = 0
     with tempfile.TemporaryDirectory() as d:

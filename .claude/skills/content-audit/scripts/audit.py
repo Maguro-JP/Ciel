@@ -136,6 +136,9 @@ class Allow:
         q = Path(path)
         if any(part in SKIP_DIRS for part in q.parts) or q.name in SKIP_NAMES:
             return True
+        # このスキル自身（検出語の一覧とテストの材料）は、配った先でも見ない
+        if "content-audit" in q.parts and ".claude" in q.parts:
+            return True
         return any(q.match(g) for g in self.paths)
 
 
