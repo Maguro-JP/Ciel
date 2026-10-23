@@ -13,6 +13,7 @@
 | [B16B1RD/bb-doc-skills](https://github.com/B16B1RD/bb-doc-skills) | MIT, Copyright (c) 2026 B16B1RD | `ja-proofread/references/rules.md` | PR 本文の 4 つの役割（`tech-write/references/pr.md`） | 要点だけ |
 | [wshuyi/skill-publisher-skill](https://github.com/wshuyi/skill-publisher-skill) | MIT, Copyright (c) 2024 wshuyi | `content-audit` | 比べただけ。取り込み無し | `localhost:<port>` の検出は候補に残す |
 | [denfry/claude-skills](https://github.com/denfry/claude-skills) `token-efficiency` | MIT, Copyright (c) 2026 denfry | `token-efficiency` | 3層の設計、CORE の決まり、フック3本（`hooks/`）、7つの節の骨組み | 文言を日本語にし、CORE に Ciel の会話の形と MCP の一覧の決まりを足した。`context_budget.py` と `install.py` は取り込まず、settings.json に直接書く |
+| [scottspence.com「how to make claude code follow hook instructions」](https://scottspence.com/posts/how-to-make-claude-code-follow-hook-instructions) | 記事（参考のみ） | `follow-instructions` | フックで差し込んだ決まりが長い会話で無視されること、CLAUDE.md に「フックの指示は必ず守る」と書くと戻るという観察 | コードは無し。同じ目的の公開スキルは見つからなかった（2026-10-24） |
 | [valorisa/Claude-Skills](https://github.com/valorisa/Claude-Skills) `token-optimization` | MIT, Copyright (c) 2026 valorisa | `token-efficiency` | 消費の4つの出どころ、途中で道具を足さない | 要点だけ |
 | [obra/superpowers](https://github.com/obra/superpowers) `subagent-driven-development` | MIT, Copyright (c) 2025 Jesse Vincent | `token-efficiency` | 文脈を渡さないサブエージェントの考え方 | 要点だけ |
 | [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) | Apache-2.0 | 無し | 参考だけ。出力を電報のように縮める方式は「助詞のある文」の決まりと合わない | 取り込み無し |
