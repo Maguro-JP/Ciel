@@ -50,6 +50,7 @@ description: いつこのスキルを使うか。トリガー条件を具体的�
 使い方とスキル一覧は [docs/USAGE.md](docs/USAGE.md)。
 公開スキル271本を実測した観察記録は [docs/OBSERVATIONS.md](docs/OBSERVATIONS.md)。
 権限と許可の層（何が止めるか、どう直すか）は [docs/PERMISSIONS.md](docs/PERMISSIONS.md)。
+指摘された振る舞いと、それを止める仕組みの対応は [docs/BEHAVIOR.md](docs/BEHAVIOR.md)。
 
 ## 使い方
 

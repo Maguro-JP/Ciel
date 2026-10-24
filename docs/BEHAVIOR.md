@@ -1,0 +1,26 @@
+# 振る舞いの矯正表
+
+ユーザーから指摘された振る舞いと、それを止める仕組み。
+言葉（CLAUDE.md やスキル）だけでは長い会話で戻るので、戻ったものはフックにする。
+週報（`skill-upkeep`）が「数で見るもの」の列を読み、減っていなければ仕組みを直す。
+
+| 指摘された振る舞い | 止める仕組み | どこで効くか | 数で見るもの |
+|---|---|---|---|
+| 指示を優先しない、言うことを聞かない | `follow-instructions` の優先順位。`directives.py` がセッション内の指示を毎ターン差し込む。CLAUDE.md の「指示の優先順位」 | 毎ターン | 直させた回数（訂正の数） |
+| 勝手に考える、自分の案を混ぜる | `follow-instructions` の「勝手に考えない」。`prompt-from-context` が対象と形を前の会話から補う | 依頼の直後 | 聞き返し（❔）の数 |
+| 訂正されても改めない、言い返す | `follow-instructions` の「訂正を受けたとき」と「反抗の禁止」。`done_check.py` が訂正への返事に反論の形があれば差し戻す | 返答の最後 | 反論の数 |
+| 反抗する、拒む、AI の判断で止める | `follow-instructions` の「反抗の禁止」の表。CLAUDE.md の「反抗を禁止する」「AI の基準で止めない」 | 毎ターン | 反論の数 |
+| 自分に権限を付与する | `no_self_grant.py`（PreToolUse）。`docs/PERMISSIONS.md` | 書き込みの前 | 止めた回数 |
+| 成果物が何か月も完成しない | `finish-first`。`focus.py` が今の成果物を毎ターン差し込む。`auto-dev` の判断表の 4 | 毎ターン | 完成した成果物の数 |
+| 手を抜く、一部だけやる | `directives.py` が指示の数を数えて差し込む。`done_check.py` が、指示が 2 つ以上あるのに ★ も ↩ も無い返事を差し戻す | 依頼の直後と返答の最後 | 指示の数と ★↩ の数 |
+| 根拠無く「できました」と言う | `done_check.py` が根拠の無い完了を差し戻す。`verify-before-done` | 返答の最後 | 根拠の無い完了の数 |
+| できないと言う | `follow-instructions` の「できないと言う前に」（別のツールと経路を1回ずつ）。`docs/PERMISSIONS.md` の書き方 | 止まったとき | ― |
+| 無駄が多い、通知の洪水、長い返事 | `token-efficiency`。4 種類のマーク。通知だけの返事は1行。`solo-pr-flow` の購読解除はマージのあと | 毎ターン | 会話の形から外れた数 |
+| 予定を書く（「〜します」） | `work-style` の「会話に出すもの」。`done_check.py` が数える | 返答の最後 | 予定の行の数 |
+| 聞き返す、判断待ちに回す | `prompt-from-context`、`finish-first`。`done_check.py` が ❔ 2 つ以上を差し戻す | 返答の最後 | ❔ の数 |
+| 短い一言を文字どおりに読む | `prompt-from-context`。`brief.py` が直前の文脈を差し込む | 短い一言のとき | 短い一言の数と聞き返し |
+| 日本語が崩れる、訳語を作る、英語の出だし | `lang-rule.sh`、`lang-check.sh`、`ja-proofread` | 毎ターンと返答の最後 | proofread の重大の数 |
+| CLI やブラウザで作る | `desktop-app`。`no_browser.py`（PostToolUse） | 書き込みのあと | 止めた回数 |
+| 時刻を UTC で書く | `lessons` の記録と CLAUDE.md | 毎ターン | ― |
+
+同じ指摘がまた来たら、この表に行を足し、言葉ではなくフックで止める。
