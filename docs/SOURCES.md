@@ -16,6 +16,7 @@
 | [scottspence.com「how to make claude code follow hook instructions」](https://scottspence.com/posts/how-to-make-claude-code-follow-hook-instructions) | 記事（参考のみ） | `follow-instructions` | フックで差し込んだ決まりが長い会話で無視されること、CLAUDE.md に「フックの指示は必ず守る」と書くと戻るという観察 | コードは無し。同じ目的の公開スキルは見つからなかった（2026-10-24） |
 | [validkeys/sherpy](https://github.com/validkeys/sherpy) `definition-of-done` | MIT, Copyright (c) 2025 Sherpy Contributors | `finish-first` | 完成条件を「確かめられる文」で書く基準（「login works」ではなく「メールとパスワードでログインできる」）と、出口のチェックリストの形 | milestones.yaml と要件ファイルの仕組みは取り込まず、Markdown の表1枚にした |
 | [claudskills.com `definition-of-done`](https://claudskills.com/skills/definition-of-done/) | ライセンス表記なし（参考のみ） | `finish-first` | 「意図・途中・かけた時間・記憶・それらしい答えは完成ではない」の5つの観点 | 文言は取り込まず要点だけ。チェックリストの項目は取り込まない |
+| [claudskills.com `intent-executor`](https://claudskills.com/skills/intent-executor/) | ライセンス表記なし（参考のみ） | `prompt-from-context` | 曖昧な一言から意図を推定して動く、という目的。「推定して、確認して、実行する」の3段のうち前後の2段 | 確認で止める段は取り込まない（聞き返さない）。手順の本文は公開ページに無く、読んでいない |
 | [valorisa/Claude-Skills](https://github.com/valorisa/Claude-Skills) `token-optimization` | MIT, Copyright (c) 2026 valorisa | `token-efficiency` | 消費の4つの出どころ、途中で道具を足さない | 要点だけ |
 | [obra/superpowers](https://github.com/obra/superpowers) `subagent-driven-development` | MIT, Copyright (c) 2025 Jesse Vincent | `token-efficiency` | 文脈を渡さないサブエージェントの考え方 | 要点だけ |
 | [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) | Apache-2.0 | 無し | 参考だけ。出力を電報のように縮める方式は「助詞のある文」の決まりと合わない | 取り込み無し |
