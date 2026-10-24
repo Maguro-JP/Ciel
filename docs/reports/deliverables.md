@@ -7,4 +7,4 @@
 | # | 成果物 | 完成条件 | 状態 | 残り | 更新 |
 |---|---|---|---|---|---|
 | 1 | あるリポジトリ（絵のアプリ）用の、アプリのウィンドウで動かすスキル | そのリポジトリに desktop-app と専用のスキルと CLAUDE.md の「ユーザーの決めたこと」が入り、deliverables.md に起動の完成条件が書かれ、PR がマージされている | 完成 | そのリポジトリの FIX の PR をマージ済み（2026-10-24 08 時台 JST）。アプリ本体のウィンドウ化は、そのリポジトリの deliverables.md の先頭の成果物 | 2026-10-24 |
-| 2 | Claude が指示どおりに動く仕組み（follow-instructions、finish-first、desktop-app、verify-before-done の Stop フック） | Ciel のスキルを使う全リポジトリ（8 本）に入り、2026-W44 の週報で「ユーザーが直させた回数」と「根拠の無い完了」がどちらも 0 | 進行中 | 8 本に 10/24 の朝に配り、CLAUDE.md の「ユーザーの決めたこと」も入れた（配布の Routine は無いので手で配った）。次の long-dev の実行で各リポジトリに deliverables.md ができるのを見る | 2026-10-24 |
+| 2 | Claude が指示どおりに動く仕組み（follow-instructions、finish-first、desktop-app、verify-before-done の Stop フック） | Ciel のスキルを使う全リポジトリ（8 本）に入り、2026-W44 の週報で「ユーザーが直させた回数」と「根拠の無い完了」がどちらも 0 | 進行中 | 8 本に 10/24 の朝に手で配った（配布の Routine は無かった）。7 本はマージ済みで、1 本は決まりどおり draft の PR でオーナーの判断待ち（Actions の課金でジョブが始まらず、手元では pytest と ruff が通っている）。次の long-dev の実行で各リポジトリに deliverables.md ができるのを見る | 2026-10-24 |
