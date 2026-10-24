@@ -15,6 +15,7 @@
 | GitHub のブランチ保護・レビュー必須 | リポジトリの持ち主 | マージ | ユーザーの決め。`.claude/policy/<ユーザー名>.json` に写す |
 | Stop フック（lang-check、gate.sh、done_check、test.sh） | リポジトリ | Claude の返答と完了の主張。ユーザーは止めない | `*_OFF=1` の環境変数で止まる。test.sh は部品の無い環境で落ちるので、そのときは出力を見て判断する |
 | no_self_grant.py（PreToolUse） | ユーザーの決まり | AI が自分に権限を付与する書き込み（settings.json の permissions、.claude/policy/、権限の既定の変更） | 止めるのが目的。ユーザーが自分の手で入れる |
+| pr_gate.py（PreToolUse） | ユーザーの決まり | 検査の記録（precheck.py）とユーザーの確認（❔ と返事）の無い PR の作成・マージ・main への push、頼まれていない Release やタグの作成 | ❔ で確認を取り、返事を待つ。ユーザーが「確認なし」「聞かずに」と言ったときだけ通る。`PR_GATE_OFF=1` はテスト用 |
 | 判断待ち（auto-dev の S5） | ユーザー | 指示されていない取り返しのつかない操作（課金、認証、本番、削除、公開、外部送信） | ユーザーがはっきり指示すれば行う。pending に答えを書くか、会話で1行 |
 
 ## 今の設定
