@@ -12,7 +12,7 @@ except Exception:
     prompt = sys.argv[1]
 # (入力に当たる語, 出す行)。語は正規表現。全部に当たる行は無い。
 TABLE = [
-    (r"PR|プルリク|push|マージ|merge", "PR を作った・push した→solo-pr-flow（自分のリポジトリなら CI を待ってマージまで進める。作成直後に PR の購読を解除する）"),
+    (r"PR|プルリク|push|マージ|merge", "PR を作る前・マージの前→solo-pr-flow「出す前の確認」（precheck.py を通し、出す内容を ❔ で見せて返事を待つ。返事なしに作らない・マージしない。購読の解除はマージのあと）"),
     (r"できました|完了|直しました|通りました|終わり", "「できました」と言う前→verify-before-done（出力を貼る。確かめていないことを書く。Stop フックが根拠の無い完了を差し戻す）"),
     (r"CI|チェックが落ち|テストが落ち|Actions|失敗した", "CI が落ちた→ci-triage"),
     (r"公開|public|秘密|鍵|トークン|個人情報|見せて|記録を書|PR", "PR やマージの前・記録を書いたあと→secret-leak-check と content-audit（鍵は前者、名前・メール・ID・費用・不快な表現・履歴・GitHub 側は後者）"),
