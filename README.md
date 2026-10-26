@@ -93,7 +93,7 @@ PR と CI
 | [`solo-pr-flow`](.claude/skills/solo-pr-flow/) | 出す前の確認（precheck と ❔ への返事）を取ってから、PR の作成・マージ・後片付けまで通す |
 | [`ci-triage`](.claude/skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
 | [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する |
-| [`tidy`](.claude/skills/tidy/) | 散らかさない決まりと、使い終えたブランチや Routine の掃除 |
+| [`tidy`](.claude/skills/tidy/) | 散らかさない決まり、月に 1 回の整理整頓、使い終えたブランチや Routine の掃除 |
 
 自律開発と定期実行
 
