@@ -41,7 +41,7 @@ Ciel の LESSONS.md に写す。固有名（非公開リポジトリの名前、
 直す前に、そのスキルをこのセッションで1回使い、書いてあることと実際の動きの差を見る。使わずに直さない。
 1つ直すごとに `./scripts/validate.sh` と `scan.py --diff` を通し、PR を1本にして `solo-pr-flow` でマージする。
 
-直す前に docs/GUIDELINES.md の 10（干渉の表）を見る。フックを足したら token-efficiency の measure_hooks.py で 1 ターンの差し込み量を測り、目安（1,200 文字）に収める。
+直す前に docs/GUIDELINES.md の 10（干渉の表）を見る。足した・消したスキルは同じ PR で README と USAGE の一覧に反映する（docs-upkeep が止める）。フックを足したら token-efficiency の measure_hooks.py で 1 ターンの差し込み量を測り、目安（1,200 文字）に収める。
 
 ### 3.5 自分のための開発
 

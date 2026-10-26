@@ -8,16 +8,16 @@ PR を送る前に、差分に以下が含まれていないか必ず確認し�
 - 個人情報、社内ホスト名・内部URL、顧客データ
 - ライセンス不明のコードや文章のコピー
 
-`./scripts/validate.sh` が簡易チェックをしますが、**最終責任は書いた人にあります**。
+`./scripts/validate.sh` が簡易チェックをしますが、最終責任は書いた人にあります。
 
 ## スキルを追加する
 
 1. `templates/skill-template` をコピーして `.claude/skills/<name>/` を作る
 2. `SKILL.md` の frontmatter を埋める
    - `name`: ディレクトリ名と一致。小文字・数字・ハイフンのみ
-   - `description`: **いつ発動すべきか**。トリガーになる単語や状況を具体的に
+   - `description`: いつ発動すべきか。トリガーになる単語や状況を具体的に
 3. 本文を書く。原則は「短く、実行可能に」
-4. `./scripts/validate.sh` を通す
+4. README と docs/USAGE.md の一覧に足す。`./scripts/validate.sh` を通す（docs-upkeep が一覧の抜けとリンク切れを止める）
 5. PR を出す（1 PR = 1 スキルが基本）
 
 ## 既存スキルを直す

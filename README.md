@@ -1,67 +1,57 @@
-# Ciel — Skill Creator / Skill Collector
+# Ciel
 
-> 「解。……スキルを、創ります」
+Claude Code のスキルを作り、集め、直し、配るための公開リポジトリです。
+名前は『転生したらスライムだった件』の智慧之王から借りています。
 
-**Ciel（シエル）** は Claude 向けの **Skill** を作り、集め、鍛え直し、管理するための公開リポジトリです。
-名前は『転生したらスライムだった件』の *智慧之王* から借りています。
-解析（Collect）→ 創造（Create）→ 進化（Evolve）。それがこのリポジトリの役割です。
+## このリポジトリは public です
 
----
+誰でも中身を見られます。更新するときは次を守ります。
 
-## ⚠️ このリポジトリは PUBLIC です
-
-誰でも中身を見られます。更新するときは必ず以下を守ってください。
-
-- **秘密情報を絶対に入れない** — APIキー / トークン / パスワード / 個人情報 / 社内URL・ホスト名
-- 実在の人物・組織の内部資料をそのまま貼らない
-- コミット前に `scripts/validate.sh` を実行する
-- 一度 push した秘密情報は「消しても漏れたまま」。必ず鍵をローテートする
-
----
+- 秘密情報（API キー、トークン、パスワード、個人情報、社内の URL やホスト名）を入れない
+- 非公開のリポジトリの名前、メールアドレス、セッションや Routine の ID、費用の数字を書かない。コミットメッセージと PR の本文にも書かない
+- コミットの前に `scripts/validate.sh` を通す
+- 一度 push した秘密情報は、消しても漏れたまま。鍵はローテートする
 
 ## 構成
 
 ```
-.claude/skills/  スキル本体（1スキル = 1ディレクトリ）。ここに置くと Ciel でも有効になる
-templates/       新規スキル用のひな形、個人設定のひな形
-scripts/         検証・コーパス収集/解析スクリプト
-docs/            設計方針・運用ルール
+.claude/skills/        スキル本体（1 スキル = 1 ディレクトリ）。Ciel 自身でも効く
+.claude/hooks/         全リポジトリに配るフック（言語の決まり、場面の案内、失敗の記録の差し込み）
+.claude/settings.json  フックの登録
+templates/             新しいスキルのひな形と、個人設定のひな形
+scripts/               validate.sh（検証）、install.sh（取り込み）、hooks-smoke.py（フックの煙テスト）、コーパスの収集と解析
+docs/                  設計方針、使い方、権限の層、振る舞いの対応表、出典、報告
 ```
 
 ## スキルの形
 
-各スキルは `.claude/skills/<skill-name>/SKILL.md` を持ちます。冒頭は YAML frontmatter：
+各スキルは `.claude/skills/<skill-name>/SKILL.md` を持ちます。冒頭は YAML の frontmatter です。
 
 ```markdown
 ---
 name: skill-name
-description: いつこのスキルを使うか。トリガー条件を具体的に書く。
+description: いつこのスキルを使うか。発動の条件を具体的に書く。
 ---
 
 # Skill Name
-本文（手順・原則・例）
+本文（手順、原則、例）
 ```
 
-- `name` はディレクトリ名と一致（小文字・ハイフン区切り）
-- `description` は **発動条件** を書く場所。「何ができるか」より「いつ使うか」
-- 補助ファイルは `references/` `scripts/` `assets/` に置き、SKILL.md から参照する
-
-詳しくは [docs/GUIDELINES.md](docs/GUIDELINES.md)。
-使い方とスキル一覧は [docs/USAGE.md](docs/USAGE.md)。
-公開スキル271本を実測した観察記録は [docs/OBSERVATIONS.md](docs/OBSERVATIONS.md)。
-権限と許可の層（何が止めるか、どう直すか）は [docs/PERMISSIONS.md](docs/PERMISSIONS.md)。
-指摘された振る舞いと、それを止める仕組みの対応は [docs/BEHAVIOR.md](docs/BEHAVIOR.md)。
+- `name` はディレクトリ名と一致させる（小文字とハイフン）
+- `description` には発動の条件を書く。「何ができるか」より「いつ使うか」
+- 補助ファイルは `references/` `scripts/` `hooks/` に置き、SKILL.md から参照する
 
 ## 使い方
 
 ```bash
 git clone https://github.com/Maguro-JP/Ciel.git
 ./Ciel/scripts/install.sh <skill-name> ~/               # 自分の PC の全プロジェクトで使う
-./Ciel/scripts/install.sh <skill-name> /path/to/repo    # そのリポジトリで使う（要コミット）
+./Ciel/scripts/install.sh <skill-name> /path/to/repo    # そのリポジトリで使う（コミットが要る）
 ```
 
-スマホや Web のセッションで使うなら、リポジトリの `.claude/skills/` に入れてコミットします。
+スマホや Web のセッションで使うには、リポジトリの `.claude/skills/` に入れてコミットします。
 `~/.claude/` に置いたものはその機械の中だけで、リモートのセッションには引き継がれません。
+取り込みと更新の詳しい手順は [docs/USAGE.md](docs/USAGE.md) にあります。
 
 ## 新しいスキルを作る
 
@@ -71,48 +61,90 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 ./scripts/validate.sh
 ```
 
+作る前に公開されているスキルを探し、使えるなら取り込んで直します。出典は [docs/SOURCES.md](docs/SOURCES.md) に書きます。
+
 ## 収録スキル
+
+姿勢と指示
 
 | スキル | 用途 |
 |---|---|
-| [`work-style`](.claude/skills/work-style/) | 仕事の進め方。確認してから動く、一つずつ、動かしてから完了と言う、確かめていないことは言わない |
-| [`verify-before-done`](.claude/skills/verify-before-done/) | 完了前の検証。動かした出力を貼る、本番の前に1件で試す、予約と結果を区別する。Stop フックが、根拠の無い完了の言い方と 2 つ以上の ❔ を差し戻す |
-| [`follow-instructions`](.claude/skills/follow-instructions/) | 指示に従う。ユーザーの一言を、スキル・チェック・自分の判断より上に置く。訂正は1文で認めて言われた通りに直し、代案は直したあとに1行だけ。フックがセッション内の指示を毎ターン差し込む |
-| [`finish-first`](.claude/skills/finish-first/) | 成果物を1つずつ完成させる。完成条件を先に書き、未完成があるうちは新しいものを始めず、戻せる判断はデフォルトで進め、完成は動かした出力で判定する。フックが今の成果物を毎ターン差し込む |
-| [`prompt-from-context`](.claude/skills/prompt-from-context/) | 短い一言を、前の文脈から全文のプロンプトにしてから動く。対象・やること・形・完成条件を前の一言、直前の ★↩❕❔、今の成果物から補い、読んだ形を ↩ で1行出す。聞き返さない。フックが短い一言のときだけ直前の文脈を差し込む |
-| [`desktop-app`](.claude/skills/desktop-app/) | アプリはウィンドウで開き、機能は画面に置く。CLI ではなく GUI、ブラウザ起動ではなくアプリケーション。包み方の選び方と完成条件の書き方。フックがブラウザ起動と CLI の入口を知らせる |
-| [`repo-bootstrap`](.claude/skills/repo-bootstrap/) | リポジトリ初期設定。CLAUDE.md、フック入り settings.json、検査とテストのフック、スキル、最小 CI を一度で置く |
-| [`lessons`](.claude/skills/lessons/) | 失敗の記録。場面・起きたこと・判定の誤り・次から の4行で残し、開始時にフックが読み直す |
-| [`long-dev`](.claude/skills/long-dev/) | 終わりのない自律開発。プロダクトを良くする原則に従い、auto-dev を期限無しで回し続ける |
-| [`dev-report`](.claude/skills/dev-report/) | 日報・週報・月報。週報は評価と来週の計画、月報は棚卸しと今月の週ごとの計画 |
-| [`scheduler`](.claude/skills/scheduler/) | スケジューリング。Routine の作成・一覧・停止、cron の決まり、費用 |
-| [`skill-sync`](.claude/skills/skill-sync/) | Ciel のスキルをリポジトリに取り込む。差分があるものだけ入れ替える |
-| [`skill-audit`](.claude/skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化」の3観点で診断する |
-| [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する。規約を読んで選択肢を絞る |
-| [`solo-pr-flow`](.claude/skills/solo-pr-flow/) | 自分のリポジトリの PR を、尋ねずにマージから後片付けまで通す。止まる条件は少なく、止まるときは条件名を挙げる |
-| [`secret-leak-check`](.claude/skills/secret-leak-check/) | 機密情報の混入をスキャンし、漏洩時の対応順序まで案内する |
-| [`content-audit`](.claude/skills/content-audit/) | 人に見られる前に中身を精査する。名前・連絡先・ID・費用・内部の場所・履歴の著者・Issue や PR の本文と、読む人が不快になる表現。private でも使う。鍵は secret-leak-check |
-| [`ja-proofread`](.claude/skills/ja-proofread/) | 日本語の精度を上げる。外国語の文字の混入、翻訳調、ら抜き、表記ゆれ、長い文を機械で拾い、残りは読み直しの観点で直す |
-| [`token-efficiency`](.claude/skills/token-efficiency/) | トークンと文脈を節約する。毎ターンの決まりをフックで差し込み、読み直しと再実行を見つけ、リポジトリが常時読ませる量を測る |
-| [`auto-dev`](.claude/skills/auto-dev/) | 自律的に開発を進める。時間制限と優先指示を受け取り、止まる条件を持つ |
+| [`work-style`](.claude/skills/work-style/) | 仕事の進め方。確認してから動く、1 つずつ、動かしてから完了と言う、確かめていないことは言わない |
+| [`follow-instructions`](.claude/skills/follow-instructions/) | 指示に従う。ユーザーの一言をスキルやチェックより上に置き、訂正は 1 文で認めて言われた通りに直す。AI は自分に権限を付与しない |
+| [`prompt-from-context`](.claude/skills/prompt-from-context/) | 短い一言を、前の文脈から全文のプロンプトにしてから動く。聞き返さない |
+| [`finish-first`](.claude/skills/finish-first/) | 成果物を 1 つずつ完成させる。完成条件を先に書き、戻せる判断はデフォルトで進める |
+| [`lessons`](.claude/skills/lessons/) | 失敗の記録。場面・起きたこと・判定の誤り・次から の 4 行で残し、開始時にフックが差し込む |
+| [`token-efficiency`](.claude/skills/token-efficiency/) | トークンと文脈を節約する。フックの差し込み量を測る |
+
+出す前の検証
+
+| スキル | 用途 |
+|---|---|
+| [`verify-before-done`](.claude/skills/verify-before-done/) | 完了の語をツールの出力と照合する Stop フック。PR・マージ・main への push の前の precheck と確認ゲート |
+| [`secret-leak-check`](.claude/skills/secret-leak-check/) | 機密情報の混入を調べ、漏れたときの順序を案内する |
+| [`content-audit`](.claude/skills/content-audit/) | 人に見られる前に中身を精査する。名前、ID、費用、履歴、GitHub 側、不快な表現 |
+| [`ja-proofread`](.claude/skills/ja-proofread/) | 日本語の精度を上げる。文字の混入、翻訳調、訳語、表記ゆれ |
+| [`docs-upkeep`](.claude/skills/docs-upkeep/) | README と docs を今のリポジトリに合わせる。壊れたリンク、無いファイル、一覧の抜け、辿れない文書を止める |
+
+PR と CI
+
+| スキル | 用途 |
+|---|---|
+| [`solo-pr-flow`](.claude/skills/solo-pr-flow/) | 出す前の確認（precheck と ❔ への返事）を取ってから、PR の作成・マージ・後片付けまで通す |
 | [`ci-triage`](.claude/skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
+| [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する |
+| [`tidy`](.claude/skills/tidy/) | 散らかさない決まりと、使い終えたブランチや Routine の掃除 |
+
+自律開発と定期実行
+
+| スキル | 用途 |
+|---|---|
+| [`auto-dev`](.claude/skills/auto-dev/) | 自律的に開発を進める。時間制限と優先の指示を受け取り、止まる条件を持つ |
+| [`long-dev`](.claude/skills/long-dev/) | 終わりのない自律開発。auto-dev を Routine で回し続ける |
+| [`dev-report`](.claude/skills/dev-report/) | 日報・週報・月報 |
+| [`scheduler`](.claude/skills/scheduler/) | Routine の作成・一覧・停止と cron の決まり |
+| [`patrol`](.claude/skills/patrol/) | 自律開発を回しているリポジトリ全部の状態を 1 つの表で見る |
+| [`pending`](.claude/skills/pending/) | 自律開発が脇に置いた判断待ちを、リポジトリを横断して見る・答える |
+| [`feedback-session`](.claude/skills/feedback-session/) | セッションをフィードバック専用に整える。1 トピック 1 セッション 1 ブランチ |
+| [`self-learn`](.claude/skills/self-learn/) | 知らないことを調べて身につけ、次から使える形で残す |
+
+アプリと模型
+
+| スキル | 用途 |
+|---|---|
+| [`desktop-app`](.claude/skills/desktop-app/) | アプリはウィンドウで開き、機能は画面に置く。CLI ではなく GUI、ブラウザではなくアプリケーション |
+| [`shared-models`](.claude/skills/shared-models/) | AI の模型の置き場を 1 か所にそろえる |
+
+スキルの管理
+
+| スキル | 用途 |
+|---|---|
+| [`skill-sync`](.claude/skills/skill-sync/) | Ciel のスキルをリポジトリに取り込む。差分があるものだけ入れ替える |
+| [`skill-audit`](.claude/skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化 / 干渉」で診断する |
+| [`skill-upkeep`](.claude/skills/skill-upkeep/) | セッションを観察してスキルを直し、新しく作る。Ciel 自身の自律開発 |
+| [`repo-bootstrap`](.claude/skills/repo-bootstrap/) | リポジトリに CLAUDE.md、フック、スキル、最小の CI を一度で置く |
+
+## 文書
+
+| 文書 | 何 |
+|---|---|
+| [docs/USAGE.md](docs/USAGE.md) | 取り込み方、呼び出し方、スキル一覧と発動の条件、方針のファイル、更新の仕方 |
+| [docs/GUIDELINES.md](docs/GUIDELINES.md) | スキルの設計方針と、スキルどうしの干渉と優先 |
+| [docs/PERMISSIONS.md](docs/PERMISSIONS.md) | 権限と許可の層。何が止めるか、どう直すか |
+| [docs/BEHAVIOR.md](docs/BEHAVIOR.md) | 指摘された振る舞いと、それを止める仕組みの対応 |
+| [docs/SOURCES.md](docs/SOURCES.md) | 取り込んだ公開スキルの出典とライセンス |
+| [docs/OBSERVATIONS.md](docs/OBSERVATIONS.md) | 公開スキルを実測した観察記録 |
+| [docs/reports/](docs/reports/) | 成果物の表と週報 |
 
 ## 個人設定
 
-言語や応答の書き方のような、常に効いてほしい好みはスキルではなく
-`~/.claude/CLAUDE.md` に置きます。ひな形は
-[templates/personal-CLAUDE.md](templates/personal-CLAUDE.md)。
+言語や応答の書き方のような、常に効いてほしい好みは `~/.claude/CLAUDE.md` に置きます。
+ひな形は [templates/personal-CLAUDE.md](templates/personal-CLAUDE.md) です。
 
 ```bash
 cat templates/personal-CLAUDE.md >> ~/.claude/CLAUDE.md
 ```
 
-`~/.claude/` に置いたものはリポジトリに入らないので、共同開発者に影響しません。
+## 貢献とライセンス
 
-## 貢献
-
-[CONTRIBUTING.md](CONTRIBUTING.md) を読んでから PR を送ってください。
-
-## ライセンス
-
-[MIT](LICENSE)
+[CONTRIBUTING.md](CONTRIBUTING.md) を読んでから PR を送ってください。ライセンスは [MIT](LICENSE) です。
