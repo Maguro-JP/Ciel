@@ -7,10 +7,10 @@ Claude Code のスキルを作り、集め、直し、配るための公開リ�
 
 誰でも中身を見られます。更新するときは次を守ります。
 
-- 秘密情報（API キー、トークン、パスワード、個人情報、社内の URL やホスト名）を入れない
-- 非公開のリポジトリの名前、メールアドレス、セッションや Routine の ID、費用の数字を書かない。コミットメッセージと PR の本文にも書かない
+- 機密情報（API キー、トークン、パスワード、個人情報、社内の URL やホスト名）を入れない
+- 非公開のリポジトリの名前、メールアドレス、セッションやルーティンの ID、費用の数字を書かない。コミットメッセージと PR の本文にも書かない
 - コミットの前に `scripts/validate.sh` を通す
-- 一度 push した秘密情報は、消しても漏れたまま。鍵はローテートする
+- 一度 push した機密情報は、消しても漏れたまま。鍵はローテートする
 
 ## 構成
 
@@ -84,6 +84,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`secret-leak-check`](.claude/skills/secret-leak-check/) | 機密情報の混入を調べ、漏れたときの順序を案内する |
 | [`content-audit`](.claude/skills/content-audit/) | 人に見られる前に中身を精査する。名前、ID、費用、履歴、GitHub 側、不快な表現 |
 | [`ja-proofread`](.claude/skills/ja-proofread/) | 日本語の精度を上げる。文字の混入、翻訳調、訳語、表記ゆれ |
+| [`user-terms`](.claude/skills/user-terms/) | 略語・訳語・造語を、ユーザーが使った語に直す。Stop フックが会話を止め、precheck が文書を注意として出す |
 | [`docs-upkeep`](.claude/skills/docs-upkeep/) | README と docs を今のリポジトリに合わせる。壊れたリンク、無いファイル、一覧の抜け、辿れない文書を止める |
 
 PR と CI
@@ -93,16 +94,16 @@ PR と CI
 | [`solo-pr-flow`](.claude/skills/solo-pr-flow/) | 出す前の確認（precheck と ❔ への返事）を取ってから、PR の作成・マージ・後片付けまで通す |
 | [`ci-triage`](.claude/skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
 | [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する |
-| [`tidy`](.claude/skills/tidy/) | 散らかさない決まり、月に 1 回の整理整頓、使い終えたブランチや Routine の掃除 |
+| [`tidy`](.claude/skills/tidy/) | 散らかさない決まり、月に 1 回の整理整頓、使い終えたブランチやルーティンの整理整頓 |
 
 自律開発と定期実行
 
 | スキル | 用途 |
 |---|---|
 | [`auto-dev`](.claude/skills/auto-dev/) | 自律的に開発を進める。時間制限と優先の指示を受け取り、止まる条件を持つ |
-| [`long-dev`](.claude/skills/long-dev/) | 終わりのない自律開発。auto-dev を Routine で回し続ける |
+| [`long-dev`](.claude/skills/long-dev/) | 終わりのない自律開発。auto-dev をルーティンで回し続ける |
 | [`dev-report`](.claude/skills/dev-report/) | 日報・週報・月報 |
-| [`scheduler`](.claude/skills/scheduler/) | Routine の作成・一覧・停止と cron の決まり |
+| [`scheduler`](.claude/skills/scheduler/) | ルーティンの作成・一覧・停止と cron の決まり |
 | [`patrol`](.claude/skills/patrol/) | 自律開発を回しているリポジトリ全部の状態を 1 つの表で見る |
 | [`pending`](.claude/skills/pending/) | 自律開発が脇に置いた判断待ちを、リポジトリを横断して見る・答える |
 | [`feedback-session`](.claude/skills/feedback-session/) | セッションをフィードバック専用に整える。1 トピック 1 セッション 1 ブランチ |

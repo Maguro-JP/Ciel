@@ -20,7 +20,7 @@
 | 散らかす（表だけの PR、増える配布ブランチ、出したあとの直しのコミット） | `tidy` の「散らかさない」の表。表・週報・lessons は同じ PR に入れ、配布ブランチは 1 日 1 本。`pr_gate.py` が頼まれていない Release やタグの作成を止める | PR とブランチを作る前 | 1 日の PR の数と、残っているブランチの数（週報） |
 | 同じ文言を繰り返す（毎ターンのフックの差し込み、❔ の出し直し） | lang-rule は 10 ターンに 1 回と止められた直後、directives は 3 件 80 文字、focus は 300 文字、CORE は 10 ターンに 1 回、lessons は 12 件。`measure_hooks.py` で測る。❔ の出し直しは前の ❔ を指す | 毎ターン | 1 ターンの差し込みの文字数 |
 | README や docs が古い（壊れたリンク、無い一覧、予定のまま） | `docs-upkeep` の `docs_check.py` が validate と precheck で止める。スキルを足した PR で一覧を直す | PR の前 | 誤りの数 |
-| 長く回すと散らかる | `tidy` の「月に 1 回の整理整頓」。`tidy_report.py` が消せるブランチ、余計なファイル、古い判断待ちと PR を集め、long-dev と skill-upkeep の Routine が月の最初の回に片付けて月報に書く | 月の最初の実行 | 月報の「整理整頓」の節の件数 |
+| 長く回すと散らかる | `tidy` の「月に 1 回の整理整頓」。`tidy_report.py` が消せるブランチ、余計なファイル、古い判断待ちと PR を集め、long-dev と skill-upkeep のルーティンが月の最初の回に整理整頓して月報に書く | 月の最初の実行 | 月報の「整理整頓」の節の件数 |
 | スキルどうしが干渉する | `docs/GUIDELINES.md` の 10 の表でどちらに従うかを決める。skill-audit と skill-upkeep が足すときに見る | スキルを足す・直すとき | 表の行数 |
 | できたと言ってから、間違えていたと言う | 上の照合で、出力の無い「できた」が出なくなる。撤回は差し戻さず数だけ残す（正直に言い直すのを止めない） | 返答の最後 | 撤回の数 |
 | できないと言う | `follow-instructions` の「できないと言う前に」（別のツールと経路を1回ずつ）。`docs/PERMISSIONS.md` の書き方 | 止まったとき | ― |
@@ -29,6 +29,7 @@
 | 聞き返す、判断待ちに回す | `prompt-from-context`、`finish-first`。`done_check.py` が ❔ 2 つ以上を差し戻す | 返答の最後 | ❔ の数 |
 | 短い一言を文字どおりに読む | `prompt-from-context`。`brief.py` が直前の文脈を差し込む | 短い一言のとき | 短い一言の数と聞き返し |
 | 日本語が崩れる、訳語を作る、英語の出だし | `lang-rule.sh`、`lang-check.sh`、`ja-proofread` | 毎ターンと返答の最後 | proofread の重大の数 |
+| ユーザーが使わない略語・訳語・造語で書く（「プルリク」「リポ」「Routine」「片付け」「JST」） | `user-terms` の対応表。`terms_check.py` が返答を表と突き合わせて差し戻し、`terms.py --diff` が文書の差分を注意で出す。`terms_learn.py` が発言の語を数えて表を育てる | 返答の最後と PR の前 | 差し戻した語の数（metrics.jsonl）と文書の注意の数 |
 | CLI やブラウザで作る | `desktop-app`。`no_browser.py`（PostToolUse） | 書き込みのあと | 止めた回数 |
 | 時刻を UTC で書く | `lessons` の記録と CLAUDE.md | 毎ターン | ― |
 

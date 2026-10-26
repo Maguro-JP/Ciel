@@ -11,7 +11,7 @@ description: README と docs とスキルの文を、今のリポジトリに合
 ## 決まりの出どころ
 
 同じ目的の公開スキルを探した（2026-10-26）。sync-docs（README と CLAUDE.md の古い節とリンクを見る）、update-project（git の差分と
-`.claude/skills/*/SKILL.md` を突き合わせる）、docs-workflow（古さ・リンク切れ・版のずれを監査する）、consistency-enforcement
+`.claude/skills/*/SKILL.md` を突き合わせる）、docs-workflow（古さ・リンク切れ・版のずれを精査する）、consistency-enforcement
 （README を正として他の文書と数を合わせる）があった。どれも手順の文だけで検査のコードは無く、ライセンスの表記も無い。
 「言及先の実在を検査する」「一覧を正と突き合わせる」の 2 つの考えを取り、検査は `scripts/docs_check.py` に書いた。
 

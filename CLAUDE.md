@@ -38,8 +38,9 @@
 - PR を作る前とマージする前（main への直接の push も）に、必ずユーザーに確認する。precheck.py で検査を全部通し、出す内容と検査の結果を ❔ で 1 行出し、返事があるまで作らない・マージしない。フックが止める（pr_gate.py）
 - 散らかさない。PR は変更のまとまりごとに 1 本で、表・週報・lessons の更新は同じ PR に入れる。配布ブランチは 1 日 1 本に積む。Release とタグは頼まれたときだけ。一時ファイルはリポジトリに置かない（tidy「散らかさない」）
 - 同じ文言を繰り返さない。フックの差し込みは 1 ターン合計 1,200 文字、SessionStart 5,000 文字を目安にし、measure_hooks.py で測る。❔ を出し直すときは前の ❔ を指して短く書く。スキルを足す・直すときは干渉の表（docs/GUIDELINES.md の 10）を見る
+- 略語・訳語・造語を使わず、ユーザーが使った語で書く（PR、リポジトリ、ルーティン、整理整頓、日本時間）。対応表は user-terms の references/user-terms.md で、ユーザーの発言から行を足す。Stop フックが会話を止め、precheck が文書の差分を注意で出す
 - README と docs は今のリポジトリに合わせる。スキルやスクリプトを足した・消した PR で一覧とリンクを直し、数・日付・予定を本文に書かない。docs-upkeep の docs_check.py が validate と precheck で止める
-- 月に 1 回は整理整頓する（tidy「月に 1 回の整理整頓」）。long-dev と skill-upkeep の Routine が月の最初の回に行い、結果を月報に書く
+- 月に 1 回は整理整頓する（tidy「月に 1 回の整理整頓」）。long-dev と skill-upkeep のルーティンが月の最初の回に行い、結果を月報に書く
 
 ## 応答の言語
 
@@ -80,7 +81,7 @@
 - 秘密情報が入っていないか `.claude/skills/secret-leak-check/scripts/scan.py --diff` で見る。
 - 人に見せてよいものか `.claude/skills/content-audit/scripts/audit.py --diff` で見る。名前、メール、ID、費用、内部の場所、不快な表現を拾う。
 - 文章を書いたら `.claude/skills/ja-proofread/scripts/proofread.py --diff` を通す。文字の混入と英語の出だしは直してからコミットする。
-- public なので、非公開リポジトリの名前、メールアドレス、セッションや Routine の ID、費用の数字を書かない。例や記録は `<owner>/<repo>`「あるリポジトリ」のように伏せる。コミットメッセージと PR の本文にも書かない（セッションの URL の行は付けない。Co-Authored-By は残す）。`validate.sh` がメールと ID を検査し、precheck.py がコミットメッセージを見る。
+- public なので、非公開リポジトリの名前、メールアドレス、セッションやルーティンの ID、費用の数字を書かない。例や記録は `<owner>/<repo>`「あるリポジトリ」のように伏せる。コミットメッセージと PR の本文にも書かない（セッションの URL の行は付けない。Co-Authored-By は残す）。`validate.sh` がメールと ID を検査し、precheck.py がコミットメッセージを見る。
 - 詳しい設計方針は [docs/GUIDELINES.md](docs/GUIDELINES.md)。
 
 ## 完了と言う前に

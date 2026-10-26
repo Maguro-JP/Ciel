@@ -44,6 +44,7 @@ Ciel の LESSONS.md に写す。固有名（非公開リポジトリの名前、
 1つ直すごとに `./scripts/validate.sh` と `scan.py --diff` を通し、PR を1本にして `solo-pr-flow` でマージする。
 
 直す前に docs/GUIDELINES.md の 10（干渉の表）を見る。足した・消したスキルは同じ PR で README と USAGE の一覧に反映する（docs-upkeep が止める）。フックを足したら token-efficiency の measure_hooks.py で 1 ターンの差し込み量を測り、目安（1,200 文字）に収める。
+毎回、user-terms の `terms_learn.py --candidates` で、ユーザーが 2 回以上使っていて対応表に無い語を見る。自分がその語を別の言い方で書いていれば、`.claude/skills/user-terms/references/user-terms.md` に行を足す。差し戻した語の数（`~/.claude/state/user-terms/metrics.jsonl`）は週報に書く。
 
 ### 3.5 自分のための開発
 

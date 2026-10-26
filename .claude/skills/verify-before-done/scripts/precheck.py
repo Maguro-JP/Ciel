@@ -6,7 +6,7 @@ HEAD ごとの結果を ~/.claude/state/pr-gate/<repo>.json に残す。pr_gate.
 通っていない HEAD の PR の作成と main への push を止める。
 
 動かすもの（あるものだけ）: コミットメッセージの ID・URL・メールの検査、git diff --check、./scripts/validate.sh、.claude/skills/*/scripts/test_*.py、pytest、
-ja-proofread・content-audit・secret-leak-check の差分（base から）、npm test（package.json に test があり node_modules があるとき）。
+ja-proofread・content-audit・secret-leak-check・user-terms の差分（base から。user-terms は注意で、落とさない）、npm test（package.json に test があり node_modules があるとき）。
 
 使い方: precheck.py [--base <ref>]   base の既定は origin のデフォルトブランチ
 環境変数: PR_GATE_STATE=dir  記録の保存先（既定は ~/.claude/state/pr-gate）
@@ -74,7 +74,8 @@ def main() -> int:
         steps.append(("pytest", f"{sys.executable} -m pytest -q -x"))
     for name, path in (("proofread", ".claude/skills/ja-proofread/scripts/proofread.py"),
                        ("content-audit", ".claude/skills/content-audit/scripts/audit.py"),
-                       ("secret-leak-check", ".claude/skills/secret-leak-check/scripts/scan.py")):
+                       ("secret-leak-check", ".claude/skills/secret-leak-check/scripts/scan.py"),
+                       ("user-terms", ".claude/skills/user-terms/scripts/terms.py")):
         if Path(path).exists():
             steps.append((name, f"{sys.executable} {path} --diff {base}"))
     if Path("package.json").exists() and Path("node_modules").is_dir():
