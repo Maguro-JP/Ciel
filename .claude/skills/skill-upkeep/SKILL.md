@@ -15,7 +15,8 @@ description: 走っているセッションを観察して、使われている�
 
 - `list_sessions` で動いているセッションを見る。タイトル、`post_turn_summary`、`context_usage`、`rate_limit_info`。止まっている・同じことを繰り返している・文脈が膨らんでいるものを控える
 - `list_triggers` で Routine を見る。実行されたのに成果がないもの、1回きりのまま残っているもの
-- 各リポジトリ（Routine の紐づけ先）で、この1週間の PR のタイトルと、`.claude/skills/lessons/LESSONS.md` に増えた項目、`docs/reports/pending.md` の答え待ちを読む
+- 各リポジトリ（ルーティンの紐づけ先）で、この1週間の PR のタイトルと、`.claude/skills/lessons/LESSONS.md` に増えた項目、`docs/reports/pending.md` の答え待ちを読む。
+  手元に clone があれば `scripts/observe.py` が 1 本で表にする（コミット・PR のマージ・DEV/SYNC/FB の数・Ciel に無い lessons の題・答えの無い判断待ち）
 - ユーザーがこの1週間に直させたこと（Ciel の git log と lessons）
 - Ciel に `content-audit` の `--all` と `ja-proofread` の `--tree` を当て、見せてはいけないものと壊れた日本語が増えていないか見る。見つかったら直す PR を先に出す
 
@@ -87,6 +88,7 @@ Ciel は public なので、非公開リポジトリの名前と ID は伏せる
 
 - 人が決めたこと（出力の形、名前、方針）は変えない。変えたくなったら `❔` で1行聞いて、答えが来るまでそのまま
 - 走っているセッションのブランチ・PR・Routine には触らない。観察だけ
+- 前の周の作業ブランチが、ユーザーの確認待ち（❔ に返事が無い）のまま残っているときは、main から切り直さず、そのブランチに積む。PR を 2 本にしない（tidy「散らかさない」）。週報も同じブランチに入れ、❔ は前の ❔ を指して短く出し直す
 - 走っているセッションにスキルの直しは届かない（起動時に読まれる）。届けたいことは1回きりの Routine で1行送る
 - 1周で直すのは3件まで。多く直すと、どれが効いたか分からない
 

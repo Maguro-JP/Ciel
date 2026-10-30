@@ -24,6 +24,7 @@ ja-proofread の `glossary.md`（開発者の間で通る語の既定）と重�
 | ルーティン | Routine、Routines、ルーチン | 発言 |
 | ユーザー | ユーザ、利用者、エンドユーザー | 発言 |
 | 指示 | 命令、インストラクション、オーダー、instruction、instructions | 発言 |
+| 指示通り | 指示どおり | 発言 |
 | 権限 | パーミッション、permission、permissions | 発言 |
 | 設定 | コンフィグ、config | 発言 |
 | 仕組み | メカニズム、機構 | 発言 |
