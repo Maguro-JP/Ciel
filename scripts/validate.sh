@@ -91,6 +91,15 @@ for s in .claude/settings.json .claude/skills/repo-bootstrap/templates/settings.
   if [ "$code" -ne 0 ]; then err "$s のフックが無害な入力で失敗する（python3 scripts/hooks-smoke.py $s で見る）"; else echo "  $s: $(printf '%s\n' "$out" | tail -1)"; fi
 done
 
+# 文書は書いた日の状態で止まる。リンク、言及先、スキル一覧、辿れる文書を今のリポジトリと突き合わせる。
+echo
+echo "== ドキュメント =="
+if [ -f .claude/skills/docs-upkeep/scripts/docs_check.py ]; then
+  out="$(python3 .claude/skills/docs-upkeep/scripts/docs_check.py 2>&1)"; code=$?
+  printf '%s\n' "$out" | grep -E '^  (!!|\?)' || true
+  if [ "$code" -ne 0 ]; then err "README や docs が今のリポジトリと合っていない（docs-upkeep の docs_check.py で見る）"; else echo "  $(printf '%s\n' "$out" | tail -1)"; fi
+fi
+
 echo
 echo "== 秘密情報 =="
 patterns=(
