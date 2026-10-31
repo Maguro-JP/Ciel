@@ -156,6 +156,14 @@ class PrGate(unittest.TestCase):
         self.assertEqual(r.returncode, 1, r.stdout)
         self.assertIn("commit messages", r.stdout)
 
+    def test_pytest_with_no_tests_passes(self):
+        # tests/ に Python 以外のテストしか無いリポジトリでは pytest が 5（0 件）で終わる。落ちた扱いにしない
+        sys.path.insert(0, str(PRECHECK.parent))
+        from precheck import pass_by_text
+        self.assertTrue(pass_by_text("pytest", 5, "no tests ran in 0.02s"))
+        self.assertTrue(pass_by_text("pytest", 0, "3 passed"))
+        self.assertFalse(pass_by_text("pytest", 1, "1 failed"))
+
 
 if __name__ == "__main__":
     unittest.main()

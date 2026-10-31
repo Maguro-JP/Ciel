@@ -54,6 +54,9 @@ def pass_by_text(name: str, code: int, out: str) -> bool:
         return bool(re.search(r"重大 0 / 注意 0", out))
     if name == "secret-leak-check":
         return "検出なし" in out
+    if name == "pytest":
+        # 5 は「集めたテストが 0 件」。tests/ に Python 以外のテストしか無いリポジトリで出る。落ちたのではない
+        return code in (0, 5)
     return code == 0
 
 
