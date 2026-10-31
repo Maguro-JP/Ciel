@@ -19,6 +19,9 @@
 | [claudskills.com `intent-executor`](https://claudskills.com/skills/intent-executor/) | ライセンス表記なし（参考のみ） | `prompt-from-context` | 曖昧な一言から意図を推定して動く、という目的。「推定して、確認して、実行する」の3段のうち前後の2段 | 確認で止める段は取り込まない（聞き返さない）。手順の本文は公開ページに無く、読んでいない |
 | sync-docs、update-project、docs-workflow、consistency-enforcement（公開スキルの登録サイトの一覧） | ライセンス表記なし（参考のみ） | `docs-upkeep` | 言及先の実在を検査する、README の一覧を正として他の文書と突き合わせる、の 2 つの考え | 手順の文だけで検査のコードは無い。コードは `docs_check.py` に自分で書いた |
 | 用語集を保守する公開スキル（公開スキルの登録サイトの一覧。glossary、terminology の名前のもの） | ライセンス表記なし（参考のみ） | `user-terms` | 用語集を 1 か所に置き、書く側がそれを読む、という形だけ | 読ませるだけでは直らなかったので、取り込み無し。ユーザーの発言から語を数え、Stop フックで止める仕組みは自分で書いた（2026-10-26。同じ目的の公開スキルは見つからなかった） |
+| [Cornjebus/security-analyzer](https://github.com/Cornjebus/security-analyzer) | MIT | `vuln-watch` | 出どころを重ねる考え（OSV と CISA KEV を合わせ、悪用済みを重さより上に置く）。危険度の式（CVSS・悪用・重要度・露出の重み付け） | コードは読んでいない。式は取り込まず、GitHub の判定か CVSS の基本値と「悪用済み」の 2 軸にした。棚卸しは全リポジトリを 1 回で見る形に自分で書いた |
+| dependency-cve-audit、osv-scanner-dependency-vulnerability-detector、weekly-dep-audit（公開スキルの登録サイトの一覧） | ライセンス表記なし（参考のみ） | `vuln-watch` | npm の lock を OSV に当てる、週 1 回で複数のリポジトリを見る、の 2 つの考え | 手順の文だけで取り込み無し。JVN（日本語）と GitHub Actions の浮いたタグの扱いは自分で足した |
+| [OSV](https://osv.dev)、[CISA KEV](https://www.cisa.gov/known-exploited-vulnerabilities-catalog)、[JVN](https://jvn.jp) | データの出どころ（API と RSS） | `vuln-watch/scripts/scan.py` | 脆弱性と悪用済みの一覧とニュース | 取ったものは `~/.cache/vuln-watch` に写しを置き、リポジトリには入れない |
 | [valorisa/Claude-Skills](https://github.com/valorisa/Claude-Skills) `token-optimization` | MIT, Copyright (c) 2026 valorisa | `token-efficiency` | 消費の4つの出どころ、途中で道具を足さない | 要点だけ |
 | [obra/superpowers](https://github.com/obra/superpowers) `subagent-driven-development` | MIT, Copyright (c) 2025 Jesse Vincent | `token-efficiency` | 文脈を渡さないサブエージェントの考え方 | 要点だけ |
 | [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) | Apache-2.0 | 無し | 参考だけ。出力を電報のように縮める方式は「助詞のある文」の決まりと合わない | 取り込み無し |

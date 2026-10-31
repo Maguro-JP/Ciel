@@ -28,6 +28,7 @@
 | 予定を書く（「〜します」） | `work-style` の「会話に出すもの」。`done_check.py` が数える | 返答の最後 | 予定の行の数 |
 | 聞き返す、判断待ちに回す | `prompt-from-context`、`finish-first`。`done_check.py` が ❔ 2 つ以上を差し戻す | 返答の最後 | ❔ の数 |
 | 短い一言を文字どおりに読む | `prompt-from-context`。`brief.py` が直前の文脈を差し込む | 短い一言のとき | 短い一言の数と聞き返し |
+| 脆弱性のニュースに気づかず、更新が遅れる | `vuln-watch`。`scan.py` が毎日、全リポジトリの依存を OSV・CISA KEV・JVN に突き合わせ、新しいものに ★ を付けて周知する。悪用済みと重大は通知し、`bump.py` で更新のブランチを用意する | 毎日のルーティン | 新規の件数と、見つけてから更新の PR までの日数 |
 | 日本語が崩れる、訳語を作る、英語の出だし | `lang-rule.sh`、`lang-check.sh`、`ja-proofread` | 毎ターンと返答の最後 | proofread の重大の数 |
 | ユーザーが使わない略語・訳語・造語で書く（「プルリク」「リポ」「Routine」「片付け」「JST」） | `user-terms` の対応表。`terms_check.py` が返答を表と突き合わせて差し戻し、`terms.py --diff` が文書の差分を注意で出す。`terms_learn.py` が発言の語を数えて表を育てる | 返答の最後と PR の前 | 差し戻した語の数（metrics.jsonl）と文書の注意の数 |
 | CLI やブラウザで作る | `desktop-app`。`no_browser.py`（PostToolUse） | 書き込みのあと | 止めた回数 |

@@ -85,6 +85,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`content-audit`](.claude/skills/content-audit/) | 人に見られる前に中身を精査する。名前、ID、費用、履歴、GitHub 側、不快な表現 |
 | [`ja-proofread`](.claude/skills/ja-proofread/) | 日本語の精度を上げる。文字の混入、翻訳調、訳語、表記ゆれ |
 | [`user-terms`](.claude/skills/user-terms/) | 略語・訳語・造語を、ユーザーが使った語に直す。Stop フックが会話を止め、precheck が文書を注意として出す |
+| [`vuln-watch`](.claude/skills/vuln-watch/) | 脆弱性の見張り。全リポジトリの依存を棚卸しし、OSV と悪用済み一覧と JVN に突き合わせ、新しいものを周知して更新を用意する |
 | [`docs-upkeep`](.claude/skills/docs-upkeep/) | README と docs を今のリポジトリに合わせる。壊れたリンク、無いファイル、一覧の抜け、辿れない文書を止める |
 
 PR と CI

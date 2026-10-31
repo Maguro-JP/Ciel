@@ -113,4 +113,5 @@ description が完璧でも、**AI が自力で簡単に片付けられる依頼
 | フックの差し込み（lang-rule、directives、focus、token-efficiency、brief）と CLAUDE.md | CLAUDE.md が元。フックは短い思い出しだけにし、1 ターン合計 1,200 文字、SessionStart 5,000 文字を目安にする。token-efficiency の measure_hooks.py で測る |
 | 「反抗の禁止」（follow-instructions）と「落ちた出力をそのまま書く」（verify-before-done） | 事実の報告は反抗ではない。出力を貼って 1 行で言い、判断はユーザーに渡す |
 | desktop-app の no_browser.py と、CLI でよいもの（Ciel のスクリプト、ライブラリ） | フックは app/ src/ gui/ desktop/ の下だけを見る |
+| 「その日のうちに更新する」（vuln-watch）と「PR の前に ❔ で確認」（pr_gate.py） | 周知（★ と通知）と更新のブランチの用意は確認なしで行う。PR の作成とマージは ❔ を当日に出して待つ。返事が無ければ pending.md に「PR 待ち」 |
 | 「開発者の間で通る語」（ja-proofread の glossary.md。「Routine」「PR」は原文のまま）と「ユーザーの語」（user-terms の対応表。ルーティン） | ユーザーの語が先。glossary は訳語を戻す先の既定で、ユーザーが別の語を使っていれば user-terms の表に行を足し、そちらに直す。両方に同じ行を書かない |
