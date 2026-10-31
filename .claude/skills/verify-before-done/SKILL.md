@@ -121,7 +121,8 @@ git show --stat HEAD
 
 ## 出す前の確認（precheck と pr_gate）
 
-PR を作る前・マージの前・main に push する前の検査は、`scripts/precheck.py` で 1 本にまとめる。
+PR を作る前・マージの前・main に push する前の検査は、`scripts/precheck.py` で 1 本にまとめる。テストは、そのリポジトリの
+`.claude/hooks/test.sh`（repo-bootstrap が置く台本）があればそれを流し、無ければ pytest を流す。
 手で選んで動かすと抜けて、出したあとに間違いが分かる。precheck は、あるものだけを順に動かし、結果と HEAD を
 `~/.claude/state/pr-gate/<repo>.json` に残す。`hooks/pr_gate.py`（PreToolUse）が、その記録と、出す内容を ❔ で見せたあとの
 ユーザーの返事の無い PR の作成・マージ・main への push を止める。手順は `solo-pr-flow` の「出す前の確認」。
