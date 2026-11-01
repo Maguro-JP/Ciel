@@ -116,6 +116,7 @@ PR と CI
 | スキル | 用途 |
 |---|---|
 | [`desktop-app`](.claude/skills/desktop-app/) | アプリはウィンドウで開き、機能は画面に置く。CLI ではなく GUI、ブラウザではなくアプリケーション |
+| [`ui-design`](.claude/skills/ui-design/) | UI はインテュイティブ・ユーザーフレンドリー・ストレスフリー。手数を数え、初めての人として歩いて確かめる。フックが書き込みのたびに検査する |
 | [`shared-models`](.claude/skills/shared-models/) | AI の模型の置き場を 1 か所にそろえる |
 
 スキルの管理
