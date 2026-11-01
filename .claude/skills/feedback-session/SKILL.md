@@ -104,19 +104,20 @@ PR をマージし、親セッションがいれば下の「セッション間�
 create_session(
   title="FB <repo> <トピック>",
   source_url="https://github.com/<owner>/<repo>",
-  model="claude-fable-5-1",
-  permission_mode="auto",
+  model=<元のセッションの model>,
+  permission_mode=<元のセッションの permission_mode>,
   tags=["feedback-session:auto", "ciel:<親の skill>:<トピック>"],
   prompt=<下の定型>)
 ```
 
-セッションを作るときの設定。省くとデフォルト（親と違う模型、エフォート low）になり、あとでユーザーが直すことになる。
+AI が作るセッションは、元のセッション（作る側）の設定を引き継ぐ。先に `get_session`（session_id 無し）で自分の
+`session_context.model`、`permission_mode`、`effort_level` を取り、そのまま渡す。省くと模型とエフォートがずれて、あとでユーザーが直すことになる。
 
 | 設定 | 値 | 理由 |
 |---|---|---|
-| model | `claude-fable-5-1`（ユーザーがこのセッションで使っている模型）。ユーザーが別の模型と言ったときだけ変える | 省くと親の模型が写り、親が古い模型だとそのまま続く |
-| permission_mode | `auto`（親と同じ。親より緩くは作れない） | `plan` は人の承認で止まる。自律のセッションには使わない |
-| effort | `create_session` では指定できない。作られた側はデフォルトで low になる。作ったら `❕ <題> を作った（effort は low。上げるならユーザーが切り替える）` と 1 行出す | ツールに欄が無い。黙っていると low のまま回る |
+| model | 元のセッションの `session_context.model` をそのまま | ユーザーが元のセッションで選んだ模型が、作った側にも効くように |
+| permission_mode | 元のセッションの `permission_mode` をそのまま（親より緩くは作れない） | `plan` は人の承認で止まる。自律のセッションには使わない |
+| effort | 元のセッションの `effort_level` を引き継ぎたいが、`create_session` に渡す欄が無く、作られた側は low になる。作ったら `❕ <題> を作った（effort は low。元は <値>。上げるならユーザーが切り替える）` と 1 行出す | ツールに欄が無い。黙っていると low のまま回る |
 | tags | `feedback-session:auto` と `ciel:<親の skill>:<トピック>` | 消すときに、自分で立てたものを見分ける |
 | title | work-style「名前の付け方」の形 | 一覧で見分ける |
 
