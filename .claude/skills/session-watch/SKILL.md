@@ -61,5 +61,5 @@ python3 .claude/skills/session-watch/scripts/judge.py --sessions sessions.json -
 
 - 全体を表で見る: `patrol`。止まっているかの判定の元はそこ。このスキルは処置まで進める
 - ブランチ・一回きりのルーティン・終わったセッションの整理整頓: `tidy`。このスキルの「無駄」は tidy の「終わったセッション」と同じ判定で、毎日回す
-- セッションを立てるときの設定と、立てた側での片付け: `feedback-session`
+- セッションを立てるときの設定と、立てた側での整理整頓: `feedback-session`
 - 定期実行: `scheduler`。週の報告: `skill-upkeep`
