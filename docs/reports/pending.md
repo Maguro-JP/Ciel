@@ -13,3 +13,10 @@
 - 決めてほしいこと: 配布用の private リポジトリの Actions は 10/17 から 3 回とも「recent account payments have failed or your spending limit needs to be increased」で始まっていない。GitHub の Billing & plans で支払いか使用上限を直すか、配布を Actions からこのセッションの週 1 回のルーティン（skill-sync で配り、PR の作成は ❔ で確認）へ移すか
 - 推す案: 支払いか上限を直す。Actions の配布は、手元に clone の無いリポジトリにも届く
 - 決まるまで: 手で配る。為替の自動売買のリポジトリには claude/SYNC-20261031 を用意した
+
+## 2026-11-02 Dependabot alerts の有効化は、このセッションからできない
+
+- 何: Ciel のスキルを配っている 10 本のリポジトリで Dependabot alerts を有効にする（vuln-watch の補い）
+- 止まった所: GitHub の API の `vulnerability-alerts` のパスは、このセッションの経路（リポジトリ単位のプロキシ）で HTTP 403。リポジトリの設定を書き換える `PATCH` は auto mode の classifier（Account & Standing-Rule Changes）で止められた
+- ユーザーにしかできないこと: 各リポジトリの Settings → Code security → Dependabot alerts を有効にする。有効にしたら、この項目を「反映済み」にする
+- それまで: vuln-watch の毎日のルーティン（OSV・CISA KEV・JVN）で見る

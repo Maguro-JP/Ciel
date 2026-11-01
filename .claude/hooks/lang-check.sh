@@ -41,6 +41,6 @@ if hits:
         (root / (Path(path).stem + ".again")).write_text("1")
     except Exception:
         pass
-    print("直前の応答に韓国語が混ざっています: " + " ".join(hits[:5]) + "\n日本語だけで書き直してください。", file=sys.stderr)
+    print("直前の応答に韓国語が混ざっています: " + " ".join(hits[:5]) + "\n混ざった行だけを日本語で書き直す。前の行を出し直さない。", file=sys.stderr)
     sys.exit(2)
 PY

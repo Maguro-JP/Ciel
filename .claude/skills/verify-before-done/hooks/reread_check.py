@@ -151,7 +151,7 @@ def main() -> int:
         reasons.append("間違っているかもしれない所と、確かめていないことを ❕ で 1 行書く（例: ❕ 疑い: …は読み直したが動かしていない）。常に自分が間違っていると疑う")
     record(d.get("session_id", ""), {**stats, "blocked": bool(reasons), "honest": honest, "doubt": not doubt_missing(text, stats)})
     if reasons:
-        print("。".join(reasons) + "（AI が作ったものには間違いがある。verify-before-done「読み直し」）", file=sys.stderr)
+        print("。".join(reasons) + "（verify-before-done「読み直し」）。足りない行だけを足す。前の行を出し直さない", file=sys.stderr)
         return 2
     return 0
 

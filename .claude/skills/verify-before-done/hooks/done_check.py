@@ -203,7 +203,7 @@ def main() -> int:
     if questions > 1:
         reasons.append(f"❔ が {questions} 行ある。1 ターンに 1 つまで。残りは決めて進めるか、ファイルに書いて ★ で渡す（follow-instructions）。")
     if reasons:
-        print("\n".join(reasons), file=sys.stderr)
+        print("\n".join(reasons) + "\n足りない行だけを足す。前の行を出し直さない。", file=sys.stderr)
         return 2
     return 0
 
