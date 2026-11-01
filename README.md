@@ -80,7 +80,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 
 | スキル | 用途 |
 |---|---|
-| [`verify-before-done`](.claude/skills/verify-before-done/) | 完了の語をツールの出力と照合する Stop フック。PR・マージ・main への push の前の precheck と確認ゲート |
+| [`verify-before-done`](.claude/skills/verify-before-done/) | 完了の語をツールの出力と照合し、書いたあとの読み直しとコミット前の差分の読みを求める Stop フック。PR・マージ・main への push の前の precheck と確認ゲート |
 | [`secret-leak-check`](.claude/skills/secret-leak-check/) | 機密情報の混入を調べ、漏れたときの順序を案内する |
 | [`content-audit`](.claude/skills/content-audit/) | 人に見られる前に中身を精査する。名前、ID、費用、履歴、GitHub 側、不快な表現 |
 | [`ja-proofread`](.claude/skills/ja-proofread/) | 日本語の精度を上げる。文字の混入、翻訳調、訳語、表記ゆれ |
