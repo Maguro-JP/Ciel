@@ -108,9 +108,14 @@ description が完璧でも、**AI が自力で簡単に片付けられる依頼
 | 「戻せる判断はデフォルトで進める」（finish-first、auto-dev）と確認ゲート | PR・マージ・push は戻せない側に数える。自律で回っているときは PR を作らず pending.md に「PR 待ち」 |
 | 「分からなければ 1 つ聞く」（follow-instructions、work-style）と「文脈から補う」（prompt-from-context） | まず前の文脈から補う。聞くのは読み方で成果物が変わるときだけで、直したあとに ❔ を 1 行 |
 | 「依頼を自分の言葉で返す」（work-style）と「了解・経過を書かない」 | ↩ 読み取り の 1 行がその返しで、ほかに書かない |
-| 「通ったツールを信じて読み直さない」（token-efficiency）と「出力を貼る」（verify-before-done） | 読み直さないのはファイルの確認。完了の語の根拠は、そのターンのツールの出力で、貼るのは最後の行と場所だけ |
+| 「ツールの成否は結果で信じる」（token-efficiency）と「AI が作ったものには間違いがある。書いたら読み直す」（verify-before-done の reread_check） | 信じるのはツールの成否（編集が入ったか）。自分が書いた中身は差分を 1 回読み、2 回目は読まない。完了の語の根拠はそのターンのツールの出力で、貼るのは最後の行と場所だけ |
 | 「尋ねずにマージ」（workspace-policy の auto_merge）と確認ゲート | auto_merge は、ユーザーが「確認なし」と言ったときだけ効く |
 | フックの差し込み（lang-rule、directives、focus、token-efficiency、brief）と CLAUDE.md | CLAUDE.md が元。フックは短い思い出しだけにし、1 ターン合計 1,200 文字、SessionStart 5,000 文字を目安にする。token-efficiency の measure_hooks.py で測る |
 | 「反抗の禁止」（follow-instructions）と「落ちた出力をそのまま書く」（verify-before-done） | 事実の報告は反抗ではない。出力を貼って 1 行で言い、判断はユーザーに渡す |
 | desktop-app の no_browser.py と、CLI でよいもの（Ciel のスクリプト、ライブラリ） | フックは app/ src/ gui/ desktop/ の下だけを見る |
+| 「subagent は頼まれたときだけ」（token-efficiency、環境の既定）と「基本バックグラウンド」（background-first） | ユーザーが「基本バックグラウンド」と決めたので、3 手以上の調べもの・検査は Agent（run_in_background）に出してよい。❔ と PR・マージ・push は親のセッションがする。1 秒で終わるものは裏に出さない（通知で 1 ターン使う） |
+| 「ツールの成否は結果で信じる」（token-efficiency）と「裏の処理の結果はファイルの末尾を読む」（background-first） | 裏の処理は exit の数と末尾の数行を読んで、通った・落ちたを言う。全部は読まない |
+| 「UI は使いやすさ」（ui-design）と「見た目の個性」（frontend-design）と「起動はウィンドウ」（desktop-app） | 3 つは重ならない。ui-design は使いやすさ（手数、答え、戻せる、邪魔しない）だけを決め、色や書体は frontend-design、起動の形は desktop-app。ui_nudge.py は tests・docs・design の下を見ない |
+| 「人が開いたセッションは消さない」（feedback-session、tidy）と「無駄なセッションを消す」（session-watch） | AI が立てたものは消す。人が開いたものは見ない・聞かない・知らせない。ルーティンに紐づいた人のセッションは、ルーティンの動き（サボり・落ちた）だけ催促する |
+| 「その日のうちに更新する」（vuln-watch）と「PR の前に ❔ で確認」（pr_gate.py） | 周知（★ と通知）と更新のブランチの用意は確認なしで行う。PR の作成とマージは ❔ を当日に出して待つ。返事が無ければ pending.md に「PR 待ち」 |
 | 「開発者の間で通る語」（ja-proofread の glossary.md。「Routine」「PR」は原文のまま）と「ユーザーの語」（user-terms の対応表。ルーティン） | ユーザーの語が先。glossary は訳語を戻す先の既定で、ユーザーが別の語を使っていれば user-terms の表に行を足し、そちらに直す。両方に同じ行を書かない |

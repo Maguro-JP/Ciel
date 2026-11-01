@@ -24,7 +24,7 @@ def inputs(tmp: Path):
         {"type": "user", "message": {"content": "README を読んで"}},
         {"type": "assistant", "message": {"content": [{"type": "tool_use", "name": "Bash", "input": {"command": "./scripts/validate.sh"}}]}},
         {"type": "user", "message": {"content": [{"type": "tool_result", "content": "誤り 0  注意 0\nexit=0"}]}},
-        {"type": "assistant", "message": {"content": [{"type": "text", "text": "★ 済み: README.md:1 を読み、`scripts/validate.sh` が通りました。"}]}},
+        {"type": "assistant", "message": {"content": [{"type": "text", "text": "★ 済み: README.md:1 を読み、`scripts/validate.sh` が通りました。\n❕ 疑い: 他の検査は動かしていない。"}]}},
     ]
     t.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n", encoding="utf-8")
     base = {"session_id": "smoke", "transcript_path": str(t), "cwd": str(ROOT)}

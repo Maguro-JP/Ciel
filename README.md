@@ -75,16 +75,18 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`finish-first`](.claude/skills/finish-first/) | 成果物を 1 つずつ完成させる。完成条件を先に書き、戻せる判断はデフォルトで進める |
 | [`lessons`](.claude/skills/lessons/) | 失敗の記録。場面・起きたこと・判定の誤り・次から の 4 行で残し、開始時にフックが差し込む |
 | [`token-efficiency`](.claude/skills/token-efficiency/) | トークンと文脈を節約する。フックの差し込み量を測る |
+| [`background-first`](.claude/skills/background-first/) | ユーザーが優先。長い処理は裏で動かし、ターンを短く終える。フックが前面の長いコマンドを止める |
 
 出す前の検証
 
 | スキル | 用途 |
 |---|---|
-| [`verify-before-done`](.claude/skills/verify-before-done/) | 完了の語をツールの出力と照合する Stop フック。PR・マージ・main への push の前の precheck と確認ゲート |
+| [`verify-before-done`](.claude/skills/verify-before-done/) | 完了の語をツールの出力と照合し、書いたあとの読み直しとコミット前の差分の読みを求める Stop フック。PR・マージ・main への push の前の precheck と確認ゲート |
 | [`secret-leak-check`](.claude/skills/secret-leak-check/) | 機密情報の混入を調べ、漏れたときの順序を案内する |
 | [`content-audit`](.claude/skills/content-audit/) | 人に見られる前に中身を精査する。名前、ID、費用、履歴、GitHub 側、不快な表現 |
 | [`ja-proofread`](.claude/skills/ja-proofread/) | 日本語の精度を上げる。文字の混入、翻訳調、訳語、表記ゆれ |
 | [`user-terms`](.claude/skills/user-terms/) | 略語・訳語・造語を、ユーザーが使った語に直す。Stop フックが会話を止め、precheck が文書を注意として出す |
+| [`vuln-watch`](.claude/skills/vuln-watch/) | 脆弱性の見張り。全リポジトリの依存を棚卸しし、OSV と悪用済み一覧と JVN に突き合わせ、新しいものを周知して更新を用意する |
 | [`docs-upkeep`](.claude/skills/docs-upkeep/) | README と docs を今のリポジトリに合わせる。壊れたリンク、無いファイル、一覧の抜け、辿れない文書を止める |
 
 PR と CI
@@ -106,6 +108,7 @@ PR と CI
 | [`scheduler`](.claude/skills/scheduler/) | ルーティンの作成・一覧・停止と cron の決まり |
 | [`patrol`](.claude/skills/patrol/) | 自律開発を回しているリポジトリ全部の状態を 1 つの表で見る |
 | [`pending`](.claude/skills/pending/) | 自律開発が脇に置いた判断待ちを、リポジトリを横断して見る・答える |
+| [`session-watch`](.claude/skills/session-watch/) | AI が作ったセッションとルーティンのサボり・止まり・無駄を判定し、催促する・待機する・消す。人のセッションには触らない |
 | [`feedback-session`](.claude/skills/feedback-session/) | セッションをフィードバック専用に整える。1 トピック 1 セッション 1 ブランチ |
 | [`self-learn`](.claude/skills/self-learn/) | 知らないことを調べて身につけ、次から使える形で残す |
 
@@ -114,6 +117,7 @@ PR と CI
 | スキル | 用途 |
 |---|---|
 | [`desktop-app`](.claude/skills/desktop-app/) | アプリはウィンドウで開き、機能は画面に置く。CLI ではなく GUI、ブラウザではなくアプリケーション |
+| [`ui-design`](.claude/skills/ui-design/) | UI はインテュイティブ・ユーザーフレンドリー・ストレスフリー。手数を数え、初めての人として歩いて確かめる。フックが書き込みのたびに検査する |
 | [`shared-models`](.claude/skills/shared-models/) | AI の模型の置き場を 1 か所にそろえる |
 
 スキルの管理
