@@ -15,7 +15,7 @@ Routine の1回の起動は1セッション分のトークンを使う。回数�
 リポジトリの欄があるが、クラウドセッションの中からその画面は使えない。
 だから、次の順で作る。リポジトリを持つセッションを先に作り、Routine をそれに紐づける。
 
-1. `create_session` に `source_url`（対象リポジトリの URL）、`model`（ユーザーが使っている模型。省くと親の模型が写る）、`permission_mode: auto`（親より緩くは作れない）、`tags`（`ciel:<skill>:<repo>`。消すときの目印）を渡してセッションを作る。返答の `session_context.sources` にそのリポジトリが入っていることを見る。effort は指定できず既定で low になるので、作ったら ❕ で 1 行知らせ、上げるかはユーザーが決める（feedback-session の表）
+1. `create_session` に `source_url`（対象リポジトリの URL）、`model`（ユーザーが使っている模型。省くと親の模型が写る）、`permission_mode: auto`（親より緩くは作れない）、`tags`（`ciel:<skill>:<repo>`。消すときの目印）を渡してセッションを作る。返答の `session_context.sources` にそのリポジトリが入っていることを見る。effort は指定できずデフォルトで low になるので、作ったら ❕ で 1 行知らせ、上げるかはユーザーが決める（feedback-session の表）
 2. `create_trigger` に `persistent_session_id`（1 の session_id）、cron、プロンプトを渡す。`create_new_session_on_fire` は使わない
 3. `fire_trigger` で1回起動する
 4. `scripts/check.sh <owner/repo> <ブランチの一部>` でリポジトリ側にブランチかコミットが増えるのを待つ。増えたら「動く」。増えなければ Routine を無効にして原因を見る
