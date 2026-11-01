@@ -50,6 +50,6 @@ Agent の途中の出力が親の文脈に乗らないこと、待っている�
 ## 他のスキルとの関係
 
 - 読む前に探す、出力を絞る、一覧には limit: `token-efficiency`。このスキルは「いつ裏に出すか」と「ターンをいつ終えるか」
-- 子のセッションの設定の引き継ぎと片付け: `feedback-session`。管理: `session-watch`
+- 子のセッションの設定の引き継ぎと整理整頓: `feedback-session`。管理: `session-watch`
 - 会話の 4 種類の行: `work-style`。裏に出したときの ❕ もその形
 - 通った・落ちたの言い方: `verify-before-done`
