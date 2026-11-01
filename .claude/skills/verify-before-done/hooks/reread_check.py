@@ -11,7 +11,8 @@ AI が作ったものには間違いがある。書いた直後の自分は、�
   proofread.py・terms.py・docs_check.py・audit.py の差分の検査
 - 動かす: validate.sh・precheck.py・test_*.py・pytest・unittest・npm test・hooks-smoke・test.sh
 差し戻すのは、編集があるのに最後の編集のあとに読み直しも実行も無いとき、Markdown を編集したのに文を読んでいないとき、
-git commit があるのにそのターンで差分を読んでいないとき。「読み直していない」と書いてあれば通す（正直な方が良い）。
+git commit があるのにそのターンで差分を読んでいないとき、作業や完了の主張があるのに疑いの 1 行（間違っているかもしれない所、
+確かめていないこと）が無いとき。「読み直していない」と書いてあれば読み直しの差し戻しはしない（正直な方が良い）。
 
 環境変数:
   REREAD_CHECK_OFF=1      止める
@@ -34,6 +35,9 @@ TEXT_READ = re.compile(
 CHECK_RUN = re.compile(r"validate\.sh|precheck\.py|test_\w+\.py|\bpytest\b|\bunittest\b|npm test|hooks-smoke|\btest\.sh\b")
 COMMIT = re.compile(r"\bgit\s+commit\b(?![^\n;|&]*--amend)|\bgit\s+commit\s+--amend\b")
 HONEST = re.compile(r"読み直していない|読み直していません|読んでいない|読んでいません|差分を見ていない|確かめていない")
+# 疑いの 1 行。常に自分が間違っていると疑う。作業や主張のある返答に、間違っているかもしれない所と確かめていないことを書く
+DOUBT = re.compile(r"疑い|確かめていない|確認していない|見ていない|読んでいない|読み直していない|間違っているかも|間違いがあり得る|私の推測|まだ分からない|分かっていない")
+CLAIM = re.compile(r"直しました|作りました|足しました|入れました|通りました|マージしました|push しました|配りました|できました|完了")
 MD = re.compile(r"\.md\b")
 
 
@@ -103,6 +107,12 @@ def judge(calls):
     return reasons, {"edits": len(edits), "md": any(r[1] for r in rows), "reread": any(r[2] for r in rows), "ran": any(r[3] for r in rows), "commits": len(commits)}
 
 
+def doubt_missing(text: str, stats: dict) -> bool:
+    """作業（編集・コミット）か完了の主張があるのに、疑いの 1 行が無い。常に自分が間違っていると疑う。"""
+    worked = stats["edits"] > 0 or stats["commits"] > 0 or bool(CLAIM.search(text))
+    return worked and not DOUBT.search(text)
+
+
 def record(session_id: str, row: dict) -> None:
     base = os.environ.get("DONE_CHECK_STATE")
     root = Path(base) if base else Path.home() / ".claude" / "state" / "verify-before-done"
@@ -135,9 +145,13 @@ def main() -> int:
         return 0
     reasons, stats = judge(calls)
     honest = bool(HONEST.search(text))
-    record(d.get("session_id", ""), {**stats, "blocked": bool(reasons) and not honest, "honest": honest})
-    if reasons and not honest:
-        print("。".join(reasons) + "（AI が作ったものには間違いがある。verify-before-done「読み直し」。読み直していないなら「読み直していない」と書く）", file=sys.stderr)
+    if honest:
+        reasons = []
+    if doubt_missing(text, stats):
+        reasons.append("間違っているかもしれない所と、確かめていないことを ❕ で 1 行書く（例: ❕ 疑い: …は読み直したが動かしていない）。常に自分が間違っていると疑う")
+    record(d.get("session_id", ""), {**stats, "blocked": bool(reasons), "honest": honest, "doubt": not doubt_missing(text, stats)})
+    if reasons:
+        print("。".join(reasons) + "（AI が作ったものには間違いがある。verify-before-done「読み直し」）", file=sys.stderr)
         return 2
     return 0
 

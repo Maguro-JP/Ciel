@@ -54,9 +54,19 @@ class Reread(unittest.TestCase):
         self.assertIn("読み直していない", err)
 
     def test_edit_then_read_passes(self):
-        rows = [user("直して"), use("Edit", file_path="a.md", old_string="x", new_string="y"), result(), use("Read", file_path="a.md"), result("y"), text("★ 直しました。")]
+        rows = [user("直して"), use("Edit", file_path="a.md", old_string="x", new_string="y"), result(), use("Read", file_path="a.md"), result("y"), text("★ 直しました。\n❕ 疑い: 動かしていない。")]
         self.assertEqual(self.run_hook(rows)[0], 0)
-        rows = [user("直して"), use("Edit", file_path="a.md", old_string="x", new_string="y"), result(), use("Bash", command="git diff -- a.md"), result("+y"), text("★")]
+        rows = [user("直して"), use("Edit", file_path="a.md", old_string="x", new_string="y"), result(), use("Bash", command="git diff -- a.md"), result("+y"), text("★\n❕ 疑い: 1 行だけ。")]
+        self.assertEqual(self.run_hook(rows)[0], 0)
+
+    def test_work_without_doubt_line_is_blocked(self):
+        rows = [user("直して"), use("Edit", file_path="a.py", old_string="x", new_string="y"), result(), use("Bash", command="python3 -I scripts/test_a.py"), result("OK"), text("★ 直しました。")]
+        code, err = self.run_hook(rows)
+        self.assertEqual(code, 2)
+        self.assertIn("疑い", err)
+        rows = [user("見て"), use("Bash", command="ls"), result("a"), text("★ 直しました。")]  # 編集は無いが完了の主張がある
+        self.assertEqual(self.run_hook(rows)[0], 2)
+        rows = [user("見て"), use("Bash", command="ls"), result("a"), text("★ 1 件です。")]  # 主張も作業も無い
         self.assertEqual(self.run_hook(rows)[0], 0)
 
     def test_markdown_edit_needs_text_not_only_tests(self):
@@ -64,11 +74,11 @@ class Reread(unittest.TestCase):
         code, err = self.run_hook(rows)
         self.assertEqual(code, 2)
         self.assertIn("文を読んでいない", err)
-        rows = [user("直して"), use("Edit", file_path="a.py", old_string="x", new_string="y"), result(), use("Bash", command="python3 -I scripts/test_a.py"), result("OK"), text("★")]
+        rows = [user("直して"), use("Edit", file_path="a.py", old_string="x", new_string="y"), result(), use("Bash", command="python3 -I scripts/test_a.py"), result("OK"), text("★\n❕ 疑い: 境界は試していない。")]
         self.assertEqual(self.run_hook(rows)[0], 0)
 
     def test_bash_edit_with_read_in_same_command_passes(self):
-        rows = [user("直して"), use("Bash", command="sed -i 's/a/b/' a.md && sed -n 3p a.md"), result("b"), text("★")]
+        rows = [user("直して"), use("Bash", command="sed -i 's/a/b/' a.md && sed -n 3p a.md"), result("b"), text("★\n❕ 疑い: 他の行は見ていない。")]
         self.assertEqual(self.run_hook(rows)[0], 0)
         rows = [user("直して"), use("Bash", command="sed -i 's/a/b/' a.md"), result(), text("★")]
         self.assertEqual(self.run_hook(rows)[0], 2)
@@ -78,7 +88,7 @@ class Reread(unittest.TestCase):
         code, err = self.run_hook(rows)
         self.assertEqual(code, 2)
         self.assertIn("差分を読まずにコミット", err)
-        rows = [user("直して"), use("Bash", command="git diff --cached -- a.md"), result("+y"), use("Bash", command="git commit -q -m x"), result(), text("★")]
+        rows = [user("直して"), use("Bash", command="git diff --cached -- a.md"), result("+y"), use("Bash", command="git commit -q -m x"), result(), text("★\n❕ 疑い: push はまだ。")]
         self.assertEqual(self.run_hook(rows)[0], 0)
 
     def test_no_edit_honest_and_off_pass(self):
