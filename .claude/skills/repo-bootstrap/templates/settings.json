@@ -191,6 +191,16 @@
     ],
     "PreToolUse": [
       {
+        "matcher": "Bash|Read|Edit|Write|MultiEdit|Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/skills/background-first/hooks/background_first.py",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "Edit|Write|MultiEdit|Bash",
         "hooks": [
           {

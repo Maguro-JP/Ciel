@@ -75,6 +75,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`finish-first`](.claude/skills/finish-first/) | 成果物を 1 つずつ完成させる。完成条件を先に書き、戻せる判断はデフォルトで進める |
 | [`lessons`](.claude/skills/lessons/) | 失敗の記録。場面・起きたこと・判定の誤り・次から の 4 行で残し、開始時にフックが差し込む |
 | [`token-efficiency`](.claude/skills/token-efficiency/) | トークンと文脈を節約する。フックの差し込み量を測る |
+| [`background-first`](.claude/skills/background-first/) | ユーザーが優先。長い処理は裏で動かし、ターンを短く終える。フックが前面の長いコマンドを止める |
 
 出す前の検証
 
