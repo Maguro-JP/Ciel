@@ -107,6 +107,7 @@ PR と CI
 | [`scheduler`](.claude/skills/scheduler/) | ルーティンの作成・一覧・停止と cron の決まり |
 | [`patrol`](.claude/skills/patrol/) | 自律開発を回しているリポジトリ全部の状態を 1 つの表で見る |
 | [`pending`](.claude/skills/pending/) | 自律開発が脇に置いた判断待ちを、リポジトリを横断して見る・答える |
+| [`session-watch`](.claude/skills/session-watch/) | セッションのサボり・止まり・無駄を判定し、起こす・知らせる・消す |
 | [`feedback-session`](.claude/skills/feedback-session/) | セッションをフィードバック専用に整える。1 トピック 1 セッション 1 ブランチ |
 | [`self-learn`](.claude/skills/self-learn/) | 知らないことを調べて身につけ、次から使える形で残す |
 
