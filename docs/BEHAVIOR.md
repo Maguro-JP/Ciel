@@ -34,6 +34,7 @@
 | 日本語が崩れる、訳語を作る、英語の出だし | `lang-rule.sh`、`lang-check.sh`、`ja-proofread` | 毎ターンと返答の最後 | proofread の重大の数 |
 | ユーザーが使わない略語・訳語・造語で書く（「プルリク」「リポ」「Routine」「片付け」「JST」） | `user-terms` の対応表。`terms_check.py` が返答を表と突き合わせて差し戻し、`terms.py --diff` が文書の差分を注意で出す。`terms_learn.py` が発言の語を数えて表を育てる | 返答の最後と PR の前 | 差し戻した語の数（metrics.jsonl）と文書の注意の数 |
 | 長い処理を前面で待ち、ユーザーの一言が届かない | `background-first`。`background_first.py`（PreToolUse）が長いコマンドの前面の実行を止め、12 回ごとに裏へ出すよう知らせる | ツールを呼ぶ前 | 止めた回数、知らせた回数 |
+| 他のリポジトリのセッションが欲しいスキルを会話で言って消える | `skill-request`。`requests.py --add` がそのリポジトリの docs/reports/skill-requests.md に書き、Ciel の skill-upkeep が `--collect` で拾う | 要請が出たとき、毎週 | 未対応の件数と、対応までの週数 |
 | CLI やブラウザで作る | `desktop-app`。`no_browser.py`（PostToolUse） | 書き込みのあと | 止めた回数 |
 | 分かりにくい・面倒な画面を作る（止まるダイアログ、ラベルの無い入力、曖昧なエラー文、画面を固める処理） | `ui-design`。`ui_nudge.py`（PostToolUse）が書き込みのたびに知らせ、`ui_check.py --diff` を precheck が注意で出す | 書き込みのあとと PR の前 | 注意の数 |
 | 時刻を UTC で書く | `lessons` の記録と CLAUDE.md | 毎ターン | ― |

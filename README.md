@@ -126,6 +126,7 @@ PR と CI
 |---|---|
 | [`skill-sync`](.claude/skills/skill-sync/) | Ciel のスキルをリポジトリに取り込む。差分があるものだけ入れ替える |
 | [`skill-audit`](.claude/skills/skill-audit/) | 既存スキルを「発動しない / 誤爆する / 肥大化 / 干渉」で診断する |
+| [`skill-request`](.claude/skills/skill-request/) | どのセッションからでも、そのリポジトリの docs/reports/skill-requests.md にスキルの要請を書き、Ciel が集めて作る・配る・状態を書き戻す |
 | [`skill-upkeep`](.claude/skills/skill-upkeep/) | セッションを観察してスキルを直し、新しく作る。Ciel 自身の自律開発 |
 | [`repo-bootstrap`](.claude/skills/repo-bootstrap/) | リポジトリに CLAUDE.md、フック、スキル、最小の CI を一度で置く |
 

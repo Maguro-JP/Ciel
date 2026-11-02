@@ -17,6 +17,7 @@ description: 走っているセッションを観察して、使われている�
 - `list_triggers` で Routine を見る。実行されたのに成果がないもの、1回きりのまま残っているもの
 - 各リポジトリ（ルーティンの紐づけ先）で、この1週間の PR のタイトルと、`.claude/skills/lessons/LESSONS.md` に増えた項目、`docs/reports/pending.md` の答え待ちを読む。
   手元に clone があれば `scripts/observe.py` が 1 本で表にする（コミット・PR のマージ・DEV/SYNC/FB の数・Ciel に無い lessons の題・答えの無い判断待ち）
+- 各リポジトリからのスキルの要請（`docs/reports/skill-requests.md`。`skill-request` の `requests.py --collect` が 1 つの表にする）。未対応は「新作」の先頭の候補
 - ユーザーがこの1週間に直させたこと（Ciel の git log と lessons）
 - Ciel に `content-audit` の `--all` と `ja-proofread` の `--tree` を当て、見せてはいけないものと壊れた日本語が増えていないか見る。見つかったら直す PR を先に出す
 
