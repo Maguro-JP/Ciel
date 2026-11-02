@@ -20,3 +20,10 @@
 - 止まった所: GitHub の API の `vulnerability-alerts` のパスは、このセッションの経路（リポジトリ単位のプロキシ）で HTTP 403。リポジトリの設定を書き換える `PATCH` は auto mode の classifier（Account & Standing-Rule Changes）で止められた
 - ユーザーにしかできないこと: 各リポジトリの Settings → Code security → Dependabot alerts を有効にする。有効にしたら、この項目を「反映済み」にする
 - それまで: vuln-watch の毎日のルーティン（OSV・CISA KEV・JVN）で見る
+
+## 2026-11-02 pr_gate の 2 つの不具合は、AI からは直せない
+
+- 何: `verify-before-done/hooks/pr_gate.py` が、Stop フックの差し戻しの文（「Stop hook feedback: …」）を人の発言と数えるので、❔ と返事の間に差し戻しが挟まると「確認なし」になる。PR の番号が付く前にブランチの名前で聞いた ❔ を、マージのときに数えない
+- 止まった所: フックの直しは auto mode の classifier（AI が自分のゲートを直す判定）で止められた
+- ユーザーにしかできないこと: `SYSTEMISH` に `Stop hook feedback` を足す。`approval()` の `matches` で、PR の番号が無いときは今のブランチの名前でも数える。直したら、この項目を「反映済み」にする
+- それまで: ❔ の返事が来たら、別の文が挟まる前にマージを呼ぶ。止まったら、PR の番号を入れた ❔ を 1 行出し直す
