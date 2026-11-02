@@ -33,7 +33,7 @@ def run(prompt, transcript=None, state=None, off=False):
 class Emotion(unittest.TestCase):
     def test_classify(self):
         self.assertEqual(classify("マージしろって 何度も言わせんなよ")[0], "いらだち")
-        self.assertEqual(classify("無能なんだから 常に間違ってると疑って")[0], "怒り")
+        self.assertEqual(classify("無能なんだから 常に間違ってると疑って")[0], "怒り")  # content-audit: ignore（検出語の例）
         self.assertEqual(classify("まだ? いつ終わるの")[0], "急かし")
         self.assertEqual(classify("また同じこと言わせるのか")[0], "いらだち")  # 強い方が先
         self.assertEqual(classify("結局直ってない")[0], "失望")
