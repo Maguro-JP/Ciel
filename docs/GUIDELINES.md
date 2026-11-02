@@ -115,6 +115,7 @@ description が完璧でも、**AI が自力で簡単に片付けられる依頼
 | desktop-app の no_browser.py と、CLI でよいもの（Ciel のスクリプト、ライブラリ） | フックは app/ src/ gui/ desktop/ の下だけを見る |
 | 「subagent は頼まれたときだけ」（token-efficiency、環境の既定）と「基本バックグラウンド」（background-first） | ユーザーが「基本バックグラウンド」と決めたので、3 手以上の調べもの・検査は Agent（run_in_background）に出してよい。❔ と PR・マージ・push は親のセッションがする。1 秒で終わるものは裏に出さない（通知で 1 ターン使う） |
 | 「ツールの成否は結果で信じる」（token-efficiency）と「裏の処理の結果はファイルの末尾を読む」（background-first） | 裏の処理は exit の数と末尾の数行を読んで、通った・落ちたを言う。全部は読まない |
+| 「訂正は 1 文で認めて直す」（follow-instructions の directives.py）と「感情を読んで 1〜2 行」（user-emotion の emotion.py） | 同じターンに両方が差し込む。感情の行は動き方（量と確認の数）、訂正の行は手順（認めて直す）で、重ねて守る。差し込みは合わせて 2 行まで |
 | 「要請を受けたら作る」（skill-request）と「PR の前に ❔」（pr_gate）、「公開に非公開の名前を書かない」（content-audit） | 要請を受けても PR とマージはユーザーの返事のあと。要請した側の返事はユーザーの返事ではない。Ciel に置く要請は非公開の名前を伏せる。要請の受け付けは skill-upkeep の観察に入れ、別のルーティンを作らない |
 | 「UI は使いやすさ」（ui-design）と「見た目の個性」（frontend-design）と「起動はウィンドウ」（desktop-app） | 3 つは重ならない。ui-design は使いやすさ（手数、答え、戻せる、邪魔しない）だけを決め、色や書体は frontend-design、起動の形は desktop-app。ui_nudge.py は tests・docs・design の下を見ない |
 | 「人が開いたセッションは消さない」（feedback-session、tidy）と「無駄なセッションを消す」（session-watch） | AI が立てたものは消す。人が開いたものは見ない・聞かない・知らせない。ルーティンに紐づいた人のセッションは、ルーティンの動き（サボり・落ちた）だけ催促する |

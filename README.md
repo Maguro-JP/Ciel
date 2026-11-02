@@ -72,6 +72,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`work-style`](.claude/skills/work-style/) | 仕事の進め方。確認してから動く、1 つずつ、動かしてから完了と言う、確かめていないことは言わない |
 | [`follow-instructions`](.claude/skills/follow-instructions/) | 指示に従う。ユーザーの一言をスキルやチェックより上に置き、訂正は 1 文で認めて言われた通りに直す。AI は自分に権限を付与しない |
 | [`prompt-from-context`](.claude/skills/prompt-from-context/) | 短い一言を、前の文脈から全文のプロンプトにしてから動く。聞き返さない |
+| [`user-emotion`](.claude/skills/user-emotion/) | ユーザーの一言から感情（いらだち、怒り、急かし、失望、承認）を読み、謝らず・聞き返さず・1〜2 行で動くなど動き方を変える。同じ指示の 2 回目を数える。フックが毎ターン読む |
 | [`finish-first`](.claude/skills/finish-first/) | 成果物を 1 つずつ完成させる。完成条件を先に書き、戻せる判断はデフォルトで進める |
 | [`lessons`](.claude/skills/lessons/) | 失敗の記録。場面・起きたこと・判定の誤り・次から の 4 行で残し、開始時にフックが差し込む |
 | [`token-efficiency`](.claude/skills/token-efficiency/) | トークンと文脈を節約する。フックの差し込み量を測る |
