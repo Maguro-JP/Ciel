@@ -62,6 +62,8 @@ ja-proofread の `glossary.md`（開発者の間で通る語の既定）と重�
 | 優先 | プライオリティ、priority | 発言 |
 | 要請 | リクエスト、request、requests、依頼書 | 発言 |
 | 感情 | エモーション、センチメント、感情値、emotion、sentiment | 発言 |
+| 魅せる README | 見栄えの良い README、映える README、きれいな README、README を整える | 発言 |
+| リポジトリ管理 | リポジトリの管理、リポジトリの運用、repo management | 発言 |
 | 真面 | まとも、真面目(?!に)、ちゃんとした | 発言 |
 
 ## 略語（ユーザーの語は無いので、省略しない形か日本語）

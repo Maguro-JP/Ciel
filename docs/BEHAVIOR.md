@@ -38,6 +38,8 @@
 | 他のリポジトリのセッションが欲しいスキルを会話で言って消える | `skill-request`。`requests.py --add` がそのリポジトリの docs/reports/skill-requests.md に書き、Ciel の skill-upkeep が `--collect` で拾う | 要請が出たとき、毎週 | 未対応の件数と、対応までの週数 |
 | CLI やブラウザで作る | `desktop-app`。`no_browser.py`（PostToolUse） | 書き込みのあと | 止めた回数 |
 | 分かりにくい・面倒な画面を作る（止まるダイアログ、ラベルの無い入力、曖昧なエラー文、画面を固める処理） | `ui-design`。`ui_nudge.py`（PostToolUse）が書き込みのたびに知らせ、`ui_check.py --diff` を precheck が注意で出す | 書き込みのあとと PR の前 | 注意の数 |
+| 素っ気ない README を出す（1 文が無い、根拠の無いバッジ、スクリーンショットが無い、動かない手順、ライセンスが無い） | `readme-showcase`。`readme_check.py` が 10 項目で点数を出し、precheck が README の差分に注意で出す | README を書いたあとと PR の前 | 点数（10 が完成） |
+| リポジトリ管理が段ごとにばらばらで、何が欠けているか分からない | `repo-management`。`repo_check.py` が 9 段を 1 つの表にし、鍵の検出だけ終了コード 1 | 新しいリポジトリ、公開の前、月に 1 回 | NG と注意の段の数 |
 | 時刻を UTC で書く | `lessons` の記録と CLAUDE.md | 毎ターン | ― |
 
 同じ指摘がまた来たら、この表に行を足し、言葉ではなくフックで止める。

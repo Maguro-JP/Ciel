@@ -89,6 +89,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`user-terms`](.claude/skills/user-terms/) | 略語・訳語・造語を、ユーザーが使った語に直す。Stop フックが会話を止め、precheck が文書を注意として出す |
 | [`vuln-watch`](.claude/skills/vuln-watch/) | 脆弱性の見張り。全リポジトリの依存を棚卸しし、OSV と悪用済み一覧と JVN に突き合わせ、新しいものを周知して更新を用意する |
 | [`docs-upkeep`](.claude/skills/docs-upkeep/) | README と docs を今のリポジトリに合わせる。壊れたリンク、無いファイル、一覧の抜け、辿れない文書を止める |
+| [`readme-showcase`](.claude/skills/readme-showcase/) | 魅せる README。一目で分かる・動かしたくなる・信用できる。根拠のあるバッジとスクリーンショット、5 手以内のクイックスタート。readme_check.py が 10 項目で点数を出す |
 
 PR と CI
 
@@ -98,6 +99,7 @@ PR と CI
 | [`ci-triage`](.claude/skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
 | [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する |
 | [`tidy`](.claude/skills/tidy/) | 散らかさない決まり、月に 1 回の整理整頓、使い終えたブランチやルーティンの整理整頓 |
+| [`repo-management`](.claude/skills/repo-management/) | リポジトリを正しく管理する 9 段（土台・方針・README・文書・鍵・公開の精査・脆弱性・整理整頓・出し方）。repo_check.py が 1 つの表にする |
 
 自律開発と定期実行
 

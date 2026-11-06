@@ -7,7 +7,7 @@ HEAD ごとの結果を ~/.claude/state/pr-gate/<repo>.json に残す。pr_gate.
 
 動かすもの（あるものだけ）: コミットメッセージの ID・URL・メールの検査、git diff --check、./scripts/validate.sh、.claude/skills/*/scripts/test_*.py、
 .claude/hooks/test.sh（リポジトリ自身のテストの台本。無ければ pytest）、
-ja-proofread・content-audit・secret-leak-check・user-terms・ui-design の差分（base から。user-terms と ui-design は注意で、落とさない）、npm test（package.json に test があり node_modules があるとき）。
+ja-proofread・content-audit・secret-leak-check・user-terms・ui-design・readme の差分（base から。user-terms と ui-design と readme は注意で、落とさない）、npm test（package.json に test があり node_modules があるとき）。
 
 使い方: precheck.py [--base <ref>]   base の既定は origin のデフォルトブランチ
 環境変数: PR_GATE_STATE=dir  記録の保存先（既定は ~/.claude/state/pr-gate）
@@ -84,7 +84,8 @@ def main() -> int:
                        ("content-audit", ".claude/skills/content-audit/scripts/audit.py"),
                        ("secret-leak-check", ".claude/skills/secret-leak-check/scripts/scan.py"),
                        ("user-terms", ".claude/skills/user-terms/scripts/terms.py"),
-                       ("ui-design", ".claude/skills/ui-design/scripts/ui_check.py")):
+                       ("ui-design", ".claude/skills/ui-design/scripts/ui_check.py"),
+                       ("readme", ".claude/skills/readme-showcase/scripts/readme_check.py")):
         if Path(path).exists():
             steps.append((name, f"{sys.executable} {path} --diff {base}"))
     if Path("package.json").exists() and Path("node_modules").is_dir():

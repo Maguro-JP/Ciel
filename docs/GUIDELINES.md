@@ -121,3 +121,5 @@ description が完璧でも、**AI が自力で簡単に片付けられる依頼
 | 「人が開いたセッションは消さない」（feedback-session、tidy）と「無駄なセッションを消す」（session-watch） | AI が立てたものは消す。人が開いたものは見ない・聞かない・知らせない。ルーティンに紐づいた人のセッションは、ルーティンの動き（サボり・落ちた）だけ催促する |
 | 「その日のうちに更新する」（vuln-watch）と「PR の前に ❔ で確認」（pr_gate.py） | 周知（★ と通知）と更新のブランチの用意は確認なしで行う。PR の作成とマージは ❔ を当日に出して待つ。返事が無ければ pending.md に「PR 待ち」 |
 | 「開発者の間で通る語」（ja-proofread の glossary.md。「Routine」「PR」は原文のまま）と「ユーザーの語」（user-terms の対応表。ルーティン） | ユーザーの語が先。glossary は訳語を戻す先の既定で、ユーザーが別の語を使っていれば user-terms の表に行を足し、そちらに直す。両方に同じ行を書かない |
+| 「README を魅せる」（readme-showcase）と「README を今に合わせる」（docs-upkeep）と「公開前の精査」（content-audit、secret-leak-check） | readme-showcase は書く側（節の順、根拠、点数）で、docs-upkeep は保つ側（壊れたリンク、一覧の抜け）。どちらも precheck で動き、readme は注意、docs は誤りで止める。出す前の名前・鍵の検査は content-audit と secret-leak-check に任せ、readme_check.py は見ない |
+| 「リポジトリ管理の 9 段」（repo-management）と「自律開発の表」（patrol）と「整理整頓」（tidy） | repo-management は管理の段（揃っているか）、patrol は動きの状態（コミット・PR・Actions・判断待ち）、tidy は整理整頓の作業そのもの。repo_check.py は各段のスキルの検査を呼ぶだけで、判定の決まりを自分で持たない |
