@@ -129,7 +129,7 @@ class Check(unittest.TestCase):
     def test_secret_is_ng_and_exit_1(self):
         if not (CIEL / ".claude" / "skills" / "secret-leak-check").is_dir():
             self.skipTest("Ciel のスキルが手元に無い")
-        make_repo(self.root, {"app.py": "KEY = '-----BEGIN RSA PRIVATE KEY-----'\n"})
+        make_repo(self.root, {"app.py": "KEY = '-----BEGIN RSA PRIVATE KEY-----'\n"})  # secret-leak-check: ignore（検出を確かめるための作り物）
         code, data = run_check(self.root, CIEL, self.state)
         self.assertEqual(code, 1)
         self.assertEqual(self.rows(data)["鍵"]["状態"], "NG")
