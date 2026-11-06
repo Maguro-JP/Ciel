@@ -27,3 +27,15 @@
 - 止まった所: フックの直しは auto mode の classifier（AI が自分のゲートを直す判定）で止められた
 - ユーザーにしかできないこと: `SYSTEMISH` に `Stop hook feedback` を足す。`approval()` の `matches` で、PR の番号が無いときは今のブランチの名前でも数える。直したら、この項目を「反映済み」にする
 - それまで: ❔ の返事が来たら、別の文が挟まる前にマージを呼ぶ。止まったら、PR の番号を入れた ❔ を 1 行出し直す
+
+## 2026-11-07 PR 待ち: user-emotion と、スキルの手入れ 2026-W45
+
+- 何: ブランチ claude/user-emotion-20261102（user-emotion、session-watch の窓の直し、rules_sync.py、教訓 5 件、週報 2026-W45）を PR にしてマージし、10 本に配る
+- 待っているもの: ❔ への返事（11/2 に出した）。返事があれば PR を作り、main に入れて配る
+- それまで: 配布の 2 回目（skill-request と見回りの決まり）は 10 本のブランチに積んであり、base への push も同じ返事を待つ
+
+## 2026-11-07 reread_check.py の誤検知は、AI からは直せない
+
+- 何: `verify-before-done/hooks/reread_check.py` が、記録のファイルへの追記（`echo exit=$? >> x.log`）を編集に数え、裏の処理を始めただけの返答に読み直しを求める（この週に 4 回）
+- 止まった所: フックの直しは auto mode の classifier（AI が自分のゲートを直す判定）で止められた
+- ユーザーにしかできないこと: `BASH_EDIT` の `>>` の部分を `(?<![|&<>])>>\s*(?!/tmp/)(?!\S*\.(?:log|out|txt)\b)\S` にする。直したら、この項目を「反映済み」にする
