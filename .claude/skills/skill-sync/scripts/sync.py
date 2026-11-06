@@ -27,7 +27,7 @@ def digest(d: Path, skip=()) -> str:
     h = hashlib.sha256()
     for f in sorted(p for p in d.rglob("*") if p.is_file()):
         rel = str(f.relative_to(d))
-        if rel in skip:
+        if rel in skip or "__pycache__" in f.parts or f.suffix == ".pyc":
             continue
         h.update(rel.encode())
         h.update(f.read_bytes())
@@ -183,7 +183,8 @@ def main():
                 keep = (dst / n / LESSONS_FILE).read_text(encoding="utf-8")
             if (dst / n).exists():
                 shutil.rmtree(dst / n)
-            shutil.copytree(SRC / n, dst / n)
+            # 手元の一時ファイル（__pycache__）を配らない。.gitignore の無いリポジトリでは main に入ってしまう
+            shutil.copytree(SRC / n, dst / n, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".pytest_cache"))
             if keep is not None:
                 merged, _ = merge_lessons((SRC / n / LESSONS_FILE).read_text(encoding="utf-8"), keep)
                 (dst / n / LESSONS_FILE).write_text(merged, encoding="utf-8")
