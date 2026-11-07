@@ -90,9 +90,9 @@ def is_test(rel: str) -> bool:
 
 def tracked(root: Path) -> list:
     """追跡しているファイル（git ls-files）。git が無ければ歩く。"""
-    out = git(root, "ls-files", "-z")
+    out = git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard")  # 追跡している物と、まだ足していない新しい物
     if out:
-        return [p for p in out.split("\0") if p and not is_skipped(p)]
+        return sorted(p for p in set(out.split("\0")) if p and not is_skipped(p) and (root / p).is_file())
     files = []
     for dp, dns, fns in os.walk(root):
         dns[:] = [d for d in dns if d not in SKIP_DIRS]

@@ -24,7 +24,7 @@ from common import (CIEL_SKILLS, Finding, code_files, file_ignored, is_test, lin
                     report, run, strip_strings, target_files, tracked)
 
 CODE = {".py", ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".sh", ".bash", ".rb", ".go", ".php", ".java", ".kt", ".cs"}
-SECRET_ID = r"\b(password|passwd|pwd|token|secret|api_key|apikey|authorization|auth_token|access_key|secret_key|client_secret|private_key|cookie|session_id|credential)s?\b"
+SECRET_ID = r"\b(password|passwd|pwd|token|secret|api_key|apikey|authorization|auth_token|access_key|secret_key|client_secret|private_key|cookie|session_id|credential)s?\b"  # code-check: ignore 検出の正規表現であり、鍵ではない
 SENSITIVE_FILE = re.compile(r"(^|/)(\.env(\..+)?|\.netrc|\.pypirc|\.npmrc|credentials\.json|service[-_]account.*\.json|secrets?\.(json|ya?ml|toml|ini|txt))$"
                             r"|\.(pem|key|p12|pfx|kdbx|jks|keystore)$|(^|/)id_(rsa|dsa|ecdsa|ed25519)(\.pub)?$", re.I)
 SENSITIVE_OK = re.compile(r"\.env\.(example|sample|template|dist)$|\.pub$|(^|/)public\.pem$", re.I)

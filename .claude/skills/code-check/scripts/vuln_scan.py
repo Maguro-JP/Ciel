@@ -30,7 +30,7 @@ ALL = PY | JS | SH
 
 # (ID, 拡張子, 正規表現, 重さ, 何, 直し方)。重さが callable のときは (lines, i, m) を受けて重さを返す
 NONLIT = r"\(\s*(?!\s*[\"'`]|\s*\))"  # 引数が文字列リテラルでも空でもない
-SECRET_NEAR = r"\b(password|passwd|pwd|token|secret|otp|nonce|session|api_key|apikey|salt|key)\b"
+SECRET_NEAR = r"\b(password|passwd|pwd|token|secret|otp|nonce|session|api_key|apikey|salt|key)\b"  # code-check: ignore 検出の正規表現であり、鍵ではない
 DYN_PY = r"(\bf[\"']|\.format\(|%\s*\(|%\s*[a-zA-Z_]|\+\s*[a-zA-Z_]|[a-zA-Z_\]\)]\s*\+)"
 DYN_JS = r"(`[^`]*\$\{|\+\s*[a-zA-Z_]|[a-zA-Z_\]\)]\s*\+)"
 # 英語の update や delete を含む f-string を SQL と取り違えないよう、SQL の形（FROM、INTO、SET、WHERE x =）まで見る

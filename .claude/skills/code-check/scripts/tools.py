@@ -150,7 +150,7 @@ def _install_gitleaks() -> bool:
     try:
         with tempfile.TemporaryDirectory() as d:
             p = Path(d) / "g.tgz"
-            urllib.request.urlretrieve(url, p)
+            urllib.request.urlretrieve(url, p)  # code-check: ignore https の固定の URL
             with tarfile.open(p) as tf:
                 m = next((m for m in tf.getmembers() if m.name == "gitleaks"), None)
                 if not m:
