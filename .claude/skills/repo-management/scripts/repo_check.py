@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""リポジトリを正しく管理できているかを、9 段で見て 1 つの表にする。
+"""リポジトリを正しく管理できているかを、12 段で見て 1 つの表にする。
 
 段ごとに別のスキルの検査を呼び、結果を 1 行に畳む。全部を自分で判定しないのは、各段の決まりはそのスキルが持ち、
 ここは「どの段が揃っていて、どの段が欠けているか」を一目で見せる入口だから。
 段: 土台（repo-bootstrap）、方針（workspace-policy）、README（readme-showcase）、文書（docs-upkeep）、鍵（secret-leak-check）、
-公開の精査（content-audit）、脆弱性（vuln-watch）、整理整頓（tidy）、出し方（solo-pr-flow）。
+公開の精査（content-audit）、依存の脆弱性（vuln-watch）、整理整頓（tidy）、出し方（solo-pr-flow）、
+バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩（code-check の 3 本）。
 
 使い方: repo_check.py [root] [--md OUT] [--json]
   検査のスクリプトは <root>/.claude/skills/ を先に見て、無ければ $CIEL_ROOT/.claude/skills/（既定 /home/user/Ciel）を使う
-終了コード: 鍵の段が NG（秘密情報を検出）のときだけ 1
+終了コード: 鍵の段が NG（秘密情報を検出）か、code-check の 3 段に重大があるときだけ 1
 """
 
 import argparse
@@ -157,7 +158,7 @@ def stage_audit(root):
 
 
 def stage_vuln(root):
-    stage = "脆弱性（vuln-watch）"
+    stage = "依存の脆弱性（vuln-watch）"
     s = script(root, "vuln-watch/scripts/inventory.py")
     if not s:
         return missing(stage, "inventory.py", "Ciel の vuln-watch を入れ、週 1 回のルーティンに載せる")
@@ -211,8 +212,33 @@ def stage_pr(root):
     return row(stage, "OK", why, "")
 
 
+def stage_code(label, script_rel, args, fix_skill):
+    """code-check の 1 本を 1 段にする。重大は NG、注意は注意、ツールの無さは根拠に出す。"""
+    def stage(root):
+        s = script(root, script_rel)
+        if not s:
+            return missing(label, Path(script_rel).name, "Ciel の code-check を入れる（skill-sync）")
+        code, out = run([sys.executable, str(s), str(root), *args], root, timeout=1800)
+        m = re.search(r"重大 (\d+) / 注意 (\d+)(?: / 情報 (\d+))?", out)
+        if not m:
+            return row(label, "注意", "出力が読めない: " + out[-120:], f"{Path(script_rel).name} を手で動かす")
+        bad, warn = int(m.group(1)), int(m.group(2))
+        tools = next((l.strip() for l in out.splitlines() if l.strip().startswith("ツール:")), "")
+        why = f"重大 {bad} / 注意 {warn}" + (f" / 情報 {m.group(3)}" if m.group(3) else "") + (f"。{tools[:90]}" if tools else "")
+        if bad:
+            return row(label, "NG", why, f"{fix_skill}。重大の行を直してから出す（code-check の references/patterns.md）")
+        return row(label, "注意" if warn else "OK", why, f"{fix_skill}。注意を直すか、理由を月報に 1 行" if warn else "")
+    return stage
+
+
+stage_crash = stage_code("バグやクラッシュ（code-check）", "code-check/scripts/crash_check.py", [], "crash_check.py")
+stage_code_vuln = stage_code("不具合や脆弱性（code-check）", "code-check/scripts/vuln_scan.py", [], "vuln_scan.py")
+stage_info = stage_code("情報の扱いや漏洩（code-check）", "code-check/scripts/info_scan.py", [], "info_scan.py")
+
+
 def check(root: Path):
-    return [f(root) for f in (stage_base, stage_policy, stage_readme, stage_docs, stage_secrets, stage_audit, stage_vuln, stage_tidy, stage_pr)]
+    return [f(root) for f in (stage_base, stage_policy, stage_readme, stage_docs, stage_secrets, stage_audit, stage_vuln, stage_tidy, stage_pr,
+                              stage_crash, stage_code_vuln, stage_info)]
 
 
 def table(rows):
@@ -248,7 +274,7 @@ def main() -> int:
     if a.md:
         now = datetime.now(JST).strftime("%Y-%m-%d %H:%M JST")
         Path(a.md).write_text(f"## リポジトリ管理: {name}（{now}）\n\n{table(rows)}\n\n{summary(rows)}\n", encoding="utf-8")
-    return 1 if any(r["段"].startswith("鍵") and r["状態"] == "NG" for r in rows) else 0
+    return 1 if any((r["段"].startswith("鍵") or "code-check" in r["段"]) and r["状態"] == "NG" for r in rows) else 0
 
 
 if __name__ == "__main__":

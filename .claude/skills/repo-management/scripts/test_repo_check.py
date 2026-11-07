@@ -93,7 +93,7 @@ class Check(unittest.TestCase):
         self.assertEqual(rows["土台"]["状態"], "NG")
         self.assertEqual(rows["方針"]["状態"], "注意")
         self.assertEqual(rows["README"]["状態"], "NG")
-        for k in ("文書", "鍵", "公開の精査", "脆弱性"):
+        for k in ("文書", "鍵", "公開の精査", "依存の脆弱性"):
             self.assertEqual(rows[k]["状態"], "注意", k)
             self.assertIn("無い", rows[k]["根拠"])
         self.assertEqual(rows["整理整頓"]["状態"], "注意")
@@ -124,7 +124,7 @@ class Check(unittest.TestCase):
             self.assertEqual(rows[k]["状態"], "OK", rows[k])
         self.assertIn(rows["文書"]["状態"], ("OK", "注意"), rows["文書"])
         self.assertIn(rows["公開の精査"]["状態"], ("OK", "注意"), rows["公開の精査"])
-        self.assertIn("棚卸し", rows["脆弱性"]["根拠"])
+        self.assertIn("棚卸し", rows["依存の脆弱性"]["根拠"])
 
     def test_secret_is_ng_and_exit_1(self):
         if not (CIEL / ".claude" / "skills" / "secret-leak-check").is_dir():

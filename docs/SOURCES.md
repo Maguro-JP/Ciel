@@ -32,6 +32,11 @@
 | [valorisa/Claude-Skills](https://github.com/valorisa/Claude-Skills) `token-optimization` | MIT, Copyright (c) 2026 valorisa | `token-efficiency` | 消費の4つの出どころ、途中で道具を足さない | 要点だけ |
 | [obra/superpowers](https://github.com/obra/superpowers) `subagent-driven-development` | MIT, Copyright (c) 2025 Jesse Vincent | `token-efficiency` | 文脈を渡さないサブエージェントの考え方 | 要点だけ |
 | [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) | Apache-2.0 | 無し | 参考だけ。出力を電報のように縮める方式は「助詞のある文」の決まりと合わない | 取り込み無し |
+| [PyCQA/bandit](https://github.com/PyCQA/bandit) | Apache-2.0, Copyright (c) 2014 Hewlett-Packard Development Company, L.P. ほか | `code-check/references/patterns.md`、`scripts/vuln_scan.py` | 検出の種類と B 番号（B102 exec、B301 pickle、B501 TLS、B506 yaml、B602 shell、B608 SQL ほか）を型の表に写した | ツールそのものは取り込まず、あれば呼ぶ（bandit -f json）。無いときだけ同じ型を正規表現で補う。重さは HIGH と MEDIUM を重大に |
+| [astral-sh/ruff](https://github.com/astral-sh/ruff) | MIT, Copyright (c) 2022 Charlie Marsh | `code-check/scripts/vuln_scan.py`、`crash_check.py`、`hooks/code_nudge.py` | 無し（外部のツールとして呼ぶだけ。S は flake8-bandit の移植、E9・F82 は構文と未定義） | 呼び出しごとに鳴る規則（S101、S603、S607、S113 ほか）は外し、正規表現側で狭く見る |
+| [semgrep/semgrep](https://github.com/semgrep/semgrep) | LGPL-2.1（規則の束 p/security-audit と p/secrets は semgrep の registry の条件。私の推測で、ページは読んでいない） | `code-check/scripts/vuln_scan.py`、`references/semgrep-rules.yml` | 無し（外部のツールとして呼ぶ）。registry が取れないときの同梱の規則 15 本は Bandit の型を semgrep の形で書き直した物 | ERROR を重大、WARNING を注意、INFO は出さない |
+| [OWASP Top 10](https://owasp.org/Top10/) | CC BY-SA 4.0, Copyright OWASP Foundation | `code-check/references/patterns.md` | 分類の名前（A02 暗号の失敗、A03 注入、A05 設定の誤り）だけ | 無し |
+| shellcheck、detect-secrets、gitleaks、pip-audit、markdownlint-cli2、markdown-link-check | GPL-3.0、Apache-2.0、MIT、Apache-2.0、MIT、ISC（`code-check/references/tools.md`） | 無し（外部のツールとして呼ぶだけ） | 無し | 出力の形を code-check の 重大・注意・情報 に写す |
 | textlint と各規則（npm） | それぞれのライセンス（MIT） | `~/.cache/ciel-textlint` | `scripts/setup-textlint.sh` で npm から入れる。リポジトリには入れない | 無し |
 
 ## 探し方

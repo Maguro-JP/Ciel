@@ -65,7 +65,7 @@ def main() -> int:
                         continue
                     for payload in samples.get(event, [{"session_id": "smoke"}]):
                         try:
-                            r = subprocess.run(cmd, shell=True, cwd=ROOT, input=json.dumps(payload, ensure_ascii=False),
+                            r = subprocess.run(cmd, shell=True, cwd=ROOT, input=json.dumps(payload, ensure_ascii=False),  # code-check: ignore 固定の文字列（ユーザーの入力は入らない）
                                                capture_output=True, text=True, env=env, timeout=h.get("timeout", 30))
                             code, err = r.returncode, r.stderr
                         except subprocess.TimeoutExpired:

@@ -14,6 +14,36 @@
 | 整理整頓 | 余計なファイルが追跡されていない、要る `.gitignore` の行がある、デフォルトブランチに入ったリモートブランチが無い | どれかがある | ― | tidy。余計なファイルは消して `.gitignore` に足す。入ったブランチは消す。月に 1 回は `tidy_report.py` |
 | 出し方 | 最後の precheck が通っている | 記録が無い、または落ちている | ― | solo-pr-flow。PR の前に `precheck.py` を通し、❔ で返事を待つ |
 
+## 10 バグやクラッシュ（code-check の crash_check.py）
+
+| 状態 | 基準 |
+|---|---|
+| OK | 構文の誤りと未定義が 0、テストが通る、起動の入口が `--help` で落ちない |
+| 注意 | 画面のある入口や引数を受けない入口（手で起動して確かめる）、不具合になりやすい書き方（ruff の B） |
+| NG | 構文の誤り、未定義の名前、テストが落ちる、起動で Traceback |
+
+直し方: 重大の行を直す。テストは落ちた物を直してから出す。
+
+## 11 不具合や脆弱性（code-check の vuln_scan.py）
+
+| 状態 | 基準 |
+|---|---|
+| OK | bandit・semgrep・ruff の S と正規表現の重大が 0、依存に high と critical が無い |
+| 注意 | 0.0.0.0、CORS、except して pass、assert の検査、http://、依存の moderate |
+| NG | 注入（shell、SQL、eval）、pickle、TLS の検証を切る、弱い乱数で鍵、debug=True、誰でも書ける権限、直書きの鍵 |
+
+直し方: code-check の `.claude/skills/code-check/references/patterns.md` の同じ番号。直せない固定の文字列は行末に `code-check: ignore 理由`。
+
+## 12 情報の扱いや漏洩（code-check の info_scan.py）
+
+| 状態 | 基準 |
+|---|---|
+| OK | 追跡してはいけないファイルが無い、鍵を出力していない、URL に鍵が無い、detect-secrets と gitleaks が 0 |
+| 注意 | .gitignore に .env が無い、db や log を追跡、鍵の書き出し、クリップボードや計測の SDK、文書の中の例 |
+| NG | .env や .pem を追跡、鍵の出力、URL の鍵、鍵のファイルを他のユーザーが読める、鍵らしき物 |
+
+直し方: 追跡から外して .gitignore へ。push 済みならローテートして履歴から消す。外に送る先と扱う個人情報は README の「情報の扱い」に書く。
+
 ## 公開の前に足すこと
 
 作業ツリーだけでは足りない。private を public にする前は、次も見る。

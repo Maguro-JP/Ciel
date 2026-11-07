@@ -49,7 +49,9 @@
 - UI の設計は、インテュイティブ・ユーザーフレンドリー・ストレスフリーを心がける（ui-design）。見れば分かり、押せば答えが返り、戻せて、手数が少なく、邪魔しない。機能が動くだけでは未完成。フックが書き込みのたびに検査する
 - スキルの要請は、どのセッションからでも受ける（skill-request）。要請する側は、そのリポジトリの docs/reports/skill-requests.md に 1 件 1 節で書いて作業の PR に入れる（Ciel に push できるなら claude/REQ-* のブランチでもよい）。Ciel は週 1 回の skill-upkeep で集めて作り、配ったら状態を書き戻す。急ぐときは Ciel に「要請を見て」と言う
 - 脆弱性は週に 1 回見る（vuln-watch。毎日は見ない。トークンの無駄）。この 7 日に push のあったリポジトリだけを棚卸しして OSV・CISA KEV・JVN に突き合わせ、新しく出たものを周知し、悪用済みと重大は更新のブランチを用意して ❔ を 1 行出す。PR とマージはユーザーの返事のあと。見回りのルーティンは、やらないこと（PR を作らない、マージしない、全リポジトリを clone しない）を書く。漏れがあればユーザーが別途指示する
-- README は魅せる形で書く（readme-showcase。一目で分かる・動かしたくなる・信用できる。根拠のあるバッジとスクリーンショット、5 手以内のクイックスタート。出す前に secret-leak-check と content-audit を通す）。リポジトリは repo-management の 9 段（土台・方針・README・文書・鍵・公開の精査・脆弱性・整理整頓・出し方）で正しく管理し、repo_check.py で一つの表にする
+- README は魅せる形で書く（readme-showcase。一目で分かる・動かしたくなる・信用できる。根拠のあるバッジとスクリーンショット、5 手以内のクイックスタート。出す前に secret-leak-check と content-audit を通す）。リポジトリは repo-management の 12 段（土台・方針・README・文書・鍵・公開の精査・依存の脆弱性・整理整頓・出し方・バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩）で正しく管理し、repo_check.py で一つの表にする
+- 作った物は、バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩を機械で確認してから出す（code-check。書き込みのたびにフックが重大を差し込み、precheck が重大で止め、repo-management の段で表にする）。Claude が作る物には問題が多いという前提で、確認を省かない
+- Claude だけで済ませず、便利なツールを使う。検査は実績のあるツール（ruff、bandit、semgrep、shellcheck、detect-secrets か gitleaks、pip-audit、npm audit、eslint、tsc、markdownlint、markdown-link-check）を先に入れて使い、自分の正規表現は無いときの補いにする（code-check の tools.py --install）
 
 ## 応答の言語
 

@@ -39,7 +39,8 @@
 | CLI やブラウザで作る | `desktop-app`。`no_browser.py`（PostToolUse） | 書き込みのあと | 止めた回数 |
 | 分かりにくい・面倒な画面を作る（止まるダイアログ、ラベルの無い入力、曖昧なエラー文、画面を固める処理） | `ui-design`。`ui_nudge.py`（PostToolUse）が書き込みのたびに知らせ、`ui_check.py --diff` を precheck が注意で出す | 書き込みのあとと PR の前 | 注意の数 |
 | 素っ気ない README を出す（1 文が無い、根拠の無いバッジ、スクリーンショットが無い、動かない手順、ライセンスが無い） | `readme-showcase`。`readme_check.py` が 10 項目で点数を出し、precheck が README の差分に注意で出す | README を書いたあとと PR の前 | 点数（10 が完成） |
-| リポジトリ管理が段ごとにばらばらで、何が欠けているか分からない | `repo-management`。`repo_check.py` が 9 段を 1 つの表にし、鍵の検出だけ終了コード 1 | 新しいリポジトリ、公開の前、月に 1 回 | NG と注意の段の数 |
+| リポジトリ管理が段ごとにばらばらで、何が欠けているか分からない | `repo-management`。`repo_check.py` が 12 段を 1 つの表にし、鍵の検出だけ終了コード 1 | 新しいリポジトリ、公開の前、月に 1 回 | NG と注意の段の数 |
+| 書いただけで確認せずに出す（構文の誤り、shell=True の注入、鍵の出力、.env の追跡） | `code-check`。書き込みのたびに `code_nudge.py` が重大を 1 行差し込み、precheck の crash・vuln・info が重大で止め、`code_check.py` が ruff・bandit・semgrep・detect-secrets・gitleaks で 1 つの表にする | 書き込みのたび、PR の前、月に 1 回 | `CODE_CHECK_OFF=1`（フック）、行末の `code-check: ignore` |
 | 時刻を UTC で書く | `lessons` の記録と CLAUDE.md | 毎ターン | ― |
 
 同じ指摘がまた来たら、この表に行を足し、言葉ではなくフックで止める。
