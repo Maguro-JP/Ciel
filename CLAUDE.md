@@ -52,6 +52,7 @@
 - README は魅せる形で書く（readme-showcase。一目で分かる・動かしたくなる・信用できる。根拠のあるバッジとスクリーンショット、5 手以内のクイックスタート。出す前に secret-leak-check と content-audit を通す）。リポジトリは repo-management の 12 段（土台・方針・README・文書・鍵・公開の精査・依存の脆弱性・整理整頓・出し方・バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩）で正しく管理し、repo_check.py で一つの表にする
 - 作った物は、バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩を機械で確認してから出す（code-check。書き込みのたびにフックが重大を差し込み、precheck が重大で止め、repo-management の段で表にする）。Claude が作る物には問題が多いという前提で、確認を省かない
 - Claude だけで済ませず、便利なツールを使う。検査は実績のあるツール（ruff、bandit、semgrep、shellcheck、detect-secrets か gitleaks、pip-audit、npm audit、eslint、tsc、markdownlint、markdown-link-check）を先に入れて使い、自分の正規表現は無いときの補いにする（code-check の tools.py --install）
+- GitHub Actions は必ず通知させ、通知を受け取る（actions-watch）。PR を作ったら同じターンで subscribe_pr_activity で購読し、完了の通知が来るまでマージの ❔ を出さない。通知が来たら必ず読んで ❕ で結果を 1 行書き、通ったら PR の番号と結果を添えてマージの ❔、落ちたら ci-triage。終わっていないのに確認することも、終わっているのに確認しないことも無くす。Stop と PreToolUse のフックが順番を止める
 
 ## 応答の言語
 

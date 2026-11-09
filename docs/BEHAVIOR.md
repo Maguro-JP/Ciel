@@ -41,6 +41,7 @@
 | 素っ気ない README を出す（1 文が無い、根拠の無いバッジ、スクリーンショットが無い、動かない手順、ライセンスが無い） | `readme-showcase`。`readme_check.py` が 10 項目で点数を出し、precheck が README の差分に注意で出す | README を書いたあとと PR の前 | 点数（10 が完成） |
 | リポジトリ管理が段ごとにばらばらで、何が欠けているか分からない | `repo-management`。`repo_check.py` が 12 段を 1 つの表にし、鍵の検出だけ終了コード 1 | 新しいリポジトリ、公開の前、月に 1 回 | NG と注意の段の数 |
 | 書いただけで確認せずに出す（構文の誤り、shell=True の注入、鍵の出力、.env の追跡） | `code-check`。書き込みのたびに `code_nudge.py` が重大を 1 行差し込み、precheck の crash・vuln・info が重大で止め、`code_check.py` が ruff・bandit・semgrep・detect-secrets・gitleaks で 1 つの表にする | 書き込みのたび、PR の前、月に 1 回 | `CODE_CHECK_OFF=1`（フック）、行末の `code-check: ignore` |
+| Actions が終わる前にマージの確認を出す、終わっても結果を見ない | `actions-watch`。`ci_gate.py`（Stop）が購読の抜け・早い ❔・結果の書き忘れを止め、`ci_merge_gate.py`（PreToolUse）が通っていない PR のマージを止め、`ci_prompt.py` が通知のターンに手順を差し込む | PR を作った直後、通知のターン、マージの前 | `ACTIONS_WATCH_OFF=1`、❔ の行の「Actions は無い」 |
 | 時刻を UTC で書く | `lessons` の記録と CLAUDE.md | 毎ターン | ― |
 
 同じ指摘がまた来たら、この表に行を足し、言葉ではなくフックで止める。

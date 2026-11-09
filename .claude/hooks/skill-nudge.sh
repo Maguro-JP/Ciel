@@ -38,6 +38,7 @@ TABLE = [
     (r"README|ドキュメント|文書|古い|リンク|最新化|整理して", "README や docs を直す・スキルを足した消した→docs-upkeep（docs_check.py が壊れたリンク、無いファイル、一覧の抜け、辿れない文書を止める。同じ PR で一覧を直す）"),
     (r"完成|終わらない|中途半端|いつ終わ|成果物", "「完成させて」「終わらない」・成果物に関わる判断待ちで止まりそう→finish-first（完成条件を先に書く。1つずつ。戻せる判断はデフォルトで進める）"),
     (r"サボ|無駄なセッション|セッション.*(止ま|消|溜ま|動いてない)", "サボり・止まり・無駄なセッション→session-watch（judge.py で判定し、AI が作ったものだけ催促・待機・消す。人のセッションには触らない）"),
+    (r"Actions|通知を受け|通知させ|check_suite|workflow_run|終わってない|終わってる|CI.*(通った|終わ)", "Actions の通知を必ず受け取る→actions-watch（PR を作ったら subscribe_pr_activity。完了の通知が来るまでマージの ❔ を出さず、来たら ❕ で結果を 1 行、通ったら番号と結果を添えて ❔、落ちたら ci-triage。フックが順番を止める）"),
     (r"バグ|クラッシュ|不具合|漏洩|漏れて|情報の扱い|ちゃんと確認|問題が多発|便利なツール", "作った物を機械で確認する→code-check（バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩。ruff・bandit・semgrep・detect-secrets などを先に使う。tools.py --install で入れ、code_check.py で 1 つの表。重大は直してから出す）"),
     (r"脆弱性|CVE|セキュリティ|依存.*(安全|更新|古)|更新が遅|パッチ|悪用", "脆弱性を調べる・依存の更新→vuln-watch（inventory.py で棚卸し、scan.py で OSV・KEV・JVN に突き合わせ、新しいものを周知。更新は bump.py と solo-pr-flow）"),
     (r"略語|訳語|造語|用語|言い方|言葉を|俺の言|呼び方", "略語・訳語・造語をユーザーの語に直す→user-terms（表は references/user-terms.md。Stop フックが会話を止め、precheck が文書を注意で出す。表に無い語は --candidates で見て足す）"),

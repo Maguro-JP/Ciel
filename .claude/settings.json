@@ -9,6 +9,11 @@
           },
           {
             "type": "command",
+            "command": "python3 .claude/skills/actions-watch/hooks/ci_prompt.py",
+            "timeout": 10
+          },
+          {
+            "type": "command",
             "command": "awk '/^## 着手前/{a=1} /^## 会話に出すもの/{b=1} /^## 人が決める/{b=0} (!a||b){print}' .claude/skills/work-style/SKILL.md 2>/dev/null || true"
           },
           {
@@ -120,6 +125,11 @@
             "type": "command",
             "command": "python3 .claude/skills/verify-before-done/hooks/done_check.py",
             "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/skills/actions-watch/hooks/ci_gate.py",
+            "timeout": 30
           }
         ]
       },
@@ -211,6 +221,11 @@
           {
             "type": "command",
             "command": "python3 .claude/skills/verify-before-done/hooks/pr_gate.py"
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/skills/actions-watch/hooks/ci_merge_gate.py",
+            "timeout": 30
           }
         ]
       }
