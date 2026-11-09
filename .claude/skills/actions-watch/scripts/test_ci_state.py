@@ -101,6 +101,10 @@ class Gate(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn("push", out)
 
+    def test_mentioning_merge_later_is_not_a_merge_question(self):
+        code, out = self.stop([user("進めて"), assistant("❔ Repo: ブランチを PR にしてよいですか。作ったら購読し、Actions の結果が来てからマージの ❔ を出します。")])
+        self.assertEqual(code, 0, out)
+
     def test_no_actions_escape(self):
         code, out = self.stop([user("進めて"), assistant("❔ Repo: PR #12 をマージしてよいですか（Actions は無い）。")])
         self.assertEqual(code, 0, out)

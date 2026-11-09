@@ -21,7 +21,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 import ci_state  # noqa: E402
 
-MERGE_Q = re.compile(r"^[❔?][^\n]*(マージ|merge)[^\n]*", re.M | re.I)  # 行の終わりまで取る（「Actions は無い」が後ろに来る）
+# マージを頼む ❔ だけ見る。「マージの ❔ はあとで出す」のように触れるだけの行は見ない。行の終わりまで取る（「Actions は無い」が後ろに来る）
+MERGE_Q = re.compile(r"^[❔?][^\n]*(マージ(して|し、|する|を|可)|merge (it|this|the pr)|マージしてよい)[^\n]*", re.M | re.I)
 NO_ACTIONS = re.compile(r"Actions\s*(は|が)\s*無い|Actions\s*(は|が)\s*ない")
 RESULT = re.compile(r"[❕!★].*(Actions|チェック|check).*(通った|通りました|落ちた|落ちました|失敗|成功|green|red)", re.I)
 
