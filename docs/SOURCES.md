@@ -38,6 +38,8 @@
 | [OWASP Top 10](https://owasp.org/Top10/) | CC BY-SA 4.0, Copyright OWASP Foundation | `code-check/references/patterns.md` | 分類の名前（A02 暗号の失敗、A03 注入、A05 設定の誤り）だけ | 無し |
 | shellcheck、detect-secrets、gitleaks、pip-audit、markdownlint-cli2、markdown-link-check | GPL-3.0、Apache-2.0、MIT、Apache-2.0、MIT、ISC（`code-check/references/tools.md`） | 無し（外部のツールとして呼ぶだけ） | 無し | 出力の形を code-check の 重大・注意・情報 に写す |
 | textlint と各規則（npm） | それぞれのライセンス（MIT） | `~/.cache/ciel-textlint` | `scripts/setup-textlint.sh` で npm から入れる。リポジトリには入れない | 無し |
+| [EveryInc/compound-engineering-plugin](https://github.com/EveryInc/compound-engineering-plugin) | MIT（著作権表示は元の LICENSE） | `research-to-tech/SKILL.md` | 「1 つの仕事が次の仕事を楽にする」考え方と、学びを決まった場所に書いて次の計画が読む流れ | 置き場を docs/knowledge/tech/ にし、文書で終わらせずアルゴリズム・技術（コードとテスト）・実装まで段を足して、段を機械で数える |
+| [blader/Claudeception](https://github.com/blader/Claudeception) | MIT（著作権表示は元の LICENSE） | `research-to-tech/SKILL.md`「残す価値の物差し」 | 残す物の 4 つの条件（調べないと分からなかった、次でも使える、使う場面が言える、動かして確かめた） | 毎ターンの差し込みはやめ、調べた直後の 15 分に 1 回と、開発をしたターンの Stop だけにした |
 
 ## 探し方
 

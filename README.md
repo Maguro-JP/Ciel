@@ -102,6 +102,7 @@ PR と CI
 | [`repo-management`](.claude/skills/repo-management/) | リポジトリを正しく管理する 12 段（土台・方針・README・文書・鍵・公開の精査・依存の脆弱性・整理整頓・出し方・バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩）。repo_check.py が 1 つの表にする |
 | [`code-check`](.claude/skills/code-check/) | 作った物のバグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩を、実績のあるツール（ruff、bandit、semgrep、shellcheck、detect-secrets、gitleaks、pip-audit、npm audit）で機械で確認する。書き込みのたびのフック、precheck の NG、repo-management の段 |
 | [`actions-watch`](.claude/skills/actions-watch/) | GitHub Actions の通知を必ず受け取る。PR を作ったら購読し、終わる前にマージの ❔ を出さず、終わったら結果を書く。Stop と PreToolUse のフックが順番を止める |
+| [`research-to-tech`](.claude/skills/research-to-tech/) | 調べ物を、情報で終わらせずに知識・アルゴリズム・技術・実装まで進めて docs/knowledge/tech/ に残す。段を機械で数え、Stop フックが知識に残さない開発を止める |
 
 自律開発と定期実行
 

@@ -53,6 +53,7 @@
 - 作った物は、バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩を機械で確認してから出す（code-check。書き込みのたびにフックが重大を差し込み、precheck が重大で止め、repo-management の段で表にする）。Claude が作る物には問題が多いという前提で、確認を省かない
 - Claude だけで済ませず、便利なツールを使う。検査は実績のあるツール（ruff、bandit、semgrep、shellcheck、detect-secrets か gitleaks、pip-audit、npm audit、eslint、tsc、markdownlint、markdown-link-check）を先に入れて使い、自分の正規表現は無いときの補いにする（code-check の tools.py --install）
 - GitHub Actions は必ず通知させ、通知を受け取る（actions-watch）。PR を作ったら同じターンで subscribe_pr_activity で購読し、完了の通知が来るまでマージの ❔ を出さない。通知が来たら必ず読んで ❕ で結果を 1 行書き、通ったら PR の番号と結果を添えてマージの ❔、落ちたら ci-triage。終わっていないのに確認することも、終わっているのに確認しないことも無くす。Stop と PreToolUse のフックが順番を止める
+- 開発で調べ物をしたら、ただの情報で終わらせない（research-to-tech）。知識として蓄え、アルゴリズムを作成し、技術として使えるところまで考えて実装する。調べる前に knowledge.py --find で探し、調べたら docs/knowledge/tech/ に 1 件作って 情報・知識・アルゴリズム・技術（コードとテスト）・実装 の 5 段を埋める。段は節の中身から機械で数え、Stop フックが知識に残さない開発を止める
 
 ## 応答の言語
 

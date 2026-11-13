@@ -9,11 +9,6 @@
           },
           {
             "type": "command",
-            "command": "python3 .claude/skills/actions-watch/hooks/ci_prompt.py",
-            "timeout": 10
-          },
-          {
-            "type": "command",
             "command": "awk '/^## 着手前/{a=1} /^## 会話に出すもの/{b=1} /^## 人が決める/{b=0} (!a||b){print}' .claude/skills/work-style/SKILL.md 2>/dev/null || true"
           },
           {
@@ -38,6 +33,11 @@
           {
             "type": "command",
             "command": ".claude/hooks/lang-rule.sh"
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/skills/actions-watch/hooks/ci_prompt.py",
+            "timeout": 10
           },
           {
             "type": "command",
@@ -135,6 +135,11 @@
             "type": "command",
             "command": "python3 .claude/skills/actions-watch/hooks/ci_gate.py",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "python3 .claude/skills/research-to-tech/hooks/research_gate.py",
+            "timeout": 30
           }
         ]
       },
@@ -205,6 +210,16 @@
             "type": "command",
             "command": "python3 .claude/skills/code-check/hooks/code_nudge.py",
             "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "WebSearch|WebFetch|mcp__Context7__.*|mcp__Exa__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/skills/research-to-tech/hooks/research_nudge.py",
+            "timeout": 10
           }
         ]
       }
