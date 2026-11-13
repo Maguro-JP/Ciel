@@ -113,6 +113,37 @@ def changed(root: Path, base: str) -> list:
     return sorted(p for p in names if not is_skipped(p) and (root / p).is_file())
 
 
+def changed_lines(root: Path, base: str) -> dict:
+    """base から変わった行。{相対パス: 行番号の集合}。追跡していない新しいファイルは入らない（全部の行が新しい）。"""
+    out, cur = {}, None
+    for line in git(root, "diff", "-U0", "--diff-filter=ACMR", base).splitlines():
+        if line.startswith("+++ "):
+            p = line[4:].strip()
+            cur = p[2:] if p.startswith("b/") else None
+            if cur:
+                out.setdefault(cur, set())
+        elif line.startswith("@@") and cur:
+            m = re.search(r"\+(\d+)(?:,(\d+))?", line)
+            if m:
+                start, n = int(m.group(1)), int(m.group(2) or 1)
+                out[cur].update(range(start, start + n))
+    return out
+
+
+def scope_to_diff(findings, root: Path, base: str) -> list:
+    """差分の検査では、変えた行の重大だけを重大のままにし、前からある行の重大は注意に落とす。
+    触っていない古い行で PR を止めると、直しを出す作業まで止まるため。古い行は木全体の検査（月に 1 回、公開の前）で見る。
+    構文の誤り（C01）と、行の無い物（ファイル全体の話）はそのまま。"""
+    lines = changed_lines(root, base)
+    for f in findings:
+        if f.sev != "重大" or not f.line or f.id == "C01":
+            continue
+        if f.path in lines and f.line not in lines[f.path]:
+            f.sev = "注意"
+            f.what += "（前からある行）"
+    return findings
+
+
 def code_files(files, exts=CODE_EXT) -> list:
     return [f for f in files if Path(f).suffix.lower() in exts]
 

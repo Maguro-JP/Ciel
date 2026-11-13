@@ -72,6 +72,17 @@ class Repo(unittest.TestCase):
         self.assertIn(("I02", "notes.db"), got)
         self.assertIn(("I03", ".gitignore"), got)
 
+    def test_diff_mode_does_not_scan_the_whole_tree(self):
+        root = make_repo({".env": "A=1\n", "a.py": "x = 1\n", ".gitignore": "*.pyc\n"})
+        env = dict(os.environ, CODE_CHECK_NO_TOOLS="1", CIEL_ROOT="/nonexistent")
+        (root / "a.py").write_text("x = 2\n", encoding="utf-8")
+        r = subprocess.run([sys.executable, str(HERE / "info_scan.py"), str(root), "--diff", "HEAD"], capture_output=True, text=True, env=env)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)  # 前からある .env では止めない
+        self.assertNotIn("I01", r.stdout)
+        r = subprocess.run([sys.executable, str(HERE / "info_scan.py"), str(root)], capture_output=True, text=True, env=env)
+        self.assertEqual(r.returncode, 1)  # 木全体の検査では見つける
+        self.assertIn("I01", r.stdout)
+
     def test_cli_without_tools(self):
         root = make_repo({"a.py": "print('x', pass" + "word)\n"})
         env = dict(os.environ, CODE_CHECK_NO_TOOLS="1", CIEL_ROOT="/nonexistent")

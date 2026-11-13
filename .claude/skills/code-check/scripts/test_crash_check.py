@@ -39,10 +39,16 @@ class Crash(unittest.TestCase):
         self.assertEqual([x for x in f if x.sev == "重大"], [])
 
     def test_smoke_crash(self):
-        root = make_repo({"main.py": "import argparse\nimport nonexistent_module_xyz\n"})
+        root = make_repo({"main.py": "import argparse\nraise RuntimeError('boom')\n"})
         f = crash_check.smoke(root)
         self.assertEqual([x.id for x in f], ["C06"])
         self.assertEqual(f[0].sev, "重大")
+
+    def test_smoke_missing_dependency_is_notice_and_only_filter(self):
+        root = make_repo({"main.py": "import argparse\nimport nonexistent_module_xyz\n"})
+        f = crash_check.smoke(root)
+        self.assertEqual([(x.id, x.sev) for x in f], [("C07", "注意")])  # 依存が無い環境は、不具合と決めない
+        self.assertEqual(crash_check.smoke(root, only=set()), [])  # 差分の検査では、変えていない入口を動かさない
 
     def test_smoke_ok_and_gui(self):
         root = make_repo({"main.py": "import argparse\np = argparse.ArgumentParser()\np.parse_args()\n",

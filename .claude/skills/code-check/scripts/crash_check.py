@@ -19,7 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import tools  # noqa: E402
-from common import Finding, code_files, line_ignored, parse_args, read_text, relpath, report, run, target_files  # noqa: E402
+from common import Finding, code_files, line_ignored, parse_args, read_text, relpath, report, run, scope_to_diff, target_files  # noqa: E402
 
 PY = {".py"}
 JS = {".js", ".mjs", ".cjs"}
@@ -204,10 +204,13 @@ def entrypoints(root: Path) -> list:
     return out[:6]
 
 
-def smoke(root: Path) -> list:
-    """--help で起動して、Traceback や落ちる物を見つける。画面を開く物と引数を受けない物は動かさない（副作用が読めない）。"""
+def smoke(root: Path, only=None) -> list:
+    """--help で起動して、Traceback や落ちる物を見つける。画面を開く物と引数を受けない物は動かさない（副作用が読めない）。
+    only があれば、その中の入口だけ（差分の検査では、変えた入口だけを動かす）。"""
     out = []
     for kind, rel in entrypoints(root):
+        if only is not None and rel not in only:
+            continue
         text = read_text(root / rel) or ""
         if GUI.search(text):
             out.append(Finding("注意", rel, 0, "C07", "画面のある入口なので、起動は手で確かめる", "アプリのウィンドウで開き、主な操作を 1 回ずつ通す"))
@@ -229,19 +232,26 @@ def smoke(root: Path) -> list:
         code, res = run(cmd, root, timeout=20, env=env)
         if code == 124:
             out.append(Finding("重大", rel, 0, "C06", "--help で起動して 20 秒で返らない", "起動の入口で重い処理や待ちを始めない"))
+        elif re.search(r"ModuleNotFoundError|No module named|Cannot find module|ERR_MODULE_NOT_FOUND", res):
+            # 依存が入っていない環境では起動を確かめられない。コードの不具合とは限らないので止めない
+            tail = ([l for l in res.strip().splitlines() if l.strip()] or ["?"])[-1][:100]
+            out.append(Finding("注意", rel, 0, "C07", f"依存が入っていないので起動を確かめられない: {tail}", "依存を入れてから --help で起動する。依存の書き忘れなら manifest に足す"))
         elif "Traceback" in res or code not in (0, 2):
             tail = ([l for l in res.strip().splitlines() if l.strip()] or ["?"])[-1][:100]
             out.append(Finding("重大", rel, 0, "C06", f"--help で起動して落ちた（exit {code}）: {tail}", "起動の入口の例外を直す。import の失敗なら依存を書く"))
     return out
 
 
-def scan(root: Path, files: list, no_tests: bool, no_smoke: bool):
+def scan(root: Path, files: list, no_tests: bool, no_smoke: bool, diff_mode: bool = False):
     used, missing = [], []
     findings = syntax(root, files, used, missing) + undefined(root, files, used, missing) + js_checks(root, files, used, missing)
+    if diff_mode:
+        # tsc はプロジェクト全体を見るので、差分の検査では変えたファイルの物だけ残す
+        findings = [f for f in findings if not f.id.startswith("TS") or f.path in files]
     if not no_tests:
         findings += tests(root, used, missing)
     if not no_smoke:
-        findings += smoke(root)
+        findings += smoke(root, set(files) if diff_mode else None)
     return findings, used, missing
 
 
@@ -250,7 +260,9 @@ def main() -> int:
     a = parse_args(__doc__, [(["--no-tests"], {"action": "store_true"}), (["--no-smoke"], {"action": "store_true"})])
     files = target_files(a.root, a.diff)
     no_smoke = a.no_smoke or os.environ.get("CODE_CHECK_SMOKE_OFF") == "1"
-    findings, used, missing = scan(a.root, files, a.no_tests, no_smoke)
+    findings, used, missing = scan(a.root, files, a.no_tests, no_smoke, bool(a.diff))
+    if a.diff:
+        findings = scope_to_diff(findings, a.root, a.diff)
     return report("バグやクラッシュ", findings, a.json, with_info=False,
                   extra={"files": len(files), "tools": tools.tools_line(sorted(set(used)), sorted(set(missing)))})
 

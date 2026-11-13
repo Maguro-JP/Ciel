@@ -21,7 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import tools  # noqa: E402
 from common import (Finding, code_files, file_ignored, is_test, line_ignored, near, parse_args, read_text, relpath, report,  # noqa: E402
-                    run, target_files)
+                    run, scope_to_diff, target_files)
 
 PY = {".py"}
 JS = {".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx"}
@@ -249,8 +249,12 @@ def dependency_findings(root: Path) -> list:
     return out
 
 
-def scan(root: Path, files: list, use_ruff: bool = True, force_regex: bool = False):
-    """ツールを先に使い、ツールの無い言語だけ正規表現で補う。"""
+MANIFESTS = {"requirements.txt", "requirements-dev.txt", "package.json", "package-lock.json"}
+
+
+def scan(root: Path, files: list, use_ruff: bool = True, force_regex: bool = False, diff_mode: bool = False):
+    """ツールを先に使い、ツールの無い言語だけ正規表現で補う。
+    差分の検査（diff_mode）では、依存は manifest を変えたときだけ見て、注意に留める（前からある依存の穴で PR を止めない。週 1 回の vuln-watch が持つ）。"""
     used, missing = [], []
     findings = []
     have = {"bandit": bool(tools.find("bandit")), "semgrep": bool(tools.find("semgrep")), "ruff": use_ruff and bool(tools.find("ruff"))}
@@ -280,7 +284,10 @@ def scan(root: Path, files: list, use_ruff: bool = True, force_regex: bool = Fal
                 continue
             findings += scan_text(rel, text, is_test(rel))
         used.append("正規表現（" + "、".join(sorted(e.lstrip(".") for e in regex_exts)) + "）")
-    deps = dependency_findings(root)
+    deps = dependency_findings(root) if not diff_mode or any(Path(f).name in MANIFESTS for f in files) else []
+    if diff_mode:
+        for f in deps:
+            f.sev = "注意"
     if deps:
         used.append("pip-audit/npm audit")
     findings += deps
@@ -291,7 +298,9 @@ def main() -> int:
     a = parse_args(__doc__, [(["--no-ruff"], {"action": "store_true", "help": "ruff を使わない"}),
                              (["--regex"], {"action": "store_true", "help": "ツールがあっても正規表現を全部動かす"})])
     files = target_files(a.root, a.diff)
-    findings, used, missing = scan(a.root, files, not a.no_ruff, a.regex)
+    findings, used, missing = scan(a.root, files, not a.no_ruff, a.regex, bool(a.diff))
+    if a.diff:
+        findings = scope_to_diff(findings, a.root, a.diff)
     return report("不具合や脆弱性", findings, a.json, with_info=False,
                   extra={"files": len(files), "tools": tools.tools_line(used, missing)})
 

@@ -97,6 +97,21 @@ class Repo(unittest.TestCase):
         self.assertIn("無し bandit", r.stdout)
         self.assertIn("不具合や脆弱性: 重大 1", r.stdout)
 
+    def test_diff_mode_only_blocks_on_changed_lines(self):
+        bad = "import os\nos.sys" + "tem('rm -rf ' + p)\nx = 1\n"
+        (self.root / "old.py").write_text(bad, encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=self.d, check=True)
+        subprocess.run(["git", "-c", "user.email=t@users.noreply.github.com", "-c", "user.name=t", "commit", "-q", "-m", "old"], cwd=self.d, check=True)
+        env = dict(os.environ, CODE_CHECK_NO_TOOLS="1")
+        (self.root / "old.py").write_text(bad.replace("x = 1", "x = 2"), encoding="utf-8")  # 悪い行には触らない
+        r = subprocess.run([sys.executable, str(HERE / "vuln_scan.py"), self.d, "--diff", "HEAD"], capture_output=True, text=True, env=env)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("前からある行", r.stdout)
+        (self.root / "old.py").write_text(bad + "os.sys" + "tem('ls ' + q)\n", encoding="utf-8")  # 新しい悪い行
+        r = subprocess.run([sys.executable, str(HERE / "vuln_scan.py"), self.d, "--diff", "HEAD"], capture_output=True, text=True, env=env)
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("old.py:4", r.stdout)
+
     def test_cli_with_tools_merges_same_line(self):
         import tools
         if not (tools.find("bandit") and tools.find("ruff")):

@@ -21,7 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import tools  # noqa: E402
 from common import (CIEL_SKILLS, Finding, code_files, file_ignored, is_test, line_ignored, near, parse_args, read_text,  # noqa: E402
-                    report, run, strip_strings, target_files, tracked)
+                    report, run, scope_to_diff, strip_strings, target_files, tracked)
 
 CODE = {".py", ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".sh", ".bash", ".rb", ".go", ".php", ".java", ".kt", ".cs"}
 SECRET_ID = r"\b(password|passwd|pwd|token|secret|api_key|apikey|authorization|auth_token|access_key|secret_key|client_secret|private_key|cookie|session_id|credential)s?\b"  # code-check: ignore 検出の正規表現であり、鍵ではない
@@ -65,14 +65,17 @@ def skip_line(src_line: str) -> bool:
     return line_ignored(src_line) or "secret-leak-check: ignore" in src_line
 
 
-def tracked_files(root: Path, files: list) -> list:
-    """追跡してはいけないファイルと、データのファイル。木全体で見る（安い）。"""
+def tracked_files(root: Path, files: list, only_changed: bool = False) -> list:
+    """追跡してはいけないファイルと、データのファイル。木全体で見る（安い）。
+    差分の検査（only_changed）では変えたファイルだけ見る。前からある物で PR を止めないため。"""
     out = []
-    for rel in tracked(root):
+    for rel in (files if only_changed else tracked(root)):
         if SENSITIVE_FILE.search(rel) and not SENSITIVE_OK.search(rel):
             out.append(Finding("重大", rel, 0, "I01", "鍵や設定の秘密を追跡している", "git rm --cached で外し .gitignore に足す。push 済みならローテートして履歴から消す"))
         elif DATA_FILE.search(rel) and not is_test(rel):
             out.append(Finding("注意", rel, 0, "I02", "データベースや記録のファイルを追跡している（中に個人情報が入りうる）", "追跡から外し .gitignore に足す。要るなら中身を見てから"))
+    if only_changed:
+        return out
     gi = read_text(root / ".gitignore") or ""
     has_code = any(rel.endswith((".py", ".js", ".ts", "package.json", "pyproject.toml", "requirements.txt")) for rel in files[:2000])
     if has_code and not re.search(r"^\s*\*?\.env\b", gi, re.M):
@@ -202,9 +205,11 @@ def ciel_scans(root: Path, used: list) -> list:
     return out
 
 
-def scan(root: Path, files: list, history: bool = False):
+def scan(root: Path, files: list, history: bool = False, diff_mode: bool = False):
+    """diff_mode では、木全体の検査（追跡しているファイル、secret-leak-check と content-audit の --tree）をしない。
+    precheck は secret-leak-check と content-audit を差分で別に回すので、ここで木全体を重ねると前からある物で止まる。"""
     used, missing = [], []
-    findings = tracked_files(root, files)
+    findings = tracked_files(root, files, diff_mode)
     for rel in files:
         if Path(rel).suffix.lower() not in CODE | {".sql", ".csv", ".json", ".yaml", ".yml", ".prisma", ".graphql", ".toml", ".ini", ".cfg", ".env", ".md"}:
             continue
@@ -213,14 +218,17 @@ def scan(root: Path, files: list, history: bool = False):
             continue
         findings += scan_text(rel, text, is_test(rel))
     findings += secret_tools(root, files, history, used, missing)
-    findings += ciel_scans(root, used)
+    if not diff_mode:
+        findings += ciel_scans(root, used)
     return findings, used, missing
 
 
 def main() -> int:
     a = parse_args(__doc__, [(["--history"], {"action": "store_true", "help": "gitleaks で履歴も見る"})])
     files = target_files(a.root, a.diff)
-    findings, used, missing = scan(a.root, files, a.history)
+    findings, used, missing = scan(a.root, files, a.history, bool(a.diff))
+    if a.diff:
+        findings = scope_to_diff(findings, a.root, a.diff)
     return report("情報の扱いや漏洩", findings, a.json, extra={"files": len(files), "tools": tools.tools_line(sorted(set(used)), sorted(set(missing)))})
 
 
