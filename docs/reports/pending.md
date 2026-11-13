@@ -33,9 +33,16 @@
 - 何: ブランチ claude/user-emotion-20261102（user-emotion、session-watch の窓の直し、rules_sync.py、教訓 5 件、週報 2026-W45）を PR にしてマージし、10 本に配る
 - 待っているもの: ❔ への返事（11/2 に出した）。返事があれば PR を作り、main に入れて配る
 - それまで: 配布の 2 回目（skill-request と見回りの決まり）は 10 本のブランチに積んであり、base への push も同じ返事を待つ
+- 答え（2026-11-07）: 進める。Ciel の #95 を main に入れ、9 本の base に push した（1 本は draft の PR のまま）。反映済み
 
 ## 2026-11-07 reread_check.py の誤検知は、AI からは直せない
 
 - 何: `verify-before-done/hooks/reread_check.py` が、記録のファイルへの追記（`echo exit=$? >> x.log`）を編集に数え、裏の処理を始めただけの返答に読み直しを求める（この週に 4 回）
 - 止まった所: フックの直しは auto mode の classifier（AI が自分のゲートを直す判定）で止められた
 - ユーザーにしかできないこと: `BASH_EDIT` の `>>` の部分を `(?<![|&<>])>>\s*(?!/tmp/)(?!\S*\.(?:log|out|txt)\b)\S` にする。直したら、この項目を「反映済み」にする
+
+## 2026-11-14 PR 待ち: 魅せる README・リポジトリ管理・確認・通知・調べ物のスキルと、スキルの手入れ 2026-W46
+
+- 何: ブランチ claude/readme-repo-20261107（readme-showcase、repo-management、code-check、actions-watch、research-to-tech、sync.py と finish-first と observe.py の直し、教訓 6 件、週報 2026-W46）を PR にする。作ったら購読し、Actions の結果が来てからマージの確認を出し、マージのあと 10 本に配る
+- 待っているもの: 確認の行への返事（11/7 から出している）。precheck は通っている
+- それまで: このブランチに積む。PR は作らない。新しいフック（code-check、actions-watch、research-to-tech）は、main に入って配られ、新しく開いたセッションから効く
