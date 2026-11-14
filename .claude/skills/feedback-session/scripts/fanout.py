@@ -183,7 +183,7 @@ def overlap(a: str, b: str) -> bool:
 
 def slug(text: str) -> str:
     s = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
-    return s[:30] if len(s) >= 3 else "t-" + hashlib.sha1(text.encode("utf-8")).hexdigest()[:6]
+    return s[:30] if len(s) >= 3 else "t-" + hashlib.sha256(text.encode("utf-8")).hexdigest()[:6]
 
 
 def group(tasks: list) -> list:
