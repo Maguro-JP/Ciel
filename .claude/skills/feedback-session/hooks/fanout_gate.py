@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from fanout_nudge import CHILD, count_instructions  # noqa: E402
+from fanout_nudge import CHILD, SEQUENTIAL, count_instructions, user_forbids  # noqa: E402
 
 ESCAPE = re.compile(r"(?m)^[❕!]\s*並列[:：]")
 SPLIT_TOOL = re.compile(r"^(Agent|Task|Workflow)$|create_session$")
@@ -88,6 +88,9 @@ def main() -> int:
     except OSError:
         return 0
     if st["split"] or CHILD.search(st["prompt"]) or ESCAPE.search(st["text"]):
+        return 0
+    # 順にやるルーティン（long-dev）と、ユーザーがセッションを増やさないと言った会話では、分けることを求めない
+    if SEQUENTIAL.search(st["prompt"]) or user_forbids(st["prompt"], path):
         return 0
     n = count_instructions(st["prompt"])
     if st["calls"] <= env_int("FANOUT_GATE_CALLS", 40) or n < env_int("FANOUT_GATE_ITEMS", 3):

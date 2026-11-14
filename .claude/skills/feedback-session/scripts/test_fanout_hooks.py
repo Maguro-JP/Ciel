@@ -72,6 +72,40 @@ class Nudge(unittest.TestCase):
         self.assertEqual(self.nudge("<task-notification>\n1. a して\n2. b して")[1], "")
         self.assertEqual(self.nudge(TWO, FANOUT_OFF="1")[1], "")
 
+    def test_quiet_when_the_user_said_no_more_sessions(self):
+        self.assertEqual(self.nudge(TWO + "\nこのセッションで動かす。勝手にセッションを増やさない")[1], "")
+        self.assertEqual(self.nudge(TWO + "\n子のセッションを立てない", session="s2")[1], "")
+        # 前の発言で決めたことは、あとのターンにも効く。「並列で」と言い直されたら、新しい方に従う
+        t = Path(self.tmp.name) / "t.jsonl"
+        rows = [{"type": "user", "message": {"content": "勝手にセッションを増やすな"}}, {"type": "assistant", "message": {"content": [{"type": "text", "text": "↩"}]}}]
+        t.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n", encoding="utf-8")
+        payload = {"session_id": "s3", "prompt": TWO, "transcript_path": str(t)}
+        self.assertEqual(run("fanout_nudge.py", payload, self.tmp.name)[1], "")
+        with open(t, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"type": "user", "message": {"content": "やっぱり並列で進めて"}}, ensure_ascii=False) + "\n")
+        self.assertNotEqual(run("fanout_nudge.py", payload, self.tmp.name)[1], "")
+        # ルーティンのプロンプト（通知の結果として届く）に書かれた決まりも読む
+        body = "--- Notification 1 of 1 · origin: scheduled trigger ---\nlong-dev。子のセッションを立てない"
+        rows = [{"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "n1", "name": "ReadNotifications", "input": {}}]}},
+                {"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": "n1", "content": body}]}}]
+        t.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n", encoding="utf-8")
+        self.assertEqual(run("fanout_nudge.py", dict(payload, session_id="s4"), self.tmp.name)[1], "")
+        # ほかのツールの結果（差分や検索の出力）に同じ語が出ても、ユーザーの決めたこととは見ない
+        rows = [{"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "b1", "name": "Bash", "input": {}}]}},
+                {"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": "b1", "content": body}]}}]
+        t.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n", encoding="utf-8")
+        self.assertNotEqual(run("fanout_nudge.py", dict(payload, session_id="s6"), self.tmp.name)[1], "")
+
+    def test_summary_quoting_other_words_is_not_the_users_decision(self):
+        t = Path(self.tmp.name) / "t.jsonl"
+        rows = [{"type": "user", "message": {"content": "This session is being continued from a previous conversation. ほかのリポジトリでは「勝手にセッションを増やさない」と書かれていた"}}]
+        t.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n", encoding="utf-8")
+        self.assertNotEqual(run("fanout_nudge.py", {"session_id": "s5", "prompt": TWO, "transcript_path": str(t)}, self.tmp.name)[1], "")
+
+    def test_quiet_on_a_sequential_routine(self):
+        long_dev = "o/r の long-dev。今日の日付（JST）で次を順にやる。\n1. 報告: 日報を書く\n2. まとめ: PR にする\n3. 開発: auto-dev を回す"
+        self.assertEqual(self.nudge(long_dev)[1], "")
+
     def test_once_per_15_minutes_per_session(self):
         self.assertNotEqual(self.nudge(TWO)[1], "")
         self.assertEqual(self.nudge(TWO)[1], "")  # 同じセッションの 2 回目は黙る
@@ -107,6 +141,11 @@ class Gate(unittest.TestCase):
         self.assertEqual(self.gate(dict(transcript(self.t, THREE, 60), stop_hook_active=True))[0], 0)
         self.assertEqual(self.gate(transcript(self.t, THREE, 60), FANOUT_OFF="1")[0], 0)
         self.assertEqual(self.gate({"session_id": "s"})[0], 0)
+
+    def test_long_dev_and_no_more_sessions_pass(self):
+        long_dev = "o/r の long-dev。今日の日付（JST）で次を順にやる。\n1. 報告: 日報を書く\n2. まとめ: PR にする\n3. 開発: auto-dev を回す"
+        self.assertEqual(self.gate(transcript(self.t, long_dev, 60))[0], 0)
+        self.assertEqual(self.gate(transcript(self.t, THREE + "\n子のセッションを立てない", 60))[0], 0)
 
     def test_thresholds_can_be_changed(self):
         self.assertEqual(self.gate(transcript(self.t, TWO, 6), FANOUT_GATE_CALLS="5", FANOUT_GATE_ITEMS="2")[0], 2)

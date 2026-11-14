@@ -108,6 +108,8 @@ python3 .claude/skills/feedback-session/scripts/fanout.py plan \
 
    作業の列を書かずに `--from-reports` を付けると、`docs/reports/deliverables.md` の未完成と `pending.md` の答えが付いた項目から作る。
    「❕ 並列: 分けない（理由）」が出たら分けない（作業が 1 つ、どれも 10 手に満たない、場所が重なる）。その 1 行を会話に出して自分で進める
+   ユーザーがセッションを増やさないと言ったとき（会話かルーティンのプロンプトに「セッションを増やさない」「子のセッションを立てない」がある）は、計画を出さずに自分で進める。
+   子に出すのは区切りのある作業だけで、long-dev そのものとルーティンは子に渡さない（紐づけ先はユーザーが使っているセッション。scheduler の「紐づけ先」）
 2. 設定を取る。`get_session`（session_id 無し）で自分の `session_context.model` と `permission_mode` を取る。権限はそのまま渡す。
    モデルは引き継がず、束の難易度で選ぶ（下の表。計画が束ごとに出す）。effort は `create_session` に渡さない（渡すのはユーザーが言ったときだけ）。作ったら
    `❕ <題> を作った（モデルは <ID>、難易度 <難易度>。effort は既定）` と 1 行出す
@@ -149,6 +151,7 @@ python3 .claude/skills/feedback-session/scripts/fanout.py plan \
 | `background-first/hooks/background_first.py` | PreToolUse。ツール呼び出しが 24 回からは、独立した残りを子のセッションに分けるよう知らせる |
 
 どれも `FANOUT_OFF=1` で止まる（background_first.py は `BACKGROUND_FIRST_OFF=1`）。子のセッション（プロンプトに「セッションやルーティンを作らない」がある）には出さない。
+fanout_nudge.py と fanout_gate.py は、ユーザーがセッションを増やさないと言った会話と、順にやる決まりのルーティン（long-dev の 報告・まとめ・開発）にも出さない。あとの発言で「並列で」と言い直されたら、新しい方に従う。
 
 ## 親セッション（並列で立てるとき）
 
