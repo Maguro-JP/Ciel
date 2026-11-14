@@ -64,6 +64,8 @@ long-dev は、auto-dev と報告を毎日起動する Routine を作るスキ�
 
 auto-dev のまま。止まる条件、判断待ち（`docs/reports/pending.md`）、会話に出すもの、
 サイクルの間を空けないことは、すべて auto-dev に書いてある。
+独立した未完成が 2 つ以上あれば、auto-dev の「2. 判断」の決まりで子のセッションに分ける（feedback-session「親が取りまとめる並列開発」）。
+子はルーティンのセッションの作業ブランチに push し、朝のまとめの PR は 1 本のまま。
 
 long-dev の Routine で始まった auto-dev は、`references/principles.md`（プロダクトを
 時間とともに良くする原則）を判断の土台に足す。記録はサイクルごとに `docs/knowledge/` に書く。

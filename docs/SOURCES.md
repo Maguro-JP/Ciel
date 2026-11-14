@@ -40,6 +40,7 @@
 | textlint と各規則（npm） | それぞれのライセンス（MIT） | `~/.cache/ciel-textlint` | `scripts/setup-textlint.sh` で npm から入れる。リポジトリには入れない | 無し |
 | [EveryInc/compound-engineering-plugin](https://github.com/EveryInc/compound-engineering-plugin) | MIT（著作権表示は元の LICENSE） | `research-to-tech/SKILL.md` | 「1 つの仕事が次の仕事を楽にする」考え方と、学びを決まった場所に書いて次の計画が読む流れ | 置き場を docs/knowledge/tech/ にし、文書で終わらせずアルゴリズム・技術（コードとテスト）・実装まで段を足して、段を機械で数える |
 | [blader/Claudeception](https://github.com/blader/Claudeception) | MIT（著作権表示は元の LICENSE） | `research-to-tech/SKILL.md`「残す価値の物差し」 | 残す物の 4 つの条件（調べないと分からなかった、次でも使える、使う場面が言える、動かして確かめた） | 毎ターンの差し込みはやめ、調べた直後の 15 分に 1 回と、開発をしたターンの Stop だけにした |
+| [Anthropic: How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system)、[Claude Code: subagents](https://code.claude.com/docs/en/sub-agents) | 公開の記事と文書（コードの取り込みは無い。考え方だけ） | `feedback-session/scripts/fanout.py`、`references/models.md`、`docs/knowledge/tech/2026-11-14-session-fanout.md` | 取りまとめる側が分けた側に渡す 4 つ（目的・出力の形・道具・作業の境界）、規模に合わせた本数、取りまとめる側に上のモデルで分けた側に下のモデル、成果は外に書いて参照だけ返す | 調べ物の話を開発に移した。境界は触る場所の重なりで機械が決め、本数の上限は 3、成果は親のブランチへの push にした |
 
 ## 探し方
 

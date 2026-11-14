@@ -34,7 +34,8 @@
 | 脆弱性のニュースに気づかず、更新が遅れる | `vuln-watch`。`scan.py` が週 1 回、この 7 日に動いたリポジトリの依存を OSV・CISA KEV・JVN に突き合わせ、新しいものに ★ を付けて周知する。悪用済みと重大は通知し、`bump.py` で更新のブランチを用意する | 毎日のルーティン | 新規の件数と、見つけてから更新の PR までの日数 |
 | 日本語が崩れる、訳語を作る、英語の出だし | `lang-rule.sh`、`lang-check.sh`、`ja-proofread` | 毎ターンと返答の最後 | proofread の重大の数 |
 | ユーザーが使わない略語・訳語・造語で書く（「プルリク」「リポ」「Routine」「片付け」「JST」） | `user-terms` の対応表。`terms_check.py` が返答を表と突き合わせて差し戻し、`terms.py --diff` が文書の差分を注意で出す。`terms_learn.py` が発言の語を数えて表を育てる | 返答の最後と PR の前 | 差し戻した語の数（metrics.jsonl）と文書の注意の数 |
-| 長い処理を前面で待ち、ユーザーの一言が届かない | `background-first`。`background_first.py`（PreToolUse）が長いコマンドの前面の実行を止め、12 回ごとに裏へ出すよう知らせる | ツールを呼ぶ前 | 止めた回数、知らせた回数 |
+| 長い処理を前面で待ち、ユーザーの一言が届かない | `background-first`。`background_first.py`（PreToolUse）が長いコマンドの前面の実行を止め、12 回ごとに裏へ出すよう、24 回からは子のセッションに分けるよう知らせる | ツールを呼ぶ前 | 止めた回数、知らせた回数 |
+| 独立した作業がいくつもあるのに、セッションをたてずに 1 本で順に進めて開発が遅い。易しい作業にも難しい作業にも同じモデルを使う | `feedback-session`「親が取りまとめる並列開発」。`fanout.py plan` が束・難易度に合うモデル・プロンプトを出す。`fanout_nudge.py`（UserPromptSubmit）が指示 2 つ以上と「並列」などの語で 1 行差し込み、`fanout_gate.py`（Stop）がツール呼び出し 40 回超・指示 3 個以上で分けていないターンを差し戻す | 一言を受けたときと返答の最後 | 子のセッションの本数、「❕ 並列: 分けない」の回数 |
 | 他のリポジトリのセッションが欲しいスキルを会話で言って消える | `skill-request`。`requests.py --add` がそのリポジトリの docs/reports/skill-requests.md に書き、Ciel の skill-upkeep が `--collect` で拾う | 要請が出たとき、毎週 | 未対応の件数と、対応までの週数 |
 | CLI やブラウザで作る | `desktop-app`。`no_browser.py`（PostToolUse） | 書き込みのあと | 止めた回数 |
 | 分かりにくい・面倒な画面を作る（止まるダイアログ、ラベルの無い入力、曖昧なエラー文、画面を固める処理） | `ui-design`。`ui_nudge.py`（PostToolUse）が書き込みのたびに知らせ、`ui_check.py --diff` を precheck が注意で出す | 書き込みのあとと PR の前 | 注意の数 |

@@ -127,3 +127,7 @@ description が完璧でも、**AI が自力で簡単に片付けられる依頼
 | 「Actions の通知と順番」（actions-watch）と「PR の流れ」（solo-pr-flow）と「落ちた原因」（ci-triage） | actions-watch は購読と通知と ❔ の順番だけを機械で守る側で、PR の作り方・マージ・後片付けは solo-pr-flow、落ちたときの原因の特定は ci-triage が持つ。決まりを 2 か所に書かず、solo-pr-flow の表から actions-watch を指す |
 | 「調べ物を技術にする」（research-to-tech）と「目標を決めて練習する」（self-learn）と「失敗の記録」（lessons）と「日の作業の記録」（auto-dev の docs/knowledge/） | research-to-tech は開発の途中の調べ物を 5 段で 1 件 1 ファイルにする側（docs/knowledge/tech/）で、判定と練習の周回が要る物は self-learn（docs/knowledge/learning/）、間違えた記録は lessons が持つ。同じ中身を 2 か所に書かず、技術にした物の場所を指す |
 | 「開発を速くするために子のセッションに分ける」（feedback-session、background-first）と「ルーティンの紐づけ先はユーザーが使っているセッション」（scheduler、long-dev） | 子に出すのは、親のブランチに積む区切りのある作業だけ。ルーティンと long-dev の紐づけ先は移さず、子はルーティンを作らない。ユーザーがセッションを増やさないと言ったリポジトリでは、子も立てない |
+| 「独立した作業は子のセッションに分ける」（feedback-session の fanout、background-first）と「未完成があるうちは新しい成果物を始めない」（finish-first）と「セッションを 1 つ立てるだけで文脈が乗る」（token-efficiency） | 分けるのは今の成果物の残りと、既にある未完成だけ。新しい成果物を始める口実にしない。10 手に満たない作業と、触る場所の重なる作業は分けない。週の上限に近い（`rate_limit_info.status` が `allowed` 以外）ときは増やさない |
+| 「モデルは難易度で選ぶ」（feedback-session の models.md）と、ユーザーがモデルを名指しした指示 | 名指しが先。表は、言われていないときの既定。分からなければ普通 |
+| 「子は PR を作らない・質問しない」（fanout のプロンプト）と「PR の前に ❔」（pr_gate）、「Actions の通知」（actions-watch） | PR と ❔ と購読は親だけがする。子は親のブランチに push して終わる |
+| 「長いターンを分ける」（fanout_gate.py、Stop）と「足りない 1 行だけを足す」（Stop フックの差し戻しの決まり） | 差し戻されたら、分けるか「❕ 並列: 分けない（理由）」の 1 行だけを足す。前の行を出し直さない |
