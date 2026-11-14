@@ -37,7 +37,7 @@ ja-proofread の `glossary.md`（開発者の間で通る語の既定）と重�
 | 作業 | タスク、task、tasks | CLAUDE.md |
 | 成果物 | アウトプット、デリバラブル、deliverable、deliverables | 発言 |
 | 機密情報 | 秘密情報、シークレット、秘匿情報、機微情報、クレデンシャル、credential、credentials、secret、secrets | 発言 |
-| 整理整頓 | (?<!後)片付け、掃除、クリーンアップ、cleanup | 発言 |
+| 整理整頓 | 掃除、クリーンアップ、cleanup | 発言 |
 | 一時ファイル | テンポラリファイル、temp ファイル、一時的なファイル | CLAUDE.md |
 | public | パブリック | 発言 |
 | private | プライベート | 発言 |
