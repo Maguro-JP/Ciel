@@ -39,6 +39,10 @@ def inputs(tmp: Path):
     }
 
 
+# フックの登録の先頭。どちらかで始まらない登録は、作業ディレクトリに頼っている
+ANCHORS = ('"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/run.sh" ', 'cd "${CLAUDE_PROJECT_DIR:-.}" && ')
+
+
 def main() -> int:
     global ROOT
     args = [a for a in sys.argv[1:]]
@@ -57,6 +61,11 @@ def main() -> int:
                     cmd = h.get("command")
                     if not cmd:
                         continue
+                    if not cmd.startswith(ANCHORS):
+                        # 相対パスのままの登録は、会話の途中で cd すると見つからず、終了コード 2 で全部のツールを止める
+                        bad += 1
+                        print(f"  NG  {event:17} {cmd}  起動役（.claude/hooks/run.sh）を通していない")
+                        continue
                     # ひな形には、対象のリポジトリで repo-bootstrap が作るフック（test.sh、check.sh）も登録されている。
                     # ここに無いファイルを指す登録は、動かさずに飛ばす（skill-sync の _command_exists と同じ見方）
                     paths = [t for t in cmd.replace("||", " ").split() if t.startswith(".claude/")]
@@ -65,7 +74,7 @@ def main() -> int:
                         continue
                     for payload in samples.get(event, [{"session_id": "smoke"}]):
                         try:
-                            r = subprocess.run(cmd, shell=True, cwd=ROOT, input=json.dumps(payload, ensure_ascii=False),
+                            r = subprocess.run(cmd, shell=True, cwd=ROOT, input=json.dumps(payload, ensure_ascii=False),  # code-check: ignore 固定の文字列（ユーザーの入力は入らない）
                                                capture_output=True, text=True, env=env, timeout=h.get("timeout", 30))
                             code, err = r.returncode, r.stderr
                         except subprocess.TimeoutExpired:
@@ -76,6 +85,16 @@ def main() -> int:
                             bad += 1
                         detail = "" if ok else f"  exit={code} {err.strip().splitlines()[-1][:120] if err.strip() else ''}"
                         print(f"  {mark}{event:17} {cmd}{detail}")
+                    # 別の作業ディレクトリ（cd したあと）からも 1 回動かし、見つからずに止まらないことを見る
+                    try:
+                        r = subprocess.run(cmd, shell=True, cwd=d, input=json.dumps(samples.get(event, [{"session_id": "smoke"}])[0], ensure_ascii=False),  # code-check: ignore 固定の文字列（ユーザーの入力は入らない）
+                                           capture_output=True, text=True, env=dict(env, CLAUDE_PROJECT_DIR=str(ROOT)), timeout=h.get("timeout", 30))
+                        code, err = r.returncode, r.stderr
+                    except subprocess.TimeoutExpired:
+                        code, err = "timeout", ""
+                    if code != 0 or "Traceback" in err or "No such file" in err:
+                        bad += 1
+                        print(f"  NG  {event:17} {cmd}  別の作業ディレクトリから動かすと失敗する exit={code}")
     print(f"フックの誤り {bad}")
     return 1 if bad else 0
 

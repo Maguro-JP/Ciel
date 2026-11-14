@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" aria-labelledby="t d">
+  <title id="t">Ciel の流れ</title>
+  <desc id="d">スキルを書き、検査し、フックで効かせ、skill-sync で別のリポジトリに配る流れの図です。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="880" height="250" rx="14" fill="#111827"/>
+  <text x="440" y="38" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="#f9fafb">Ciel: スキルを作り、検査し、効かせ、配る</text>
+
+  <g font-family="sans-serif" text-anchor="middle">
+    <rect x="30" y="70" width="180" height="120" rx="10" fill="#1f2937" stroke="#f97316" stroke-width="2"/>
+    <text x="120" y="102" font-size="16" font-weight="bold" fill="#fdba74">1. スキル</text>
+    <text x="120" y="130" font-size="12" fill="#e5e7eb">.claude/skills/</text>
+    <text x="120" y="150" font-size="12" fill="#e5e7eb">&lt;name&gt;/SKILL.md</text>
+    <text x="120" y="172" font-size="12" fill="#9ca3af">いつ使うかを書く</text>
+
+    <rect x="250" y="70" width="180" height="120" rx="10" fill="#1f2937" stroke="#f97316" stroke-width="2"/>
+    <text x="340" y="102" font-size="16" font-weight="bold" fill="#fdba74">2. 検査</text>
+    <text x="340" y="130" font-size="12" fill="#e5e7eb">scripts/validate.sh</text>
+    <text x="340" y="150" font-size="12" fill="#e5e7eb">precheck.py</text>
+    <text x="340" y="172" font-size="12" fill="#9ca3af">出す前に機械で確かめる</text>
+
+    <rect x="470" y="70" width="180" height="120" rx="10" fill="#1f2937" stroke="#f97316" stroke-width="2"/>
+    <text x="560" y="102" font-size="16" font-weight="bold" fill="#fdba74">3. フック</text>
+    <text x="560" y="130" font-size="12" fill="#e5e7eb">.claude/hooks/</text>
+    <text x="560" y="150" font-size="12" fill="#e5e7eb">.claude/settings.json</text>
+    <text x="560" y="172" font-size="12" fill="#9ca3af">決まりを毎回効かせる</text>
+
+    <rect x="690" y="70" width="160" height="120" rx="10" fill="#1f2937" stroke="#f97316" stroke-width="2"/>
+    <text x="770" y="102" font-size="16" font-weight="bold" fill="#fdba74">4. 配布</text>
+    <text x="770" y="130" font-size="12" fill="#e5e7eb">skill-sync</text>
+    <text x="770" y="150" font-size="12" fill="#e5e7eb">scripts/install.sh</text>
+    <text x="770" y="172" font-size="12" fill="#9ca3af">別のリポジトリへ</text>
+  </g>
+
+  <g stroke="#9ca3af" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <line x1="212" y1="130" x2="246" y2="130"/>
+    <line x1="432" y1="130" x2="466" y2="130"/>
+    <line x1="652" y1="130" x2="686" y2="130"/>
+  </g>
+  <text x="440" y="226" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#9ca3af">コミットしたものだけが、スマホや Web のセッションに届きます</text>
+</svg>

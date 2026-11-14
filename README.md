@@ -1,7 +1,28 @@
 # Ciel
 
 Claude Code のスキルを作り、集め、直し、配るための公開リポジトリです。
+
+![validate](https://img.shields.io/github/actions/workflow/status/Maguro-JP/Ciel/validate.yml?branch=main)
+![License](https://img.shields.io/github/license/Maguro-JP/Ciel)
+
+![スキルを書き、検査し、フックで効かせ、別のリポジトリへ配る流れの図](docs/images/ciel-flow.svg)
+
 名前は『転生したらスライムだった件』の智慧之王から借りています。
+
+## 目次
+
+- [このリポジトリは public です](#このリポジトリは-public-です)
+- [特長](#特長)
+- [クイックスタート](#クイックスタート)
+- [インストール](#インストール)
+- [構成](#構成)
+- [スキルの形](#スキルの形)
+- [使い方](#使い方)
+- [新しいスキルを作る](#新しいスキルを作る)
+- [収録スキル](#収録スキル)
+- [文書](#文書)
+- [個人設定](#個人設定)
+- [貢献とライセンス](#貢献とライセンス)
 
 ## このリポジトリは public です
 
@@ -11,6 +32,58 @@ Claude Code のスキルを作り、集め、直し、配るための公開リ�
 - 非公開のリポジトリの名前、メールアドレス、セッションやルーティンの ID、費用の数字を書かない。コミットメッセージと PR の本文にも書かない
 - コミットの前に `scripts/validate.sh` を通す
 - 一度 push した機密情報は、消しても漏れたまま。鍵はローテートする
+
+## 特長
+
+- 1 スキル 1 ディレクトリで、いつ使うかを `description` に書くだけで作れます
+- フックが言語の決まりや場面の案内を毎回差し込み、決まりが会話の途中で落ちるのを防ぎます
+- `scripts/validate.sh` が、スキルとフックを出す前に機械で検査します
+- `skill-sync` で、差分のあるスキルだけを別のリポジトリへ入れ替えられます
+- コミットしたスキルは、スマホや Web のセッションにも届きます
+
+## クイックスタート
+
+手元のリポジトリ `my-repo` に、Ciel のスキルとフックを入れます。前提は git と Python 3 です。
+
+1. Ciel を取得します。
+
+   ```bash
+   git clone https://github.com/Maguro-JP/Ciel.git
+   ```
+
+2. 入る差分を見ます。差分があると終了コード 1 で一覧を出します。
+
+   ```bash
+   python3 Ciel/.claude/skills/skill-sync/scripts/sync.py my-repo
+   ```
+
+3. 入れます。スキルと、`.claude/settings.json` のフックの登録が書き込まれます。
+
+   ```bash
+   python3 Ciel/.claude/skills/skill-sync/scripts/sync.py my-repo --apply
+   ```
+
+4. コミットします。コミットしないと、スマホや Web のセッションには反映されません。
+
+   ```bash
+   git -C my-repo add .claude && git -C my-repo commit -m "Ciel のスキルを更新"
+   ```
+
+5. もう一度 2 のコマンドを流して、何も出ずに終了コード 0 で終われば、最新です。
+
+## インストール
+
+必要なのは git と Python 3 だけです。取り込みには、用途に応じて 2 つのツールがあります。
+
+```bash
+git clone https://github.com/Maguro-JP/Ciel.git
+./Ciel/scripts/install.sh                               # 置けるスキルの一覧を出す
+./Ciel/scripts/install.sh --all /path/to/repo           # 全部置く
+python3 Ciel/.claude/skills/skill-sync/scripts/sync.py /path/to/repo --apply   # 差分だけ入れ替える（フックも）
+```
+
+更新するときは Ciel で `git pull` してから、同じコマンドをもう一度流します。
+取り込みと更新の詳しい手順は [docs/USAGE.md](docs/USAGE.md) にあります。
 
 ## 構成
 
@@ -89,6 +162,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`user-terms`](.claude/skills/user-terms/) | 略語・訳語・造語を、ユーザーが使った語に直す。Stop フックが会話を止め、precheck が文書を注意として出す |
 | [`vuln-watch`](.claude/skills/vuln-watch/) | 脆弱性の見張り。全リポジトリの依存を棚卸しし、OSV と悪用済み一覧と JVN に突き合わせ、新しいものを周知して更新を用意する |
 | [`docs-upkeep`](.claude/skills/docs-upkeep/) | README と docs を今のリポジトリに合わせる。壊れたリンク、無いファイル、一覧の抜け、辿れない文書を止める |
+| [`readme-showcase`](.claude/skills/readme-showcase/) | 魅せる README。一目で分かる・動かしたくなる・信用できる。根拠のあるバッジとスクリーンショット、5 手以内のクイックスタート。readme_check.py が 10 項目で点数を出す |
 
 PR と CI
 
@@ -98,6 +172,10 @@ PR と CI
 | [`ci-triage`](.claude/skills/ci-triage/) | GitHub のチェックを読み、落ちたステップまで特定して対処する |
 | [`workspace-policy`](.claude/skills/workspace-policy/) | リポジトリでの進め方を一度だけ決めて記録する |
 | [`tidy`](.claude/skills/tidy/) | 散らかさない決まり、月に 1 回の整理整頓、使い終えたブランチやルーティンの整理整頓 |
+| [`repo-management`](.claude/skills/repo-management/) | リポジトリを正しく管理する 12 段（土台・方針・README・文書・鍵・公開の精査・依存の脆弱性・整理整頓・出し方・バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩）。repo_check.py が 1 つの表にする |
+| [`code-check`](.claude/skills/code-check/) | 作った物のバグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩を、実績のあるツール（ruff、bandit、semgrep、shellcheck、detect-secrets、gitleaks、pip-audit、npm audit）で機械で確認する。書き込みのたびのフック、precheck の NG、repo-management の段 |
+| [`actions-watch`](.claude/skills/actions-watch/) | GitHub Actions の通知を必ず受け取る。PR を作ったら購読し、終わる前にマージの ❔ を出さず、終わったら結果を書く。Stop と PreToolUse のフックが順番を止める |
+| [`research-to-tech`](.claude/skills/research-to-tech/) | 調べ物を、情報で終わらせずに知識・アルゴリズム・技術・実装まで進めて docs/knowledge/tech/ に残す。段を機械で数え、Stop フックが知識に残さない開発を止める |
 
 自律開発と定期実行
 

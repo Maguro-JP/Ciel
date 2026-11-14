@@ -121,3 +121,13 @@ description が完璧でも、**AI が自力で簡単に片付けられる依頼
 | 「人が開いたセッションは消さない」（feedback-session、tidy）と「無駄なセッションを消す」（session-watch） | AI が立てたものは消す。人が開いたものは見ない・聞かない・知らせない。ルーティンに紐づいた人のセッションは、ルーティンの動き（サボり・落ちた）だけ催促する |
 | 「その日のうちに更新する」（vuln-watch）と「PR の前に ❔ で確認」（pr_gate.py） | 周知（★ と通知）と更新のブランチの用意は確認なしで行う。PR の作成とマージは ❔ を当日に出して待つ。返事が無ければ pending.md に「PR 待ち」 |
 | 「開発者の間で通る語」（ja-proofread の glossary.md。「Routine」「PR」は原文のまま）と「ユーザーの語」（user-terms の対応表。ルーティン） | ユーザーの語が先。glossary は訳語を戻す先の既定で、ユーザーが別の語を使っていれば user-terms の表に行を足し、そちらに直す。両方に同じ行を書かない |
+| 「README を魅せる」（readme-showcase）と「README を今に合わせる」（docs-upkeep）と「公開前の精査」（content-audit、secret-leak-check） | readme-showcase は書く側（節の順、根拠、点数）で、docs-upkeep は保つ側（壊れたリンク、一覧の抜け）。どちらも precheck で動き、readme は注意、docs は誤りで止める。出す前の名前・鍵の検査は content-audit と secret-leak-check に任せ、readme_check.py は見ない |
+| 「リポジトリ管理の 12 段」（repo-management）と「自律開発の表」（patrol）と「整理整頓」（tidy） | repo-management は管理の段（揃っているか）、patrol は動きの状態（コミット・PR・Actions・判断待ち）、tidy は整理整頓の作業そのもの。repo_check.py は各段のスキルの検査を呼ぶだけで、判定の決まりを自分で持たない |
+| 「作った物の機械の確認」（code-check）と「鍵の有無」（secret-leak-check）と「非公開の名前・費用」（content-audit）と「依存の CVE の見張り」（vuln-watch）と組み込みの `/security-review` | code-check は自分のコードの穴・クラッシュ・情報の扱いを実績のあるツールで見る側で、鍵の型は secret-leak-check、名前と費用は content-audit、依存の週 1 回は vuln-watch がそれぞれ持つ。code-check はその 3 つの要約を取り込むだけで、決まりを 2 か所に書かない。`/security-review` は読んで判断する側で、PR の差分で併用する |
+| 「Actions の通知と順番」（actions-watch）と「PR の流れ」（solo-pr-flow）と「落ちた原因」（ci-triage） | actions-watch は購読と通知と ❔ の順番だけを機械で守る側で、PR の作り方・マージ・後片付けは solo-pr-flow、落ちたときの原因の特定は ci-triage が持つ。決まりを 2 か所に書かず、solo-pr-flow の表から actions-watch を指す |
+| 「調べ物を技術にする」（research-to-tech）と「目標を決めて練習する」（self-learn）と「失敗の記録」（lessons）と「日の作業の記録」（auto-dev の docs/knowledge/） | research-to-tech は開発の途中の調べ物を 5 段で 1 件 1 ファイルにする側（docs/knowledge/tech/）で、判定と練習の周回が要る物は self-learn（docs/knowledge/learning/）、間違えた記録は lessons が持つ。同じ中身を 2 か所に書かず、技術にした物の場所を指す |
+| 「開発を速くするために子のセッションに分ける」（feedback-session、background-first）と「ルーティンの紐づけ先はユーザーが使っているセッション」（scheduler、long-dev） | 子に出すのは、親のブランチに積む区切りのある作業だけ。ルーティンと long-dev の紐づけ先は移さず、子はルーティンを作らない。ユーザーがセッションを増やさないと言ったリポジトリでは、子も立てない |
+| 「独立した作業は子のセッションに分ける」（feedback-session の fanout、background-first）と「未完成があるうちは新しい成果物を始めない」（finish-first）と「セッションを 1 つ立てるだけで文脈が乗る」（token-efficiency） | 分けるのは今の成果物の残りと、既にある未完成だけ。新しい成果物を始める口実にしない。10 手に満たない作業と、触る場所の重なる作業は分けない。週の上限に近い（`rate_limit_info.status` が `allowed` 以外）ときは増やさない |
+| 「モデルは難易度で選ぶ」（feedback-session の models.md）と、ユーザーがモデルを名指しした指示 | 名指しが先。表は、言われていないときの既定。分からなければ普通 |
+| 「子は PR を作らない・質問しない」（fanout のプロンプト）と「PR の前に ❔」（pr_gate）、「Actions の通知」（actions-watch） | PR と ❔ と購読は親だけがする。子は親のブランチに push して終わる |
+| 「長いターンを分ける」（fanout_gate.py、Stop）と「足りない 1 行だけを足す」（Stop フックの差し戻しの決まり） | 差し戻されたら、分けるか「❕ 並列: 分けない（理由）」の 1 行だけを足す。前の行を出し直さない |
