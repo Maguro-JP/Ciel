@@ -69,7 +69,9 @@ def main() -> int:
     mine = "\n".join(texts)
     reasons = []
     # 1. 作ったのに購読していない
-    if any("create_pull_request" in t for t in tools) and not any("subscribe_pr_activity" in t for t in tools):
+    # 止められた作成（フックの差し戻し、エラー）は PR が無いので数えない。成功した作成だけ見る（ci_state.read の acts）
+    created = any("create_pull_request" in a["tool"] and a["line"] > turn["line"] for a in st["acts"])
+    if created and not any("subscribe_pr_activity" in t for t in tools):
         reasons.append("PR を作ったのに Actions の通知を購読していない。subscribe_pr_activity を呼び、完了の通知が来るまでマージの ❔ を出さない（actions-watch）")
     # 2. 終わっていないのに、マージの確認を出している
     for m in MERGE_Q.finditer(mine):

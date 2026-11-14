@@ -28,9 +28,13 @@ def result(text):
 
 def assistant(text="", tools=()):
     c = [{"type": "text", "text": text}] if text else []
-    for name, inp in tools:
-        c.append({"type": "tool_use", "name": name, "input": inp})
+    for n, (name, inp) in enumerate(tools):
+        c.append({"type": "tool_use", "id": f"toolu_{name[-12:]}_{n}", "name": name, "input": inp})
     return {"type": "assistant", "message": {"role": "assistant", "content": c}}
+
+
+def tool_result(tool_use_id, text, is_error=False):
+    return {"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": tool_use_id, "is_error": is_error, "content": text}]}}
 
 
 def event(kind, conclusion=None, sha=SHA, pr=PR):
@@ -82,6 +86,33 @@ class Gate(unittest.TestCase):
         self.assertIn("購読", out)
         code, out = self.stop([user("PR を作って"), assistant("★ PR #12", [("mcp__github__create_pull_request", {}), ("mcp__Claude_Code_Remote__subscribe_pr_activity", {})])])
         self.assertEqual(code, 0, out)
+
+    def test_blocked_create_is_not_counted(self):
+        tool = ("mcp__github__create_pull_request", {"owner": "Owner", "repo": "Repo"})
+        tid = assistant("", [tool])["message"]["content"][0]["id"]
+        # フックに止められた作成（エラー）。PR は無いので差し戻さない
+        code, out = self.stop([user("PR を作って"), assistant("", [tool]), tool_result(tid, "PreToolUse:mcp__github__create_pull_request hook error: blocked", True),
+                               assistant("❕ 作成は止められた。")])
+        self.assertEqual(code, 0, out)
+        # is_error が付かずに文だけが hook error の形でも同じ
+        code, out = self.stop([user("PR を作って"), assistant("", [tool]), tool_result(tid, "hook error: pr_gate blocked", False), assistant("❕ 止められた。")])
+        self.assertEqual(code, 0, out)
+        # 成功した作成で購読が無ければ差し戻す
+        code, out = self.stop([user("PR を作って"), assistant("", [tool]), tool_result(tid, '{"number": 12}'), assistant("★ PR #12")])
+        self.assertEqual(code, 2)
+        self.assertIn("購読", out)
+        # 成功した作成でも購読があれば通る
+        sub = ("mcp__github__subscribe_pr_activity", {})
+        code, out = self.stop([user("PR を作って"), assistant("", [tool, sub]), tool_result(tid, '{"number": 12}'), assistant("★ PR #12")])
+        self.assertEqual(code, 0, out)
+
+    def test_acts_skip_failed_calls(self):
+        push = ("Bash", {"command": "git push origin x"})
+        tid = assistant("", [push])["message"]["content"][0]["id"]
+        p = write([user("go"), user(event("check_suite.completed")), assistant("", [push]), tool_result(tid, "rejected", True)])
+        st = ci_state.read(p)
+        self.assertEqual(st["acts"], [])
+        self.assertFalse(ci_state.latest(st, 12)["stale"])
 
     def test_merge_question_before_actions(self):
         code, out = self.stop([user("進めて"), assistant("❔ Repo: PR #12 をマージしてよいですか。")])

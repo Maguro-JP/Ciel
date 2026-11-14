@@ -22,6 +22,8 @@ CONCLUSION = re.compile(Q + r'conclusion' + Q + r':\s*' + Q + r'(?P<c>[a-z_]+)' 
 FAILED = {"failure", "timed_out", "action_required", "startup_failure", "stale"}
 DONE_KINDS = {"check_suite.completed", "workflow_run.completed"}
 PUSH = re.compile(r"\bgit\s+push\b|\bgh\s+pr\s+create\b")
+# PreToolUse のフックに止められた呼び出しの結果。is_error が付かない形でも文に出る
+BLOCKED_RESULT = re.compile(r"hook error|PreToolUse[^\n]{0,40}(?:blocked|denied|returned)|blocking hook", re.I)
 PUSH_TOOLS = ("push_files", "create_or_update_file", "create_pull_request", "update_pull_request_branch", "merge_pull_request")
 
 
@@ -37,6 +39,11 @@ def text_of(content) -> str:
                 inner = x.get("content")
                 parts.append(inner if isinstance(inner, str) else text_of(inner))
     return "\n".join(parts)
+
+
+def failed_result(block: dict) -> bool:
+    """tool_result が失敗か。エラーの印か、フックに止められた文なら失敗。"""
+    return bool(block.get("is_error")) or bool(BLOCKED_RESULT.search(text_of([block])[:2000]))
 
 
 def status_of(kind: str, block: str) -> str:
@@ -56,8 +63,11 @@ def read(path: str) -> dict:
     """記録を 1 回だけ読み、(通知の列, 行ごとの出来事の列) を返す。
 
     出来事は、PR を作る・push する呼び出し（その後の Actions は古い）と、人の発言の位置（このターンの判定に使う）。
+    止められた呼び出し（結果がエラー、フックの差し戻し）は、PR も push も起きていないので出来事に入れない。
+    結果がまだ無い呼び出しは、起きたものとして残す。
     """
     events, acts, users = [], [], []
+    failed_ids = set()
     with open(path, encoding="utf-8", errors="replace") as f:
         for i, line in enumerate(f):
             if "head_sha" in line:
@@ -77,7 +87,7 @@ def read(path: str) -> dict:
                         inp = x.get("input") or {}
                         cmd = str(inp.get("command", ""))
                         if any(t in name for t in PUSH_TOOLS) or (name == "Bash" and PUSH.search(cmd)):
-                            acts.append({"line": i, "tool": name, "cmd": cmd[:200], "pr": f"{inp.get('owner', '')}/{inp.get('repo', '')}#{inp.get('pullNumber') or inp.get('pull_number') or ''}"})
+                            acts.append({"id": x.get("id"), "line": i, "tool": name, "cmd": cmd[:200], "pr": f"{inp.get('owner', '')}/{inp.get('repo', '')}#{inp.get('pullNumber') or inp.get('pull_number') or ''}"})
             elif '"type":"user"' in line or '"type": "user"' in line:
                 try:
                     e = json.loads(line)
@@ -87,7 +97,10 @@ def read(path: str) -> dict:
                     continue
                 c = e.get("message", {}).get("content", [])
                 is_result = not isinstance(c, str) and any(isinstance(x, dict) and x.get("type") == "tool_result" for x in c)
+                if is_result:
+                    failed_ids.update(x.get("tool_use_id") for x in c if isinstance(x, dict) and x.get("type") == "tool_result" and failed_result(x))
                 users.append({"line": i, "result": is_result, "text": text_of(c)[:4000]})
+    acts = [a for a in acts if not (a["id"] and a["id"] in failed_ids)]
     return {"events": events, "acts": acts, "users": users}
 
 
