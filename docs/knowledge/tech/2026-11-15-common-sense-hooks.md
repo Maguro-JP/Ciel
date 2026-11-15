@@ -51,7 +51,7 @@
 3. 失敗（error、または記録の is_error の結果）は、呼び出しと失敗の形の組で数える。フックに止められたときは、ツールの名前と理由の組で数える
 4. 2 回目で「同じ失敗の 2 回目」。3 回目からは黙る
 5. 見た呼び出しの ID を覚え、記録から拾うときに飛ばす
-端の場合: 探すコマンド（grep）の出力は見ない。人が止めた・権限で断られた結果は数えない。1 セッションの知らせは 8 回まで。
+端の場合: 探すコマンド（grep）の出力は見ない。ソースコードの行（except、raise で始まる行など）は、失敗の語を含んでいても数えない。人が止めた・権限で断られた結果は数えない。1 セッションの知らせは 8 回まで。
 
 ## 技術
 - 場所: `.claude/skills/common-sense/hooks/_cs.py` の `is_human`、`parse`、`last_turns`（記録からターンを取り出す）、`is_lookup`、`is_external_lookup`（調べる呼び出しの判定）
@@ -62,7 +62,10 @@
 
 ## 実装
 - common-sense のスキルとして入れ、`.claude/settings.json` とひな形に登録した（SessionStart、UserPromptSubmit、Stop、PostToolUse、PostToolUseFailure）
-- テストの出力: `Ran 28 tests in 1.858s` `OK`（test_gates.py）、`Ran 26 tests in 2.632s` `OK`（test_nudges.py）
+- テストの出力: `Ran 28 tests in 1.858s` `OK`（test_gates.py）、`Ran 28 tests in 3.259s` `OK`（test_nudges.py）
+- 実際の会話の記録（人のターン 70、Bash と MCP の結果 1412）の全部に判定を当てた出力: `guess_gate {'語なし': 69, '通す（疑いの行か、聞かれた）': 1}`、`followup_gate {'マージが成功したターン': 17}`（差し戻し 0）、`同じ失敗が 3 件以上': 12`、`同じ失敗の 2 回目 5`（5 件ともフックに同じ理由で止められた形）、memory_nudge の知らせ 0
+- 当てる前は「同じ失敗が 3 件以上」が 24 件で、半分は偽の知らせだった。ファイルの中身を出したときの `except Exception:` の行と、検査の結果の「まだ止められる」の語に当たっていた。ソースコードの行を外し、語を減らして 12 件になった。残りには、配った先の 10 本で同じテストが落ちた出力が入っている。作った判定は、実際の記録に当てないと偽の当たりが分からない
+- 記録の読みの速さ（39MB の記録）: `last_turns(1) 0.009 秒 / last_turns(3) 0.081 秒`
 - 配った先の形（そのリポジトリ自身の登録がある settings.json）のコピーに sync.py で配り、そこで動かした出力: `test_gates.py exit 0 | Ran 28 tests in 1.795s  OK`、`test_nudges.py exit 0 | Ran 26 tests in 2.634s  OK`、`hooks-smoke --root exit 0 | フックの誤り 0`
 - 差し込みの量: `SessionStart 合計 3848 文字（目安 5000）: 目安内`、`UserPromptSubmit 合計 1065 文字（目安 1200）: 目安内`。today.py は SessionStart で 84 文字、普段のターンは 0 文字
 - テストが効いているかを、スキルのコピーの 1 か所を壊して確かめた。人の発言の見分けを外すと `FAILED (failures=4)`、重複の確認を外すと `FAILED (failures=1)`

@@ -140,6 +140,22 @@ class Odd(Base):
         out = "".join(f"FAILED tests/t{i}.py::test_{i} - ModuleNotFoundError: No module named 'yaml'\n" for i in range(4))
         self.assertIn("同じ失敗が 4 件", self.post("python3 -m pytest -q | tail -20", out))
 
+    def test_error_lines_without_a_prefix_are_counted(self):
+        out = "ModuleNotFoundError: No module named 'yaml'\n" * 3
+        self.assertIn("同じ失敗が 3 件", self.post("sh run_all.sh | tail -30", out))
+
+    def test_source_code_and_harmless_words_are_not_failures(self):
+        # ファイルの中身を出したときの行（実際の記録を当てて見つけた偽の知らせ）
+        code = "    except Exception:\n        pass\n" * 4 + "+    raise ValueError(\"x\")\n" * 3 + "12:    except OSError:\n" * 3
+        self.assertEqual(self.post("sed -n 1,80p hooks/x.py", code), "")
+        # 「まだ止められる」は、検査の結果の言い回しで、失敗ではない
+        audit = "".join(f"docs/a{i}.md:{i}（作業ツリー、まだ止められる）\n" for i in range(5))
+        self.assertEqual(self.post("python3 audit.py --diff", audit), "")
+        # 失敗の中身は、ソースコードの行ではなく、エラーの行から取る
+        err = "Exit code 1\nTraceback (most recent call last):\n  File \"a.py\", line 3, in <module>\n    raise ValueError(\"x\")\nValueError: x"
+        self.assertEqual(self.failed_call("python3 a.py", err, tid="e1"), "")
+        self.assertIn("同じ失敗の 2 回目（valueerror: x）", self.failed_call("python3 a.py", err, tid="e2"))
+
     def test_quiet_when_not_the_same_or_not_a_failure(self):
         self.assertEqual(self.post(stdout="repo-a: 落ちた（lint）\nrepo-b: 落ちた（test_sync.py）\nok\n"), "")
         self.assertEqual(self.post(stdout="誤り 0  注意 0\n誤り 0  注意 0\n誤り 0  注意 0\n3 passed, 0 failed\n0 errors\n0 errors\n0 errors\n"), "")

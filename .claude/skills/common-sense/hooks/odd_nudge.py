@@ -31,8 +31,11 @@ import _cs  # noqa: E402
 SAME = 3          # 1 回の出力で、同じ失敗の行が何回あれば知らせるか
 TAIL = 256 << 10  # 失敗した結果を拾うときに読む、記録の後ろの大きさ
 FAIL = re.compile(
-    r"\b(?:error|errors|failed|failure|fatal|exception|traceback|denied|refused|rejected|timed out|not found|no such file|cannot|unable to|panic)\b"
-    r"|\bFAIL\b|\bNG\b|✗|✘|❌|失敗|エラー|落ちた|落ちました|誤り|見つかりません|できません|止められ", re.I)
+    r"\b(?:error|errors|failed|failure|fatal|exception|denied|refused|rejected|timed out|not found|no such file|cannot|unable to|panic)\b"
+    r"|(?-i:\b\w+(?:Error|Exception)\b)|\bFAIL\b|\bNG\b|✗|✘|❌|失敗|エラー|落ちた|落ちました|誤り|見つかりません|できません", re.I)
+# ソースコードの行（ファイルの中身や差分を出したとき）。失敗の語を含んでいても、失敗の出力ではない
+CODE = re.compile(r"^\s*(?:\d+[:\t|]\s*)?[+-]?\s*(?:except\b|raise\b|catch\b|throw\b|def\b|class\b|if\b|elif\b|else\b|return\b|import\b|from\b|try\b|with\b"
+                  r"|assert\b|print\(|#|//|/\*|\*\s|\"\"\"|\'\'\')")
 # 失敗が 0 件という行は、失敗ではない
 ZERO = re.compile(r"\b(?:0|no)\s+(?:errors?|failures?|failed|warnings?)\b|(?:errors?|failures?|failed|誤り|失敗|重大|注意|エラー)\s*[:=]?\s*0\b|\b0\s*件", re.I)
 ERR_KIND = re.compile(r"\b\w*(?:error|exception)\b\s*[:：]\s*.{5,}$", re.I)
@@ -87,7 +90,7 @@ def same_failures(text: str):
     """同じ失敗の行がいちばん多い形と、その数。"""
     count = Counter()
     for line in text.splitlines()[:3000]:
-        if len(line) > 400 or not FAIL.search(line) or ZERO.search(line):
+        if len(line) > 400 or not FAIL.search(line) or ZERO.search(line) or CODE.match(line):
             continue
         count.update(signatures(line))
     if not count:
@@ -102,7 +105,7 @@ def failure_sig(text: str) -> str:
     if lines and re.match(r"\s*Exit code \d+", lines[0]):
         lines = lines[1:]
     for ln in lines[:200]:
-        if FAIL.search(ln) and not ZERO.search(ln):
+        if FAIL.search(ln) and not ZERO.search(ln) and not CODE.match(ln):
             return norm(ln)
     return norm(lines[-1]) if lines else ""
 

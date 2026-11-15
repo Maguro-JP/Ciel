@@ -46,7 +46,7 @@
 | [Soju06/knowpatch](https://github.com/Soju06/knowpatch) | MIT, Copyright (c) 2026 Soju06 | `common-sense/references/lookup.md`「記憶で書かない物」「決まり」 | 変わった所は文書に、版はパッケージの管理の道具に聞く、という分け方。版を聞くコマンド（`npm view`、`pip index versions`、`cargo search`）。調べられないときの扱い | 直しの一覧（corrections）は取り込まない。古くなる物を持たず、そのつど一次情報を見る |
 | [florianbuetow/claude-code](https://github.com/florianbuetow/claude-code) `plugins/agent-guardrails` | MIT, Copyright (c) 2026（名前の記載なし） | `common-sense/hooks/guess_gate.py` | 推測の語を Stop フックで見て差し戻す形（`last_assistant_message` を読み、`stop_hook_active` なら通す） | 語は日本語で書き直した。語だけでは止めず、そのターンに調べる呼び出しが無いときだけ止める。コードは取り込まない |
 | [skymanbp/cc-enforcer](https://github.com/skymanbp/cc-enforcer) | MIT, Copyright (c) 2026 skymanbp | `common-sense/hooks/guess_gate.py` | 当てる語を不確かさの断定に絞り、技術の文で普通に使う語（素の should）は当てない、という偽の差し戻しの減らし方。壊れても通す作り | 考え方だけ。日本語では「はずがない」「〜したいと思います」「確かに」を外す形にした。コードは取り込まない |
-| [Claude Code: Hooks reference](https://code.claude.com/docs/en/hooks) | 公式の文書（コードの取り込みは無い） | `common-sense/hooks/`、`docs/knowledge/tech/2026-11-15-common-sense-hooks.md` | PostToolUse は成功したツールでしか動かず、失敗は PostToolUseFailure に来ること。Stop の `last_assistant_message`。会話の記録は遅れて書かれること | 失敗のフックが配れない先のために、会話の記録から失敗を拾う道を足した |
+| [Claude Code の公式の文書「Hooks reference」](https://code.claude.com/docs/en/hooks) | 公式の文書（コードの取り込みは無い） | `common-sense/hooks/`、`docs/knowledge/tech/2026-11-15-common-sense-hooks.md` | PostToolUse は成功したツールでしか動かず、失敗は PostToolUseFailure に来ること。Stop の `last_assistant_message`。会話の記録は遅れて書かれること | 失敗のフックが配れない先のために、会話の記録から失敗を拾う道を足した |
 | date-check（公開スキルの登録サイトの一覧） | ライセンス表記なし（参考のみ） | `common-sense/hooks/today.py` | 日付は記憶ではなく、システムの時計から取る、という考え | 取り込み無し。手順として読ませる形ではなく、フックが日本時間の日付を出す |
 
 ## 探し方
