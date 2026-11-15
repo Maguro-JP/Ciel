@@ -150,6 +150,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`lessons`](.claude/skills/lessons/) | 失敗の記録。場面・起きたこと・判定の誤り・次から の 4 行で残し、開始時にフックが差し込む |
 | [`token-efficiency`](.claude/skills/token-efficiency/) | トークンと文脈を節約する。フックの差し込み量を測る |
 | [`background-first`](.claude/skills/background-first/) | ユーザーが優先。長い処理は裏で動かし、ターンを短く終える。フックが前面の長いコマンドを止める |
+| [`common-sense`](.claude/skills/common-sense/) | 当たり前のことをやる、おかしいことをおかしいと思う、疑問は調べる、自分の知識は古いと認識する。フックが今日の日付を出し、調べていない推測とマージのあとの止まりを差し戻し、同じ失敗と記憶で書いた依存を知らせる |
 
 出す前の検証
 

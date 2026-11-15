@@ -5,6 +5,7 @@
 
 | 題 | 段 | 技術の場所 | 日付 |
 |---|---|---|---|
+| [推測と古い知識をフックで止める（失敗は PostToolUse に来ない）](2026-11-15-common-sense-hooks.md) | 実装 | `.claude/skills/common-sense/hooks/_cs.py` | 2026-11-15 |
 | [フックの登録は、作業ディレクトリに頼らない](2026-11-14-hook-working-directory.md) | 実装 | `.claude/hooks/run.sh` | 2026-11-14 |
 | [調べ物を 5 段で残し、段を節の中身から数える](2026-11-14-research-ladder.md) | 実装 | `.claude/skills/research-to-tech/scripts/knowledge.py` | 2026-11-14 |
 | [独立した作業を子のセッションに分け、難易度でモデルを選ぶ](2026-11-14-session-fanout.md) | 実装 | `.claude/skills/feedback-session/scripts/fanout.py` | 2026-11-14 |

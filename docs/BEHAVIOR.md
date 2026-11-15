@@ -45,6 +45,11 @@
 | Actions が終わる前にマージの確認を出す、終わっても結果を見ない | `actions-watch`。`ci_gate.py`（Stop）が購読の抜け・早い ❔・結果の書き忘れを止め、`ci_merge_gate.py`（PreToolUse）が通っていない PR のマージを止め、`ci_prompt.py` が通知のターンに手順を差し込む | PR を作った直後、通知のターン、マージの前 | `ACTIONS_WATCH_OFF=1`、❔ の行の「Actions は無い」 |
 | 調べて分かった気になり、会話の中だけで終える（次の日に同じことをまた調べる） | `research-to-tech`。`research_nudge.py` が調べた直後に手順を差し込み、`research_gate.py`（Stop）が知識に残さない開発を止め、`knowledge.py --check` が段（情報・知識・アルゴリズム・技術・実装）を節の中身から数える | 調べた直後、開発をしたターンの終わり、PR の前 | `RESEARCH_TO_TECH_OFF=1`、`❕ 調べ物: 知識にしない（理由）` の行 |
 | long-dev のルーティンの紐づけ先が、AI が新しく作ったセッションに移る（ユーザーが使っているセッションでは何も起きず、セッションが増える） | `scheduler` の「紐づけ先」の表（今のセッション、ユーザーが使っているセッション、の順）。`binding_gate.py`（Stop）が、今作ったセッションへの紐づけ、実行のたびに新しいセッションを作る形、子のセッションでの作成を止める | 継続開発のルーティンを作ったターンの終わり | `SCHEDULER_BINDING_OFF=1`、`❕ 紐づけ: 新しいセッション（理由）` の行 |
+| 当たり前のことをやってくれない（マージのあとの配布を始めずに、同じ確認を出し直す） | `common-sense` の「当たり前をやる」と `.claude/skills/common-sense/references/followups.md` の表。`followup_gate.py`（Stop）が、マージが成功したのに配布の開始も `❕ 次:` の行も無く ❔ で終えるターンを差し戻す | 仕事を引き受けた直後、マージしたターンの終わり | `COMMON_SENSE_OFF=1`、`❕ 次: …` の行 |
+| おかしいことをおかしいと思わない（全部が同じ失敗、数の桁が違う、言葉と機械の判定が逆、を流す） | `common-sense` の合図の表と `.claude/skills/common-sense/references/signals.md`。`odd_nudge.py`（PostToolUse、PostToolUseFailure）が、同じ失敗の行が並んだ出力と、同じ失敗の繰り返しで、原因を先に調べるよう知らせる | Bash と MCP の呼び出しのあと | 知らせた回数、`❕ おかしい` の行の数 |
+| 疑問を調べようとしない（「たぶん」「はず」「と思う」で済ませる） | `common-sense` の「疑問は調べる」と `.claude/skills/common-sense/references/lookup.md` の調べる順。`guess_gate.py`（Stop）が、推測の語があるのに調べる呼び出しが無いターンを差し戻す | 返答の最後 | 差し戻した回数、`❕ 疑い: …は調べられない（理由）` の行 |
+| 自分の認識だけで済ませて調べようとしない（公開されている物の名前と中身、ライブラリの使い方を記憶で書く） | `common-sense` の「疑問は調べる」「知識は古い」。`memory_nudge.py`（PostToolUse）が、外の物への新しい依存を、外の事実を見に行かずに書いたときに知らせる | 書き込みのあと | 知らせた回数 |
+| 自分の知識は数年前の物だという認識がない（学習の時点の最新を、今の最新と書く） | `common-sense` の「知識は古い」。`today.py`（SessionStart、UserPromptSubmit）が今日の日付（日本時間）と、外の事実は一次情報で確かめる決まりを出す | セッションの始めと、間を置いたターン | 確かめた版か日付の書いてある出所の数 |
 | 時刻を UTC で書く | `lessons` の記録と CLAUDE.md | 毎ターン | ― |
 
 同じ指摘がまた来たら、この表に行を足し、言葉ではなくフックで止める。
