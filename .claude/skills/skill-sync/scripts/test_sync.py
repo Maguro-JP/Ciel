@@ -66,6 +66,23 @@ class Registration(unittest.TestCase):
         self.assertEqual(len(alone["hooks"]["SessionStart"][0]["hooks"]), 1)
 
 
+class FirstRun(unittest.TestCase):
+    def test_superseded_registration_is_dropped_on_the_first_run_too(self):
+        # 古い登録だけがある対象に、1 回目の配布で後継を足す。足したあとに古い方が残らないこと
+        d = Path(tempfile.mkdtemp())
+        (d / ".claude" / "skills" / "work-style").mkdir(parents=True)
+        (d / ".claude" / "skills" / "work-style" / "SKILL.md").write_text("# x\n", encoding="utf-8")
+        old = "cat .claude/skills/work-style/SKILL.md 2>/dev/null || true"
+        (d / ".claude" / "settings.json").write_text(json.dumps({"hooks": {"SessionStart": [{"hooks": [{"type": "command", "command": old}]}]}}), encoding="utf-8")
+        cur, missing = sync.settings_missing(d)
+        self.assertTrue(any("work-style" in h["command"] for _, _, h in missing))  # 後継は、これから足す
+        sync.apply_hooks(d, [], [], cur, missing)
+        after = json.loads((d / ".claude" / "settings.json").read_text(encoding="utf-8"))
+        cmds = [h["command"] for gs in after["hooks"].values() for g in gs for h in g["hooks"]]
+        self.assertNotIn(old, cmds)
+        self.assertEqual(sum("work-style/SKILL.md" in c for c in cmds), 1)
+
+
 class Launcher(unittest.TestCase):
     def run_from(self, cwd, *args, project=None):
         env = dict(os.environ)

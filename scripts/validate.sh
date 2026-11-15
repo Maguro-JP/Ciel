@@ -91,6 +91,11 @@ for s in .claude/settings.json .claude/skills/repo-bootstrap/templates/settings.
   if [ "$code" -ne 0 ]; then err "$s のフックが無害な入力で失敗する（python3 scripts/hooks-smoke.py $s で見る）"; else echo "  $s: $(printf '%s\n' "$out" | tail -1)"; fi
 done
 
+# スキルの案内（skill-nudge.sh）は、ひな形の方が配られる。手元にだけ行を足すと、新しいスキルの案内が配った先に届かない
+if ! cmp -s .claude/hooks/skill-nudge.sh .claude/skills/repo-bootstrap/templates/hooks/skill-nudge.sh; then
+  err "ひな形の skill-nudge.sh が手元の .claude/hooks/skill-nudge.sh と違う（cp で合わせる）"
+fi
+
 # 文書は書いた日の状態で止まる。リンク、言及先、スキル一覧、辿れる文書を今のリポジトリと突き合わせる。
 echo
 echo "== ドキュメント =="
