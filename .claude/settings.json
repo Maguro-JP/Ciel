@@ -34,6 +34,15 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/run.sh\" .claude/skills/bug-first/hooks/bug_prompt.py",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -117,6 +126,15 @@
           {
             "type": "command",
             "command": "\"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/run.sh\" .claude/skills/common-sense/hooks/today.py",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/run.sh\" .claude/skills/bug-first/hooks/bug_prompt.py",
             "timeout": 10
           }
         ]
@@ -210,6 +228,15 @@
             "timeout": 15
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/run.sh\" .claude/skills/bug-first/hooks/bug_gate.py",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -279,6 +306,16 @@
           {
             "type": "command",
             "command": "\"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/run.sh\" .claude/skills/common-sense/hooks/memory_nudge.py",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/run.sh\" .claude/skills/bug-first/hooks/crash_nudge.py",
             "timeout": 10
           }
         ]
