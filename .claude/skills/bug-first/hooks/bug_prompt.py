@@ -49,6 +49,12 @@ ASKING = re.compile(r"^(?:の|のか|か|かな|よね|っけ)?\s*[?？]")
 # 語そのものの話（フックやスキルの語の一覧を直す相談）と、テストや Actions が落ちた話
 META = re.compile(r"という(?:語|言葉|言い方)|(?:の|な)(?:語|言葉)(?:を|が|は|に|で|も)|語を足|検出|判定|拾[うっいわ]|当て[るた]|当た[るっら]|正規表現|パターン|description|のような(?:語|問い|言い方)|みたいな(?:語|言い方)")
 CI = re.compile(r"(?:テスト|CI|Actions|チェック|検査|precheck|validate|ジョブ|workflow|ビルド|lint)[^。\n]{0,10}$", re.I)
+# 語の前を見て外すもの。同じ語でも、前に来る物でバグの報告ではなくなる
+BEFORE = [
+    ("落ち", CI),  # テストや Actions が落ちた（ci-triage の場面）
+    ("消え", re.compile(r"(?:エラー|警告|注意|誤り|バグ|不具合|問題|症状|ブランチ|セッション|ルーティン|通知)[^。\n]{0,6}$")),  # 「エラーが消えた」は良い知らせ。ブランチやセッションは整理整頓の話
+    ("固ま", re.compile(r"(?:方針|仕様|設計|予定|計画|考え|案|構成|日程|内容)[^。\n]{0,4}$")),  # 「方針が固まった」は、決まったという意味
+]
 QUOTED = re.compile(r"「[^」\n]*」|『[^』\n]*』|`[^`\n]*`|\"[^\"\n]*\"|“[^”\n]*”")
 
 
@@ -62,7 +68,7 @@ def report(prompt: str) -> str:
                 continue
             if m.group(0).startswith(("バグ", "不具合")) and ASKING.match(line[m.end():]):
                 continue
-            if m.group(0).startswith("落ち") and CI.search(line[:m.start()]):
+            if any(m.group(0).startswith(word) and pat.search(line[:m.start()]) for word, pat in BEFORE):
                 continue
             return m.group(0)
     return ""

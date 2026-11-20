@@ -50,7 +50,7 @@ class Bump(unittest.TestCase):
         self.assertEqual(version.bump("2026.11.0"), "2026.11.1")
 
     def test_other_shapes_are_left(self):
-        for v in ("1.2.3-beta.1", "1.2", "v1.2.3", "1.2.3.4", "", "workspace"):
+        for v in ("1.2.3-beta.1", "1.2", "v1.2.3", "2026.11.21.1", "", "workspace"):
             self.assertIsNone(version.bump(v), v)
 
 
