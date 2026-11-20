@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""PostToolUse フック（Bash）: 実行の出力にクラッシュの印があるとき、バグとして帳簿に書いて先に直すよう 1 行で知らせる。
+"""PostToolUse フック（Bash）: 実行の出力にクラッシュのマークがあるとき、バグとして帳簿に書いて先に直すよう 1 行で知らせる。
 
 ユーザーの決まり: 何よりもバグ修正を優先させる。特に致命的なバグ、クラッシュや操作不能、破損や漏洩等は即修正版を出す。
 クラッシュの出力を見ても、やり方を変えて先へ進み、落ちた物をそのまま残してしまう。止めはしない。
 
-印は 2 段。
-  強い印: Segmentation fault、core dumped、SIGSEGV、SIGABRT、FATAL、メモリ不足。テストの中でも、わざと出す物ではない
-  弱い印: Traceback、panic、Unhandled、Uncaught。テストはわざと落として出すので、テストの出力では知らせない
+マークは 2 段。
+  強いマーク: Segmentation fault、core dumped、SIGSEGV、SIGABRT、FATAL、メモリ不足。テストの中でも、わざと出す物ではない
+  弱いマーク: Traceback、panic、Unhandled、Uncaught。テストはわざと落として出すので、テストの出力では知らせない
 知らせないもの（偽の知らせを減らす）:
-  - テストの出力と、テストを動かすコマンドの弱い印
-  - 探すコマンド（grep）と、ソースや文書を見るコマンド（cat、sed、git diff）の出力（印の文字が書いてあるだけ）
+  - テストの出力と、テストを動かすコマンドの弱いマーク
+  - 探すコマンド（grep）と、ソースや文書を見るコマンド（cat、sed、git diff）の出力（マークの文字が書いてあるだけ）
   - その場で書いた 1 行のスクリプトだけで起きた Traceback（File "<string>"、"<stdin>"）と、入れてある物の中だけの Traceback
   - 人が止めた（KeyboardInterrupt）、出力の先が閉じた（BrokenPipeError）
   - 同じクラッシュの 2 回目から（同じ出力には 1 回だけ）
@@ -21,7 +21,7 @@ PostToolUse は成功したツールでしか動かない（公式の文書と�
 重なりの整理:
   - common-sense の odd_nudge.py は「同じ失敗の行が 3 回以上」と「同じ失敗の 2 回目」を知らせる。同じ失敗が 3 件以上並ぶ出力では、こちらは黙る。
     2 回目は、こちらが「同じ出力には 1 回だけ」なので黙り、odd_nudge.py だけが言う
-  - code-check の code_nudge.py は、書き込みのたびに構文の誤りを見る（Edit、Write）。こちらは Bash だけを見て、SyntaxError は印にしない
+  - code-check の code_nudge.py は、書き込みのたびに構文の誤りを見る（Edit、Write）。こちらは Bash だけを見て、SyntaxError はマークにしない
 
 環境変数:
   BUG_FIRST_OFF=1          止める
@@ -49,12 +49,12 @@ SOFT = [
     ("Unhandled", re.compile(r"Unhandled(?:PromiseRejection(?:Warning)?| [Pp]romise [Rr]ejection| [Ee]xception| [Rr]ejection)\b"
                              r"|^[ \t]*Uncaught (?:\w+\.)*\w*(?:Error|Exception)\b|^[ \t]*(?:\[[^\]\n]{0,30}\]\s*)?uncaughtException\b|^Exception in thread \"", re.M)),
 ]
-# テストを動かすコマンドと、テストの出力の形。弱い印は、テストがわざと落として出す
+# テストを動かすコマンドと、テストの出力の形。弱いマークは、テストがわざと落として出す
 TEST_CMD = re.compile(r"\bpytest\b|\bunittest\b|\btest_\w+\.py\b|\w+_test\.(?:py|go)\b|\b(?:npm|pnpm|yarn)\s+(?:run\s+)?test\b|\b(?:vitest|jest|mocha|tox|nox)\b"
                       r"|\bcargo\s+test\b|\bgo\s+test\b|validate\.sh|precheck\.py|hooks-smoke\.py")
 TEST_OUT = re.compile(r"^Ran \d+ tests? in |^(?:FAIL|ERROR): \w+ \(|^=+ (?:FAILURES|ERRORS|test session starts|short test summary info) =+|^test result: (?:ok|FAILED)"
                       r"|^running \d+ tests?$|^Tests:\s+\d+ |^--- (?:FAIL|PASS): |^(?:ok|FAIL)\s+\S+\s+[\d.]+s$", re.M)
-# 探すコマンドと、ソースや文書を見るコマンド。出力に印の文字があっても、クラッシュではない
+# 探すコマンドと、ソースや文書を見るコマンド。出力にマークの文字があっても、クラッシュではない
 SEARCH_CMD = re.compile(r"(?:^|[;&|(]\s*)(?:grep|egrep|fgrep|rg|ag|ack)\b|\bgit\s+(?:-C\s+\S+\s+)?(?:grep|diff|show|log|blame)\b")
 VIEW_SRC = re.compile(r"(?:^|[;&|(]\s*)(?:cat|head|tail|less|more|nl|bat|sed|awk)\b[^;&|]*\.(?:py|pyi|js|mjs|cjs|ts|tsx|jsx|rs|go|java|kt|c|cc|cpp|h|hpp|cs|rb|php|sh|bash|md|json|ya?ml|toml|html|css)\b")
 FRAME = re.compile(r'^\s*File "([^"\n]+)", line \d+', re.M)
@@ -99,7 +99,7 @@ def traceback_sig(text: str, start: int):
 
 
 def crash(cmd: str, text: str):
-    """(印の名前, 同じクラッシュかを比べる形)。クラッシュの出力でなければ None。"""
+    """(マークの名前, 同じクラッシュかを比べる形)。クラッシュの出力でなければ None。"""
     if not text.strip() or SEARCH_CMD.search(cmd) or VIEW_SRC.search(cmd):
         return None
     for name, pat in HARD:

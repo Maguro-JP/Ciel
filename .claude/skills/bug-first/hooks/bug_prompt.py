@@ -26,7 +26,7 @@ import _bf  # noqa: E402
 LINE = "バグ修正が最優先。重さを決めて帳簿に書き、致命的は今の作業を止めて修正版を出す（bug-first）"
 MAX_LEN = 4000  # これより長い発言は、依頼文や資料の貼り付けとみなす
 SYSTEMISH = re.compile(r"^\s*<|wake reason|task-notification|SYSTEM NOTIFICATION|system-reminder|Stop hook feedback|This session is being continued")
-# 親が子に渡す依頼文の印（feedback-session の fanout.py）
+# 親が子に渡す依頼文のマーク（feedback-session の fanout.py）
 CHILD = re.compile(r"セッションやルーティンを作らない|親のセッションから分けた")
 
 # バグの症状の言い方。名詞だけ（「クラッシュや破損」）は決まりの話に多いので、起きた形（動詞）で当てる
