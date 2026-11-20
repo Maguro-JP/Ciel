@@ -176,6 +176,7 @@ PR と CI
 | [`tidy`](.claude/skills/tidy/) | 散らかさない決まり、月に 1 回の整理整頓、使い終えたブランチやルーティンの整理整頓 |
 | [`repo-management`](.claude/skills/repo-management/) | リポジトリを正しく管理する 12 段（土台・方針・README・文書・鍵・公開の精査・依存の脆弱性・整理整頓・出し方・バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩）。repo_check.py が 1 つの表にする |
 | [`code-check`](.claude/skills/code-check/) | 作った物のバグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩を、実績のあるツール（ruff、bandit、semgrep、shellcheck、detect-secrets、gitleaks、pip-audit、npm audit）で機械で確認する。書き込みのたびのフック、precheck の NG、repo-management の段 |
+| [`no-fake`](.claude/skills/no-fake/) | コーディングが出来ない・出来ているように見せるだけ・バグも放置・わかっていてわざと壊す、を抑える。見せかけを作らない（置き場のままの実装、握りつぶし、偽のデータ、テストの見せかけ、配線されていない物）、動かして見せる、壊さない（変える前の状態を測る、消した物を数える、検査を弱めない）。`fake_scan.py` が形を拾い、フックが知らせて差し戻し、precheck が重大で止める |
 | [`actions-watch`](.claude/skills/actions-watch/) | GitHub Actions の通知を必ず受け取る。PR を作ったら購読し、終わる前にマージの ❔ を出さず、終わったら結果を書く。Stop と PreToolUse のフックが順番を止める |
 | [`research-to-tech`](.claude/skills/research-to-tech/) | 調べ物を、情報で終わらせずに知識・アルゴリズム・技術・実装まで進めて docs/knowledge/tech/ に残す。段を機械で数え、Stop フックが知識に残さない開発を止める |
 
