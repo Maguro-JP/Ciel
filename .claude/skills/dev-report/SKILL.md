@@ -47,6 +47,7 @@ description: 日報・週報・月報を書くとき。「日報」「週報」�
 良くなったこと: 
 AI 精度: 前後の数字。測っていなければ「測っていない」
 直したバグ: 
+バグの数: `python3 .claude/skills/bug-first/scripts/bugs.py --stats --since <昨日の日付>` の 1 行（見つけた、直した、残り、致命的を直すまでの時間）。帳簿が無ければ「帳簿なし」
 テスト: 出力の要点
 知識: docs/knowledge/ に足した項目
 GitHub: PR 番号、マージの有無
@@ -75,6 +76,7 @@ Actions: 走った回数と、そのうち手元でできたはずのもの。�
 AI 精度: 
 得た知識: 
 解決した問題: 
+バグの数: `bugs.py --stats --since <週の月曜の日付>` の 1 行（見つけた、直した、残り、致命的を直すまでの時間）。残っている致命的は、番号と症状も書く
 未解決（Critical/High/Medium/Low）: 
 GitHub: 
 Actions: 
