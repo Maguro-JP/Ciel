@@ -90,7 +90,7 @@ description: 何よりもバグ修正を優先させ、特に致命的なバグ�
 4. 再現するテストを先に書いて、落ちるのを見ます。落ちた理由がバグそのものであることを、出力で確かめます
 5. 最小の修正をします。ついでの整理や作り直しを混ぜません
 6. テスト一式と code-check を通します。最初の再現の手順も、もう一度動かします
-7. 版を上げます。そのリポジトリが版を持つ場所を探し、patch を 1 つ上げます。どこにも無ければ上げません
+7. 版を上げます。`scripts/version.py` で、そのリポジトリが版を持つ場所を探し、`--bump --apply` で patch を 1 つ上げます。どこにも無ければ上げません
 8. 変更履歴に書きます。CHANGELOG があれば 1 行足し、無ければ Release の本文に書きます
 9. precheck を通し、❔ を 1 行だけ出します（8 の決まり）。帳簿の状態を確認待ちにします
 10. 返事があり次第、PR を作り、Actions の通知を待ち、通ったらマージします
@@ -141,7 +141,7 @@ description: 何よりもバグ修正を優先させ、特に致命的なバグ�
   記録の読み方は common-sense の `_cs.py` に合わせてあり、common-sense が無いリポジトリでは、`bug_gate.py` は黙って通り、`crash_nudge.py` は成功した実行の出力だけを見ます
 - 偽の差し込みを減らすため、`bug_prompt.py` は、問い（「バグは無い?」）、決まりの話（「落ちたら直して」）、語そのものの話、テストや Actions が落ちた話には出しません
 - 同じ失敗が 3 件以上並ぶ出力と、同じ失敗の 2 回目は common-sense の `odd_nudge.py` が言うので、`crash_nudge.py` は重ねて言いません
-- テストは `scripts/test_bugs.py` と `scripts/test_hooks.py` です
+- テストは `scripts/test_bugs.py`、`scripts/test_version.py`、`scripts/test_hooks.py` です
 
 ## 使わないとき
 
