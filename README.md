@@ -151,6 +151,7 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`token-efficiency`](.claude/skills/token-efficiency/) | トークンと文脈を節約する。フックの差し込み量を測る |
 | [`background-first`](.claude/skills/background-first/) | ユーザーが優先。長い処理は裏で動かし、ターンを短く終える。フックが前面の長いコマンドを止める |
 | [`common-sense`](.claude/skills/common-sense/) | 当たり前のことをやる、おかしいことをおかしいと思う、疑問は調べる、自分の知識は古いと認識する。フックが今日の日付を出し、調べていない推測とマージのあとの止まりを差し戻し、同じ失敗と記憶で書いた依存を知らせる |
+| [`bug-first`](.claude/skills/bug-first/) | 何よりもバグ修正を優先させる。特に致命的なバグ、クラッシュや操作不能、破損や漏洩等は即修正版を出す。重さを決めて帳簿（docs/reports/bugs.md）に書き、致命的は今の作業を止め、再現するテストを先に書いて直し、版を上げて Release まで出す |
 
 出す前の検証
 
