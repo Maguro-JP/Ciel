@@ -97,8 +97,8 @@ python3 .claude/skills/no-fake/scripts/fake_scan.py --stats --days 7      # こ�
 
 | 何 | いつ | すること | 止めるか |
 |---|---|---|---|
-| `fake_nudge.py` | PostToolUse（Edit、Write、MultiEdit） | 書いた中身に重大の形があれば、何行目のどの形かを 1 行で知らせる。この編集で足した行だけを見る | 止めない |
-| `fake_gate.py` | Stop | このターンの編集に、重大の形が残っている・テストを消したか弱めた・関数やファイルを消した、のどれかがあり、返答に対応する行が無いとき。コードのファイルを変えたのに、変えたあとに 1 回も動かさず、「動かしていない」とも書いていないとき | 止める。直すか、上の表の行を 1 行足すと通る |
+| `hooks/fake_nudge.py` | PostToolUse（Edit、Write、MultiEdit） | 書いた中身に重大の形があれば、何行目のどの形かを 1 行で知らせる。この編集で足した行だけを見る | 止めない |
+| `hooks/fake_gate.py` | Stop | このターンの編集に、重大の形が残っている・テストを消したか弱めた・関数やファイルを消した、のどれかがあり、返答に対応する行が無いとき。コードのファイルを変えたのに、変えたあとに 1 回も動かさず、「動かしていない」とも書いていないとき | 止める。直すか、上の表の行を 1 行足すと通る |
 | precheck の `no-fake` の段 | PR を作る前、マージの前 | `fake_scan.py --diff <base>` を回す。重大で NG、注意は数だけ出す | 重大で止める |
 
 - `NO_FAKE_OFF=1` で 2 本とも止まる（ユーザーが自分の手で入れる）
@@ -107,7 +107,7 @@ python3 .claude/skills/no-fake/scripts/fake_scan.py --stats --days 7      # こ�
 - ユーザーが置き場や削除を頼んだターン（一言に「骨組み」「スタブ」「あとで実装」「消して」「削除」がある）は、その形では差し戻さない
 - `fake_nudge.py` は、code-check の `code_nudge.py` が出す物（構文、脆弱性の型、情報の扱い）を出さない。テストのファイルの中の文字列の見本と、
   このスキルの表には当てない
-- テスト: `scripts/test_fake_scan.py`
+- テスト: `scripts/test_fake_scan.py`、`scripts/test_removed.py`、`scripts/test_baseline.py`、`scripts/test_hooks.py`
 
 ## 常に改善する（数え方）
 

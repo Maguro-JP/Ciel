@@ -395,9 +395,9 @@ def scan_python(rel: str, text: str, test: bool) -> list:
                 add("重大", fn, "T02", "テスト", f"中身の無いテスト {name}()", "何を確かめるテストかを書く。まだ書けないなら、テストを足さない")
             elif not _has_assert(fn):
                 add("注意", fn, "T01", "テスト", f"assert の無いテスト {name}()", "結果を assert で確かめる。落ちないことだけを見るなら、そう名前に書く")
-            if re.search(r"(?:^|[.\s])(?:skip|xfail)\b", decos):
-                add("重大", fn, "T03", "テスト", f"テストを飛ばしている（{name} の skip か xfail）", "飛ばさずに通す。飛ばす理由があるなら ❕ 弱めた: に書く", end=fn.lineno)
             for d in fn.decorator_list:
+                if re.search(r"(?:^|\.)(?:skip|xfail)\b", _unparse(d)):  # 足した行で拾えるように、デコレータの行に付ける（def の行は前からある）
+                    add("重大", d, "T03", "テスト", f"テストを飛ばしている（{name} の skip か xfail）", "飛ばさずに通す。飛ばす理由があるなら ❕ 弱めた: に書く", end=d.lineno)
                 mocked(d, fn)
             return
         if shape is None or (name.startswith("__") and name.endswith("__")) or _abstract(fn, cls) or rel.endswith(".pyi"):
@@ -823,6 +823,26 @@ def read_text(path: Path):
     return b.decode("utf-8", errors="replace")
 
 
+def repo_root(path) -> Path:
+    """ファイルのあるリポジトリの根（.git のある所まで上がる）。フックが、worktree の中のファイルもその根からの相対で見るため。無ければ None。"""
+    p = Path(path).resolve()
+    for d in [p] + list(p.parents) if p.is_dir() else list(p.parents):
+        if (d / ".git").exists():
+            return d
+    return None
+
+
+def rel_to_root(path) -> str:
+    """リポジトリの根からの相対パス。リポジトリの外のファイル（一時の場所の物）は空文字。"""
+    root = repo_root(path)
+    if root is None:
+        return ""
+    try:
+        return norm(Path(path).resolve().relative_to(root))
+    except ValueError:
+        return ""
+
+
 def _skeleton(line: str) -> str:
     return re.sub(r"\"[^\"]*\"|'[^']*'|\b\d+(?:\.\d+)?\b|\b(?:True|False|None|true|false|null)\b", "§", line.strip())
 
@@ -1059,8 +1079,8 @@ def state_dir() -> Path:
 
 def record(src: str, findings, session: str = "", blocked=None) -> None:
     """拾った数を、種類ごとに 1 行ずつ足す。書けなくても止めない（数は目安）。"""
-    kinds = Counter((f.kind, f.sev) for f in findings) if findings and not isinstance(findings, dict) else Counter(findings or {})
-    if not kinds:
+    kinds = Counter(findings) if isinstance(findings, dict) else Counter((f.kind, f.sev) for f in findings or [])
+    if not any(kinds.values()):
         return
     try:
         root = state_dir()
@@ -1068,6 +1088,8 @@ def record(src: str, findings, session: str = "", blocked=None) -> None:
         sid = re.sub(r"[^A-Za-z0-9_-]", "", session or "")[:40]
         with open(root / "metrics.jsonl", "a", encoding="utf-8") as f:
             for (kind, sev), n in sorted(kinds.items()):
+                if not n:
+                    continue
                 row = {"ts": int(time.time()), "session": sid, "src": src, "kind": kind, "sev": sev, "n": n}
                 if blocked is not None:
                     row["blocked"] = bool(blocked)
