@@ -38,8 +38,22 @@ CODE = re.compile(r"^\s*(?:\d+[:\t|]\s*)?[+-]?\s*(?:except\b|raise\b|catch\b|thr
                   r"|assert\b|print\(|#|//|/\*|\*\s|\"\"\"|\'\'\')")
 # 失敗が 0 件という行は、失敗ではない
 ZERO = re.compile(r"\b(?:0|no)\s+(?:errors?|failures?|failed|warnings?)\b|(?:errors?|failures?|failed|誤り|失敗|重大|注意|エラー)\s*[:=]?\s*0\b|\b0\s*件", re.I)
+# 数えた結果（"うち失敗": 2、失敗 2 件、failed: 2、failures=1）。何が失敗したかを言わないので、同じ失敗かを比べられない。
+# この部分を除いても失敗の語が残る行だけを、失敗の行に数える。単数の Error: 500 は、数ではなく失敗の中身
+COUNTED = re.compile(r"(?:失敗|エラー|誤り)[\"'」]?\s*[:：=]?\s*\d+\s*(?:件|個|本|回)?(?![\w.])|\b(?:errors|failures|failed)[\"']?\s*[:=]\s*\d+(?![\w.])", re.I)
 ERR_KIND = re.compile(r"\b\w*(?:error|exception)\b\s*[:：]\s*.{5,}$", re.I)
-SEARCH_CMD = re.compile(r"^\s*(?:grep|egrep|rg|ag|git\s+grep)\b")  # 探した結果の行は、失敗の語を含んでいても失敗ではない
+# 探した結果の行は、失敗の語を含んでいても失敗ではない。探すコマンドかどうかは is_search で決める
+SEARCH_CMD = re.compile(r"^(?:grep|egrep|fgrep|rg|ag|ack|git\s+grep)\b")
+# 出力を出さないコマンド（場所や変数を決めるだけ）。探すコマンドの前に並んでいても、出力は探した結果のまま
+QUIET_CMD = re.compile(r"^(?:cd|pushd|popd|export|set|unset|shopt|source|\.|:|true)\b|^\w+=\S*$")
+# 中身や一覧を次に渡すだけのコマンド。パイプの中で探すコマンドの前後にあっても、全体は探すコマンドのまま
+FEED_CMD = re.compile(r"^(?:cat|tac|nl|head|tail|sed|find|fd|ls|sort|uniq|cut|tr|wc|echo|printf|git\s+(?:ls-files|ls-tree|show|log|diff|blame))\b")
+XARGS = re.compile(r"^xargs\b(?:\s+-\S+(?:\s+(?:\d+|\{\}))?)*\s*")  # xargs は、後ろのコマンドで決める（xargs grep は探す、xargs python3 は実行）
+# ソースコードのファイルの中身を出すコマンド（sed -n 1,80p x.py）。出力はファイルの中身で、実行の結果ではない。
+# ログと記録（.log、.txt、.json、.md、拡張子なし）は実行の結果を書いた物なので入れない
+SHOW_CMD = re.compile(r"^(?:cat|nl|head|tail|sed\s+-n)\b")
+SOURCE_FILE = re.compile(r"\.(?:py|pyi|js|mjs|cjs|ts|tsx|jsx|sh|bash|html|css|rs|go|java|rb|c|h|cpp)$", re.I)
+QUOTED = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"")
 BLOCKED = re.compile(r"hook error|PreToolUse[^\n]{0,60}(?:blocked|denied|returned)|blocking hook", re.I)
 # 人が止めた、権限で断られた、は調べる失敗ではない（権限は follow-instructions の手順で扱う）
 SKIP = re.compile(r"^\s*(?:Permission |\[Request interrupted|The user doesn't want|<tool_use_error>)", re.I)
@@ -86,11 +100,49 @@ def signatures(line: str) -> set:
     return {x for x in out if len(x) >= 8}
 
 
+def is_failure_line(line: str) -> bool:
+    """失敗の行か。失敗が 0 件の行、ソースコードの行、数えた結果だけの行は、失敗の行ではない。"""
+    if len(line) > 400 or ZERO.search(line) or CODE.match(line):
+        return False
+    return bool(FAIL.search(COUNTED.sub(" ", line)))
+
+
+def is_search(command: str) -> bool:
+    """出力が、探した結果かファイルの中身だけのコマンドか。
+    cd や変数の代入を前に並べた形（cd x && grep …）、中身や一覧をパイプで渡す形（cat x | grep …、git ls-files | xargs grep …）、
+    ソースコードのファイルの中身を出す形（sed -n 1,80p x.py）も、探すコマンドと見る。
+    実行の出力を grep で絞った形（pytest | grep FAILED）、ログを読む形（tail x.log）、実行が 1 つでも混ざる形は、実行の結果なので、探すコマンドと見ない。"""
+    bare = QUOTED.sub("Q", command)  # 引用の中の区切り（grep -E "a|b"）で切らない
+    if re.search(r"<<|\$\(|`|\b(?:for|while|if|do|then)\b", bare):
+        return False  # heredoc、埋め込み、繰り返しの中は読み切れない。実行の結果として見る
+    found = False
+    for seg in re.split(r"&&|\|\||;|\n", bare):
+        stages = [re.sub(r"^(?:\w+=\S*\s+)+", "", s.strip()) for s in seg.split("|")]
+        stages = [s for s in stages if s]
+        if not stages or QUIET_CMD.match(stages[0]):
+            continue
+        kinds = []
+        for s in stages:
+            s = XARGS.sub("", s) or "echo"
+            kinds.append("search" if SEARCH_CMD.match(s) else "feed" if FEED_CMD.match(s) else "run")
+        if "run" in kinds:
+            return False  # 実行が 1 つでも混ざれば、出力は実行の結果
+        if "search" in kinds:
+            found = True
+            continue
+        files = [t for t in stages[0].split()[1:] if not t.startswith("-") and "." in t.rsplit("/", 1)[-1]]
+        if SHOW_CMD.match(stages[0]) and files and all(SOURCE_FILE.search(t) for t in files):
+            found = True
+            continue
+        return False  # ログや一覧を読むだけの形は、実行の結果を読んでいる
+    return found
+
+
 def same_failures(text: str):
     """同じ失敗の行がいちばん多い形と、その数。"""
     count = Counter()
     for line in text.splitlines()[:3000]:
-        if len(line) > 400 or not FAIL.search(line) or ZERO.search(line) or CODE.match(line):
+        if not is_failure_line(line):
             continue
         count.update(signatures(line))
     if not count:
@@ -105,7 +157,7 @@ def failure_sig(text: str) -> str:
     if lines and re.match(r"\s*Exit code \d+", lines[0]):
         lines = lines[1:]
     for ln in lines[:200]:
-        if FAIL.search(ln) and not ZERO.search(ln) and not CODE.match(ln):
+        if is_failure_line(ln):
             return norm(ln)
     return norm(lines[-1]) if lines else ""
 
@@ -189,7 +241,7 @@ def main() -> int:
                     st["said"] = (st["said"] + [sig])[-100:]
                     messages.append(f"同じ失敗が {n} 件（{sig[:60]}）。個別に直さず、共通の原因を先に調べる（common-sense）")
 
-    if not (name == "Bash" and SEARCH_CMD.search(str(inp.get("command", "")))):
+    if not (name == "Bash" and is_search(str(inp.get("command", "")))):
         sig, n = same_failures(text)
         if n >= SAME and sig not in st["said"]:
             st["said"] = (st["said"] + [sig])[-100:]

@@ -164,6 +164,54 @@ class Odd(Base):
         self.assertEqual(self.post(stdout=SAME3, COMMON_SENSE_OFF="1"), "")
         self.assertEqual(self.post(stdout=SAME3, COMMON_SENSE_MAX_NUDGE="0"), "")
 
+    def test_search_command_after_a_separator_is_still_a_search(self):
+        # 探した結果の行は、失敗の語を含んでいても失敗ではない。cd や変数を前に並べた形、中身や一覧をパイプで渡す形も同じ（実際の記録で出た偽の知らせ）
+        hits = "a.py:1: raise error\nb.py:2: raise error\nc.py:3: raise error\n"
+        for cmd in ('cd /repo && grep -rn "error" src',
+                    'cd /repo; grep -rn "error" src',
+                    'cd /repo && git grep -n error',
+                    'export LC_ALL=C && rg -n "error|failed" src | head -20',
+                    "cat notes.md | grep -n 'error; failed'",
+                    'git ls-files | xargs grep -n "error"',
+                    'cd /repo && grep -c error a.py; grep -n error b.py'):
+            self.assertEqual(self.post(cmd, hits), "", cmd)
+        # ソースコードのファイルの中身を出す形。中身の行は、失敗の出力ではない（CODE の形に当たらない行もある）
+        code = "".join(f'        r.write({{"app/a{i}.py": "try:\\n    go()\\nexcept Exception:\\n    pass\\n"}})\n' for i in range(3))
+        self.assertEqual(self.post("cd /repo && sed -n 1,40p scripts/test_x.py && grep -n 'diff' scripts/x.py", code), "")
+        self.assertEqual(self.post("sed -n 116,216p .claude/skills/x/scripts/test_x.py", code), "")
+        self.assertEqual(self.post("cat hooks/a.py | head -40", code), "")
+
+    def test_filtered_output_of_a_run_is_not_a_search(self):
+        # 実行の出力を grep で絞った形は、実行の結果。探すコマンドと見ない（配った先の全部で同じテストが落ちた、を拾う）
+        for cmd in ('python3 -m pytest -q 2>&1 | grep FAILED',
+                    'cd /repo && python3 sync_all.py | grep -E "落ちた|OK"',
+                    'for r in a b c; do (cd $r && python3 t.py 2>&1 | grep -E "落ちた|OK"); done',
+                    'grep -c error a.py && python3 sync_all.py',
+                    'tail -30 /tmp/precheck.log',
+                    'cat /tmp/dist/result.json',
+                    'sed -n 1,40p a.py && python3 a.py'):
+            self.setUp()
+            self.assertIn("同じ失敗が 3 件", self.post(cmd, SAME3), cmd)
+
+    def test_counted_results_are_not_failure_lines(self):
+        # 数えた結果の行（「失敗」のあとが数だけ）は、何が失敗したかを言わない。同じ失敗の行に数えない（実際の記録で出た偽の知らせ）
+        counted = "".join(f'{{"種類": "k{i}", "見つけた": {i + 4}, "うち失敗": 2}}\n' for i in range(3))
+        self.assertEqual(self.post("python3 stats.py --json", counted), "")
+        for line in ("no-fake: 見つけた 5、うち失敗: 2", "ひな形の検査  失敗 2 件", "誤り 1  注意 30", "tests run: 9, failed: 2", "FAILED (failures=3)",
+                     "found 12, errors: 12"):
+            self.setUp()
+            got = self.post("python3 stats.py", (line + "\n") * 3)
+            if line.startswith("FAILED"):
+                self.assertIn("同じ失敗が 3 件", got, line)  # 数のほかに失敗の語がある行は、数える
+            else:
+                self.assertEqual(got, "", line)
+        # 数のほかに失敗の中身がある行は、これまでどおり数える
+        self.assertIn("同じ失敗が 3 件", self.post("python3 sync_all.py", SAME3))
+        self.setUp()
+        self.assertIn("同じ失敗が 3 件", self.post("python3 run.py", "HTTP Error: 500\n" * 3))
+        self.setUp()
+        self.assertIn("同じ失敗が 3 件", self.post("python3 run.py", "エラー: 2 件のファイルが見つかりません\n" * 3))
+
     def test_mcp_result_as_text_blocks(self):
         msg = self.post(name="mcp__github__actions_list", response=[{"type": "text", "text": SAME3}])
         self.assertIn("同じ失敗が 3 件", msg)

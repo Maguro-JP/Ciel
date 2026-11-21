@@ -101,6 +101,8 @@ description: 当たり前のことをやる・おかしいことをおかしい�
 - 止めるフックの文は 1 行。差し戻されたら、足りない 1 行だけを足す。`stop_hook_active` が真なら通す
 - PostToolUse は成功したツールでしか動かない。失敗は PostToolUseFailure に来る。この登録が無いリポジトリでは、
   `odd_nudge.py` が次に成功した呼び出しのときに、会話の記録から失敗を拾う
+- `odd_nudge.py` は、探した結果（`cd … && grep …`、`cat x | grep …`）、ソースコードのファイルの中身（`sed -n 1,80p x.py`）、
+  数えた結果だけの行（`"うち失敗": 2`）を、失敗の行に数えない。実行の出力を grep で絞った形（`pytest | grep FAILED`）と、ログを読む形（`tail x.log`）は数える
 - 推測の語は、コード・引用・言われたことのコピー（↩ の行）・`❕ おかしい` の行の中では見ない。人が予想や意見を聞いたターンも見ない
 - テスト: `scripts/test_gates.py`、`scripts/test_nudges.py`
 
