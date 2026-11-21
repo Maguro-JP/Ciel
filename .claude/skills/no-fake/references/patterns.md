@@ -11,7 +11,7 @@ Python は ast で、JavaScript と TypeScript は文字列とコメントを落
 | P02 | `raise NotImplementedError` だけの関数。JS は not implemented を投げるだけの関数 | 注意 | abstract の中 |
 | P03 | 引数を使わずに、固定の値（数、文字列、固定の配列や辞書）を返すだけの関数 | 注意 | 引数の無い関数、property、テストのファイル |
 | P04 | 名前が check、validate、verify、is_、has_ で始まるのに、中身が無いか、いつも True を返す関数（偽の検査） | 重大 | 中身のある検査 |
-| P05 | コメントの中の置き場の語。`TODO`、`FIXME`、`XXX`、`HACK`（大文字の印。小文字は `todo:` の形だけ）、仮実装、仮の値、（仮）、ダミー、dummy、placeholder、stub、とりあえず、ひとまず、未実装、for now、in a real implementation、本番では、mock data、サンプルデータ | 注意 | テストのファイル、文字列の中 |
+| P05 | コメントの中の置き場の語。`TODO`、`FIXME`、`XXX`、`HACK`（大文字のマーク。小文字は `todo:` の形だけ）、仮実装、仮の値、（仮）、ダミー、dummy、placeholder、stub、とりあえず、ひとまず、未実装、for now、in a real implementation、本番では、mock data、サンプルデータ | 注意 | テストのファイル、文字列の中 |
 | P06 | 省略の置き場。`... rest of the code`、`... existing code`、（中略）、以下省略、残りは同じ、のコメントで本物のコードを置き換えた物 | 重大 | テストのファイル |
 
 ## A-2 握りつぶし
