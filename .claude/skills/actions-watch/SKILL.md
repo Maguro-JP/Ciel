@@ -34,6 +34,7 @@ description: GitHub Actions の通知を必ず受け取り、終わる前に確�
 | `hooks/ci_merge_gate.py` | PreToolUse（merge_pull_request） | その PR の完了して通った通知が記録に無ければマージしない。通知のあとに push していても止める | 止める |
 
 通知の読み方は `scripts/ci_state.py`（会話の記録から kind、head_sha、pr、conclusion を拾い、PR ごとの最後の状態を出す）。
+その PR への、結果がまだ無いマージの呼び出しは、通知のあとの push に数えない。マージの前のフックが判定している最中の呼び出し自身が、記録に入っていることがあるため。
 `ACTIONS_WATCH_OFF=1` で 3 つとも止まる（ユーザーが自分の手で入れる）。
 
 ## 使わないとき

@@ -66,10 +66,10 @@ def read(path: str) -> dict:
 
     出来事は、PR を作る・push する呼び出し（その後の Actions は古い）と、人の発言の位置（このターンの判定に使う）。
     止められた呼び出し（結果がエラー、フックの差し戻し）は、PR も push も起きていないので出来事に入れない。
-    結果がまだ無い呼び出しは、起きたものとして残す。
+    結果がまだ無い呼び出しは、起きたものとして残す。結果が出たかどうかは、出来事の done に入れる。
     """
     events, acts, users = [], [], []
-    failed_ids = set()
+    failed_ids, result_ids = set(), set()
     with open(path, encoding="utf-8", errors="replace") as f:
         for i, line in enumerate(f):
             if "head_sha" in line:
@@ -101,8 +101,9 @@ def read(path: str) -> dict:
                 is_result = not isinstance(c, str) and any(isinstance(x, dict) and x.get("type") == "tool_result" for x in c)
                 if is_result:
                     failed_ids.update(x.get("tool_use_id") for x in c if isinstance(x, dict) and x.get("type") == "tool_result" and failed_result(x))
+                    result_ids.update(x.get("tool_use_id") for x in c if isinstance(x, dict) and x.get("type") == "tool_result")
                 users.append({"line": i, "result": is_result, "text": text_of(c)[:4000]})
-    acts = [a for a in acts if not (a["id"] and a["id"] in failed_ids)]
+    acts = [dict(a, done=bool(a["id"] and a["id"] in result_ids)) for a in acts if not (a["id"] and a["id"] in failed_ids)]
     return {"events": events, "acts": acts, "users": users}
 
 
@@ -112,8 +113,18 @@ def latest(state: dict, pr_number: int, repo: str = "") -> dict:
     if not evs:
         return {}
     last = evs[-1]
-    stale = any(a["line"] > last["line"] and (a["pr"].endswith(f"#{pr_number}") or a["tool"] == "Bash") for a in state["acts"])
-    return {**last, "stale": stale}
+
+    def after(a: dict) -> bool:
+        if a["line"] <= last["line"]:
+            return False
+        same = a["pr"].endswith(f"#{pr_number}")
+        if same and "merge_pull_request" in a["tool"] and not a.get("done"):
+            # この PR への、結果がまだ無いマージの呼び出し。マージの前のフックが判定している最中の呼び出し自身が、記録に入っていることがある。
+            # まだ何も起きていないので、通知のあとの push に数えない（数えると、通った PR のマージが 1 回止まり、同じ呼び出しの 2 回目で通る）
+            return False
+        return same or a["tool"] == "Bash"
+
+    return {**last, "stale": any(after(a) for a in state["acts"])}
 
 
 NOT_HUMAN = re.compile(r"^\s*(?:Stop hook feedback|\[SYSTEM NOTIFICATION|<task-notification>|<system-reminder>|<wake reason=)")

@@ -134,6 +134,27 @@ class Gate(unittest.TestCase):
         self.assertEqual(st["acts"], [])
         self.assertFalse(ci_state.latest(st, 12)["stale"])
 
+    def test_the_merge_call_being_judged_is_not_a_push_after_the_event(self):
+        # マージの前のフックが動くとき、記録には、判定している最中のマージの呼び出し（結果はまだ無い）が入っていることがある。
+        # それを「通知のあとの push」に数えると、通った PR のマージが 1 回止まり、同じ呼び出しの 2 回目で通る
+        merge = ("mcp__github__merge_pull_request", {"owner": "Owner", "repo": "Repo", "pullNumber": 12})
+        p = write([user("マージして"), user(event("check_suite.completed")), assistant("", [merge])])
+        st = ci_state.read(p)
+        self.assertEqual(len(st["acts"]), 1)  # 出来事としては残る（ほかの判定が使う）
+        self.assertFalse(ci_state.latest(st, 12)["stale"])
+        # 結果が出たマージ（成功）のあとは、これまでどおり古い
+        tid = assistant("", [merge])["message"]["content"][0]["id"]
+        p = write([user("マージして"), user(event("check_suite.completed")), assistant("", [merge]), tool_result(tid, '{"merged": true}')])
+        self.assertTrue(ci_state.latest(ci_state.read(p), 12)["stale"])
+        # 同じ発言の中で、結果の無い push とマージが並ぶときは、push があるので古い
+        push = ("mcp__github__push_files", {"owner": "Owner", "repo": "Repo", "pullNumber": 12})
+        p = write([user("マージして"), user(event("check_suite.completed")), assistant("", [push, merge])])
+        self.assertTrue(ci_state.latest(ci_state.read(p), 12)["stale"])
+        # ほかの PR の、結果の無いマージは、この PR の判定に関わらない（これまでどおり）
+        other = ("mcp__github__merge_pull_request", {"owner": "Owner", "repo": "Repo", "pullNumber": 13})
+        p = write([user("マージして"), user(event("check_suite.completed")), assistant("", [other])])
+        self.assertFalse(ci_state.latest(ci_state.read(p), 12)["stale"])
+
     def test_merge_question_before_actions(self):
         code, out = self.stop([user("進めて"), assistant("❔ Repo: PR #12 をマージしてよいですか。")])
         self.assertEqual(code, 2)
@@ -187,6 +208,15 @@ class MergeGate(unittest.TestCase):
         self.assertEqual(code, 2)
         code, out = self.pre([assistant("❔ Repo: PR #12 をマージしてよいですか（Actions は無い）"), user("お願い")])
         self.assertEqual(code, 0, out)
+
+    def test_passes_when_the_transcript_already_holds_the_call_being_judged(self):
+        merge = ("mcp__github__merge_pull_request", {"owner": "Owner", "repo": "Repo", "pullNumber": 12})
+        code, out = self.pre([user(event("check_suite.completed")), user("お願い"), assistant("", [merge])])
+        self.assertEqual(code, 0, out)
+        push = ("Bash", {"command": "git push origin x"})
+        code, out = self.pre([user(event("check_suite.completed")), user("お願い"), assistant("", [push]), assistant("", [merge])])
+        self.assertEqual(code, 2)  # 通知のあとの push は、これまでどおり止める
+        self.assertIn("通知のあとに push している", out)
 
 
 class Prompt(unittest.TestCase):
