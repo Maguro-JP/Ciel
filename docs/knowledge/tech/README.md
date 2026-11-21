@@ -5,6 +5,9 @@
 
 | 題 | 段 | 技術の場所 | 日付 |
 |---|---|---|---|
+| [致命的なバグの修正版を出す手順と、バグの帳簿（クラッシュの出力は失敗した実行に出る）](2026-11-21-bug-first-hotfix.md) | 実装 | `.claude/skills/bug-first/scripts/bugs.py` | 2026-11-21 |
+| [見せかけの実装とテストを機械で拾う（足した行だけを見て、ターンの終わりに差し戻す）](2026-11-21-no-fake-shapes.md) | 実装 | `.claude/skills/no-fake/scripts/fake_scan.py` | 2026-11-21 |
+| [推測と古い知識をフックで止める（失敗は PostToolUse に来ない）](2026-11-15-common-sense-hooks.md) | 実装 | `.claude/skills/common-sense/hooks/_cs.py` | 2026-11-15 |
 | [フックの登録は、作業ディレクトリに頼らない](2026-11-14-hook-working-directory.md) | 実装 | `.claude/hooks/run.sh` | 2026-11-14 |
 | [調べ物を 5 段で残し、段を節の中身から数える](2026-11-14-research-ladder.md) | 実装 | `.claude/skills/research-to-tech/scripts/knowledge.py` | 2026-11-14 |
 | [独立した作業を子のセッションに分け、難易度でモデルを選ぶ](2026-11-14-session-fanout.md) | 実装 | `.claude/skills/feedback-session/scripts/fanout.py` | 2026-11-14 |

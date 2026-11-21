@@ -150,6 +150,8 @@ $EDITOR .claude/skills/my-new-skill/SKILL.md
 | [`lessons`](.claude/skills/lessons/) | 失敗の記録。場面・起きたこと・判定の誤り・次から の 4 行で残し、開始時にフックが差し込む |
 | [`token-efficiency`](.claude/skills/token-efficiency/) | トークンと文脈を節約する。フックの差し込み量を測る |
 | [`background-first`](.claude/skills/background-first/) | ユーザーが優先。長い処理は裏で動かし、ターンを短く終える。フックが前面の長いコマンドを止める |
+| [`common-sense`](.claude/skills/common-sense/) | 当たり前のことをやる、おかしいことをおかしいと思う、疑問は調べる、自分の知識は古いと認識する。フックが今日の日付を出し、調べていない推測とマージのあとの止まりを差し戻し、同じ失敗と記憶で書いた依存を知らせる |
+| [`bug-first`](.claude/skills/bug-first/) | 何よりもバグ修正を優先させる。特に致命的なバグ、クラッシュや操作不能、破損や漏洩等は即修正版を出す。重さを決めて帳簿（docs/reports/bugs.md）に書き、致命的は今の作業を止め、再現するテストを先に書いて直し、版を上げて Release まで出す |
 
 出す前の検証
 
@@ -174,6 +176,7 @@ PR と CI
 | [`tidy`](.claude/skills/tidy/) | 散らかさない決まり、月に 1 回の整理整頓、使い終えたブランチやルーティンの整理整頓 |
 | [`repo-management`](.claude/skills/repo-management/) | リポジトリを正しく管理する 12 段（土台・方針・README・文書・鍵・公開の精査・依存の脆弱性・整理整頓・出し方・バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩）。repo_check.py が 1 つの表にする |
 | [`code-check`](.claude/skills/code-check/) | 作った物のバグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩を、実績のあるツール（ruff、bandit、semgrep、shellcheck、detect-secrets、gitleaks、pip-audit、npm audit）で機械で確認する。書き込みのたびのフック、precheck の NG、repo-management の段 |
+| [`no-fake`](.claude/skills/no-fake/) | コーディングが出来ない・出来ているように見せるだけ・バグも放置・わかっていてわざと壊す、を抑える。見せかけを作らない（置き場のままの実装、握りつぶし、偽のデータ、テストの見せかけ、配線されていない物）、動かして見せる、壊さない（変える前の状態を測る、消した物を数える、検査を弱めない）。`fake_scan.py` が形を拾い、フックが知らせて差し戻し、precheck が重大で止める |
 | [`actions-watch`](.claude/skills/actions-watch/) | GitHub Actions の通知を必ず受け取る。PR を作ったら購読し、終わる前にマージの ❔ を出さず、終わったら結果を書く。Stop と PreToolUse のフックが順番を止める |
 | [`research-to-tech`](.claude/skills/research-to-tech/) | 調べ物を、情報で終わらせずに知識・アルゴリズム・技術・実装まで進めて docs/knowledge/tech/ に残す。段を機械で数え、Stop フックが知識に残さない開発を止める |
 

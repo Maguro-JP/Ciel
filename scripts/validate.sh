@@ -91,6 +91,23 @@ for s in .claude/settings.json .claude/skills/repo-bootstrap/templates/settings.
   if [ "$code" -ne 0 ]; then err "$s のフックが無害な入力で失敗する（python3 scripts/hooks-smoke.py $s で見る）"; else echo "  $s: $(printf '%s\n' "$out" | tail -1)"; fi
 done
 
+# フック（.claude/hooks/ の全部。起動役の run.sh も）は、ひな形の方が配られる。手元だけを直すと、配った先には古いフックが残る
+# （新しいスキルの案内が届かない。毎ターン全文を出す古い形が配られ、差し込みが目安を超える）
+for f in .claude/skills/repo-bootstrap/templates/hooks/*; do
+  [ -f "$f" ] || continue
+  n="$(basename "$f")"
+  if ! cmp -s ".claude/hooks/$n" "$f"; then
+    err "ひな形の $n が手元の .claude/hooks/$n と違う（cp で合わせる）"
+  fi
+done
+
+# 配る物の行末の空白。新しいリポジトリに土台を置くと全部の行が差分になり、1 行でもあると最初の `git diff --check` が落ちる
+ws="$(git grep -nI -e '[[:space:]]$' -- .claude/skills .claude/hooks 2>/dev/null | head -5)"
+if [ -n "$ws" ]; then
+  printf '%s\n' "$ws" | sed 's/^/    /'
+  err "配る物に行末の空白がある（上の行。新しく置いたリポジトリの git diff --check が落ちる）"
+fi
+
 # 文書は書いた日の状態で止まる。リンク、言及先、スキル一覧、辿れる文書を今のリポジトリと突き合わせる。
 echo
 echo "== ドキュメント =="
