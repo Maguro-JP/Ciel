@@ -17,7 +17,10 @@ import sys
 import time
 from pathlib import Path
 
-SYSTEMISH = re.compile(r"^\s*<|wake reason|task-notification|SYSTEM NOTIFICATION|system-reminder|Stop hook feedback|This session is being continued")
+# 人の発言ではない文。通知、フックの差し戻し、要約のほか、システムの知らせ 3 種（返事が無いときの催促、作業プロセスの再起動、
+# ほかのセッションからの文）。知らせは同じ文が何度も来るので、人の発言と数えると「同じ指示が 3 回目」になる。文頭に来る形だけを除く
+SYSTEMISH = re.compile(r"^\s*<|wake reason|task-notification|SYSTEM NOTIFICATION|system-reminder|Stop hook feedback|This session is being continued"
+                       r"|^\s*The user hasn.t heard from you in a while|^\s*This session.s worker process was restarted|^\s*Another Claude session sent a message")
 # 強い順。先に当たったものを感情とする
 CUES = [
     ("怒り", re.compile(r"無能|クソ|ふざけ|ゴミ|最悪|ありえない|信用できない|バカ|馬鹿|アホ|使えない|何回言わせ|いい加減にしろ")),  # content-audit: ignore（検出語の一覧）

@@ -68,6 +68,28 @@ class Emotion(unittest.TestCase):
             out = run("PR #94 をマージしろって言ってんじゃん", transcript=str(t), state=d)[1]
             self.assertIn("同じ指示が", out)
 
+    def test_system_notices_are_not_the_user(self):
+        # 実際の記録にあった、システムの知らせ 3 種。人の発言ではない。同じ文が何度も来るので、人の発言と数えると「同じ指示が 3 回目」と差し込む
+        notices = ["The user hasn't heard from you in a while — say in a few words what you're doing, then continue.",
+                   "This session's worker process was restarted. If your previous turn was already complete, take no action.",
+                   "Another Claude session sent a message: <agent-report>終わりました。PR にしてよいです</agent-report>"]
+        with tempfile.TemporaryDirectory() as d:
+            t = Path(d) / "t.jsonl"
+            rows = [{"type": "user", "message": {"content": "Ciel の PR #94 をマージして配って"}}]
+            rows += [{"type": "user", "message": {"content": n}} for n in notices for _ in range(2)]
+            t.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n", encoding="utf-8")
+            state = Path(d) / "state"
+            for n in notices:
+                self.assertEqual(run(n, transcript=str(t), state=str(state)), (0, ""), n)
+            self.assertFalse((state / "metrics.jsonl").exists())  # 数にも入れない
+            # 知らせが間に並んでいても、人の一言の数え方は変わらない（前の人の発言は 1 件だけ）
+            out = run("PR #94 をマージしろ", transcript=str(t), state=str(state))[1]
+            self.assertIn("同じ指示が 2 回目", out)
+            rows = [json.loads(x) for x in (state / "metrics.jsonl").read_text(encoding="utf-8").splitlines()]
+            self.assertEqual([r["repeated"] for r in rows], [2])
+            # 人が同じ語を使った発言は、これまでどおり人の発言
+            self.assertIn("感情: 急かし", run("まだ? The user hasn't heard の文ばかり出る", state=str(state))[1])
+
 
 if __name__ == "__main__":
     unittest.main()
