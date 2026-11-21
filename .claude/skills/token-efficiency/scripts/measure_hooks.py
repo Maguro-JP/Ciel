@@ -19,13 +19,25 @@ from pathlib import Path
 STATE = tempfile.mkdtemp()
 
 
+def clean_env() -> dict:
+    """フックに渡す環境。測定の実行が、本物の置き場（~/.claude/state/ の状態と metrics.jsonl）に書かないようにする。
+    置き場の環境変数を 1 つずつ渡す形は、フックが増えるたびに漏れた（測定の行が、週 1 回の数に混ざった）。
+    HOME を一時の場所に向け、呼んだ側の *_STATE は渡さない（渡すと、そこに書く）。git の設定だけは、元の場所を指す。"""
+    env = {k: v for k, v in os.environ.items() if not k.endswith("_STATE")}
+    gitconfig = Path.home() / ".gitconfig"
+    if gitconfig.is_file() and "GIT_CONFIG_GLOBAL" not in env:
+        env["GIT_CONFIG_GLOBAL"] = str(gitconfig)
+    env["HOME"] = STATE
+    return env
+
+
 def run(cmd: str, payload: dict) -> int:
     """2 回動かして 2 回目の長さを返す。1 ターン目だけ全文を出すフックがあるので、普段のターンの量を測る。"""
     n = 0
     for _ in range(2):
         try:
             r = subprocess.run(cmd, shell=True, input=json.dumps(payload, ensure_ascii=False), capture_output=True, text=True, timeout=60,  # code-check: ignore 固定の文字列（ユーザーの入力は入らない）
-                               env=dict(os.environ, LANG_RULE_STATE=STATE, TOKEN_EFFICIENCY_STATE=STATE, FOLLOW_INSTRUCTIONS_STATE=STATE))
+                               env=clean_env())
             n = len(r.stdout)
         except (OSError, subprocess.TimeoutExpired):
             return 0
