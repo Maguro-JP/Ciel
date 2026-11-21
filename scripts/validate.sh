@@ -96,6 +96,13 @@ if ! cmp -s .claude/hooks/skill-nudge.sh .claude/skills/repo-bootstrap/templates
   err "ひな形の skill-nudge.sh が手元の .claude/hooks/skill-nudge.sh と違う（cp で合わせる）"
 fi
 
+# 配る物の行末の空白。新しいリポジトリに土台を置くと全部の行が差分になり、1 行でもあると最初の `git diff --check` が落ちる
+ws="$(git grep -nI -e '[[:space:]]$' -- .claude/skills .claude/hooks 2>/dev/null | head -5)"
+if [ -n "$ws" ]; then
+  printf '%s\n' "$ws" | sed 's/^/    /'
+  err "配る物に行末の空白がある（上の行。新しく置いたリポジトリの git diff --check が落ちる）"
+fi
+
 # 文書は書いた日の状態で止まる。リンク、言及先、スキル一覧、辿れる文書を今のリポジトリと突き合わせる。
 echo
 echo "== ドキュメント =="
