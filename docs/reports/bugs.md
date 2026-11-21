@@ -31,14 +31,14 @@
 
 ## B-002 sync.py が、PreToolUse と PostToolUseFailure のフックの登録を配らない
 - 重さ: 重い
-- 状態: 未修正
+- 状態: 修正済み
 - 見つけた日: 2026-11-21 17:08
 - 知った所: 配った先の形の settings.json と、ひな形の settings.json の比較
 - 症状: sync.py の HOOK_EVENTS が 4 つ（SessionStart、UserPromptSubmit、Stop、PostToolUse）だけです。ひな形にある PreToolUse の 4 本（pr_gate.py、ci_merge_gate.py、background_first.py、no_self_grant.py）と PostToolUseFailure の 1 本（odd_nudge.py）が、配った先の settings.json に足されません。PR の前の確認のフックが、配った先では動いていません
 - 再現の手順: 空のリポジトリに sync.py --apply で配り、settings.json の hooks のキーを見ます。PreToolUse と PostToolUseFailure がありません
 - 直したコミット:
 - 修正版:
-- 直した日:
+- 直した日: 2026-11-21 17:33
 
 ## B-003 差分の検査が、base の側の変更を自分の変更と数える
 - 重さ: 重い

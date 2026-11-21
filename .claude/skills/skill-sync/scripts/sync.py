@@ -76,7 +76,6 @@ def lessons_changed(s: Path, d: Path) -> bool:
 # スキルだけ配っても、フックの登録（settings.json）が無いと効かないものがある（token-efficiency、gate.sh）。
 # repo-bootstrap のひな形を元に、フックのファイルと登録を差分だけ足す。対象にしかない登録は消さない。
 TEMPLATE = SRC / "repo-bootstrap" / "templates"
-HOOK_EVENTS = ("SessionStart", "UserPromptSubmit", "Stop", "PostToolUse")
 
 
 def hook_file_diffs(target_root: Path):
@@ -163,8 +162,10 @@ def settings_missing(target_root: Path):
     fixed = reanchor(cur, tpl) + drop_superseded(cur)
     have = {h.get("command", "") for es in cur.get("hooks", {}).values() for e in es for h in e.get("hooks", [])}
     missing = []
-    for ev in HOOK_EVENTS:
-        for e in tpl.get("hooks", {}).get(ev, []):
+    # ひな形にあるイベントの全部を見る。名前を決め打ちにしていたときは、あとから足したイベント
+    # （PreToolUse の確認のゲート、PostToolUseFailure の知らせ）の登録が、配った先に届かなかった
+    for ev, entries in tpl.get("hooks", {}).items():
+        for e in entries:
             for h in e.get("hooks", []):
                 cmd = h.get("command", "")
                 if cmd not in have and _command_exists(cmd, target_root):

@@ -83,6 +83,49 @@ class FirstRun(unittest.TestCase):
         self.assertEqual(sum("work-style/SKILL.md" in c for c in cmds), 1)
 
 
+class EveryEvent(unittest.TestCase):
+    """ひな形にある登録は、どのイベントの物も配る。イベントの名前を決め打ちにすると、あとから足したイベント
+    （PreToolUse の確認のゲート、PostToolUseFailure の知らせ）の登録が、配った先に届かない。"""
+
+    def test_registrations_of_every_event_are_added_with_their_matcher(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tpl, target = Path(tmp) / "tpl", Path(tmp) / "target"
+            hooks = {ev: [{"matcher": "Bash", "hooks": [{"type": "command", "command": RUN + f".claude/skills/x/hooks/{ev.lower()}.py"}]}]
+                     for ev in ("SessionStart", "PreToolUse", "PostToolUseFailure", "SubagentStop")}
+            (tpl / "hooks").mkdir(parents=True)
+            (tpl / "settings.json").write_text(json.dumps({"hooks": hooks}), encoding="utf-8")
+            for ev in hooks:
+                f = target / ".claude/skills/x/hooks" / f"{ev.lower()}.py"
+                f.parent.mkdir(parents=True, exist_ok=True)
+                f.write_text("", encoding="utf-8")
+            (target / ".claude/skills/x/hooks/subagentstop.py").unlink()  # ファイルが無い登録は足さない
+            old = sync.TEMPLATE
+            sync.TEMPLATE = tpl
+            try:
+                cur, missing = sync.settings_missing(target)
+                self.assertEqual(sorted(ev for ev, _, _ in missing), ["PostToolUseFailure", "PreToolUse", "SessionStart"])
+                sync.apply_hooks(target, [], [], cur, missing)
+                self.assertEqual(sync.settings_missing(target)[1], [])  # 2 回目は足す物が無い
+            finally:
+                sync.TEMPLATE = old
+            got = json.loads((target / ".claude/settings.json").read_text(encoding="utf-8"))["hooks"]
+            self.assertEqual(sorted(got), ["PostToolUseFailure", "PreToolUse", "SessionStart"])
+            self.assertEqual(got["PreToolUse"], hooks["PreToolUse"])  # matcher ごと
+
+    def test_a_new_repository_gets_every_registration_whose_file_exists(self):
+        # 配った先の形で見る。空のリポジトリに配ったあと、ひな形の登録のうち、ファイルがある物は全部入っていること
+        with tempfile.TemporaryDirectory() as tmp:
+            r = subprocess.run([sys.executable, "-I", str(HERE / "sync.py"), tmp, "--apply"], capture_output=True, text=True, timeout=300)
+            self.assertIn(r.returncode, (0, 1), r.stderr)
+            tpl = json.loads((ROOT / ".claude/skills/repo-bootstrap/templates/settings.json").read_text(encoding="utf-8"))["hooks"]
+            got = json.loads((Path(tmp) / ".claude/settings.json").read_text(encoding="utf-8"))["hooks"]
+            have = {(ev, g.get("matcher"), h["command"]) for ev, gs in got.items() for g in gs for h in g["hooks"]}
+            lost = [(ev, h["command"]) for ev, gs in tpl.items() for g in gs for h in g["hooks"]
+                    if sync._command_exists(h["command"], Path(tmp)) and (ev, g.get("matcher"), h["command"]) not in have]
+            self.assertEqual(lost, [])
+            self.assertIn("PreToolUse", got)
+
+
 class TemplateHooks(unittest.TestCase):
     def test_every_template_hook_is_the_same_as_the_hook_here(self):
         # 配った先に行くのは、ひな形の方。手元の .claude/hooks/ だけを直すと、配った先には古いフックが残る
