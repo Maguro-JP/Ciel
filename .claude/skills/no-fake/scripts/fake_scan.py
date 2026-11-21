@@ -598,9 +598,10 @@ def scan_js(rel: str, text: str, test: bool) -> list:
         if IGNORE_LINE in raw:
             continue
         nxt = slines[no].strip() if no < len(slines) else ""
-        if JS_CATCH_EMPTY.search(s) or (JS_CATCH_OPEN.search(s) and nxt == "}" and (no + 1) not in comments and no not in comments):
+        explained = no in comments  # 同じ行にコメントがあれば、捨てる理由が書いてあると見る（中のコメントは、文字列と一緒に空白にしてある）
+        if (JS_CATCH_EMPTY.search(s) and not explained) or (JS_CATCH_OPEN.search(s) and nxt == "}" and (no + 1) not in comments and not explained):
             add("重大", no, "S03", "握りつぶし", "例外を握りつぶしている（中身の無い catch）", "記録するか、呼び元に返す。捨ててよいなら理由をコメントに書く", no + 1)
-        elif JS_PROMISE_SWALLOW.search(s):
+        elif JS_PROMISE_SWALLOW.search(s) and not explained:
             add("重大", no, "S03", "握りつぶし", "失敗を握りつぶしている（.catch(() => {})）", "記録するか、呼び元に返す")
         if not test:
             m = TEST_ENV_JS.search(s)

@@ -178,6 +178,9 @@ class JavaScriptShapes(unittest.TestCase):
         self.assertEqual(found("src/a.js", "go().catch(() => null);\n"), [("S03", "重大")])
         self.assertEqual(found("src/a.js", "try {\n  go();\n} catch (e) {\n  // 無くても動く\n}\n"), [])
         self.assertEqual(found("src/a.js", "go().catch((e) => report(e));\n"), [])
+        # 同じ行に理由のコメントがある物は、捨てると決めた物として拾わない
+        self.assertEqual(found("src/a.js", "try { go(); } catch (e) { /* 無くても動く */ }\n"), [])
+        self.assertEqual(found("src/a.js", "audio.play().catch(() => {}); // 自動再生が断られても、画面は進める\n"), [])
 
     def test_branch_only_for_tests(self):
         self.assertEqual(found("src/a.js", "if (process.env.JEST_WORKER_ID) return fake;\n"), [("D03", "重大")])

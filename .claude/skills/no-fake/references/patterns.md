@@ -20,7 +20,7 @@ Python は ast で、JavaScript と TypeScript は文字列とコメントを落
 |---|---|---|---|
 | S01 | `except:`、`except Exception:`、`except BaseException:` の中身が `pass` か `...` だけ。`suppress(Exception)` | 重大 | 中身のある扱い（記録、投げ直し） |
 | S02 | 型を絞った except（`except OSError:` など）の中身が `pass` だけで、理由のコメントが無い | 注意 | 同じ行か中身の行に理由のコメントがある物 |
-| S03 | 中身の無い `catch`、`.catch(() => {})`、`.catch(() => null)` | 重大 | 中にコメントで理由が書いてある catch、失敗を扱う `.catch` |
+| S03 | 中身の無い `catch`、`.catch(() => {})`、`.catch(() => null)` | 重大 | 中か同じ行に、コメントで理由が書いてある物。失敗を扱う `.catch` |
 | S04 | 新しく足した `\|\| true`（シェル、ワークフロー、Makefile、Dockerfile、package.json） | 注意 | 前からある行（差分のときだけ数える） |
 | S05 | 新しく足した `2>/dev/null` | 注意 | 前からある行（差分のときだけ数える） |
 
