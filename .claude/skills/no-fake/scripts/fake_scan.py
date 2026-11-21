@@ -833,6 +833,27 @@ def repo_root(path) -> Path:
     return None
 
 
+_HOME = {}
+
+
+def skills_home(root) -> bool:
+    """このリポジトリが、スキルの元か（scripts/validate.sh がスキルの検査をしている）。"""
+    key = str(root)
+    if key not in _HOME:
+        try:
+            head = (Path(root) / "scripts" / "validate.sh").read_text(encoding="utf-8", errors="replace")[:400]
+        except OSError:
+            head = ""
+        _HOME[key] = "skill" in head.lower()
+    return _HOME[key]
+
+
+def is_vendored(root, rel: str) -> bool:
+    """配った先の .claude/skills/ の中か。そこにあるのは元のリポジトリのコピーなので、見ない。
+    コピーの中の形で、配った先の検査と返答を止めないため（直すのは元のリポジトリ。配った先の全部で同じ検査が落ちるのを避ける）。"""
+    return norm(rel).startswith(".claude/skills/") and root is not None and not skills_home(root)
+
+
 def rel_to_root(path) -> str:
     """リポジトリの根からの相対パス。リポジトリの外のファイル（一時の場所の物）は空文字。"""
     root = repo_root(path)
@@ -1052,7 +1073,7 @@ def scan_tree(root: Path) -> list:
             dns[:] = [d for d in dns if d not in SKIP_DIRS]
             files += [norm(os.path.relpath(os.path.join(dp, f), root)) for f in fns]
         files.sort()
-    files = [f for f in files if not is_skipped(f)]
+    files = [f for f in files if not is_skipped(f) and not is_vendored(root, f)]
     found = []
     for rel in files:
         if not is_scanned(rel):
@@ -1144,7 +1165,7 @@ def main() -> int:
         if git(root, "rev-parse", "--git-dir")[0] != 0:
             print("見せかけの確認: git のリポジトリではないので、差分は見ない")
             return 0
-        diffs = git_diffs(root, a.diff)
+        diffs = [fd for fd in git_diffs(root, a.diff) if not is_vendored(root, fd.path)]
         found = scan_diffs(diffs, lambda rel: read_text(root / rel), wiring_root=root, ignores=commit_ignores(root, a.diff))
         label = f"差分（{a.diff} との分かれ目から）"
     else:

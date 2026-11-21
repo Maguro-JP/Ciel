@@ -172,7 +172,7 @@ def file_change(path: str, rec: dict, reader=disk):
     """(相対パス, 状態, 前の中身, 今の中身, 足した行と消した行)。見ない物は None。
     reader は、今の中身の読み方（実際の記録に当てるときは、そのターンの終わりの中身を渡す）。"""
     rel = fs.rel_to_root(path)
-    if not rel or fs.is_skipped(rel):
+    if not rel or fs.is_skipped(rel) or fs.is_vendored(fs.repo_root(path), rel):
         return None
     exists, now = reader(path)
     if exists and now is None:

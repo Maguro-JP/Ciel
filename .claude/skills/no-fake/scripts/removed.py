@@ -140,7 +140,7 @@ def main() -> int:
     if fs.git(root, "rev-parse", "--git-dir")[0] != 0:
         print("消えた物: git のリポジトリではないので、見ない")
         return 0
-    items = removed_items(git_changes(root, a.diff))
+    items = removed_items([c for c in git_changes(root, a.diff) if not fs.is_vendored(root, c[0])])
     ignores = fs.commit_ignores(root, a.diff)
     items = [i for i in items if i["name"] not in ignores and i["path"] not in ignores]
     count = {k: sum(1 for i in items if i["kind"] == k) for k in KINDS}

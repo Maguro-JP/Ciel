@@ -128,7 +128,8 @@ def detect(root: Path) -> list:
         start = "tests" if (root / "tests").is_dir() else "test"
         # 始める場所に __init__.py が無いと、根からの discover は 1 件も集めない（実際に流して確かめた）。無ければ -s で場所を渡す
         cmds.append(("", [py, "-m", "unittest", "discover", "-v"] + ([] if (root / start / "__init__.py").exists() else ["-s", start])))
-    for t in sorted(glob.glob(str(root / ".claude" / "skills" / "*" / "scripts" / "test_*.py"))):
+    # スキルのテストは、スキルの元のリポジトリでだけ流す。配った先ではコピーなので、そのリポジトリのテストに数えない（テストの無いリポジトリでは黙る）
+    for t in sorted(glob.glob(str(root / ".claude" / "skills" / "*" / "scripts" / "test_*.py"))) if fs.skills_home(root) else []:
         rel = os.path.relpath(t, root).replace(os.sep, "/")
         cmds.append((rel.split("/")[2] + "/", [py, "-I", rel, "-v"]))
     pkg = root / "package.json"

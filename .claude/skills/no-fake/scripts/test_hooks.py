@@ -364,6 +364,15 @@ class Nudge(Case):
         r = subprocess.run([sys.executable, "-I", str(HOOKS / "fake_nudge.py")], input="{broken", capture_output=True, text=True, timeout=60)
         self.assertEqual((r.returncode, r.stdout, r.stderr), (0, "", ""))
 
+    def test_copies_of_skills_are_told_only_at_their_home(self):
+        path = self.put(".claude/skills/x/hooks/a.py", SWALLOW)
+        self.assertEqual(self.nudge("Write", {"file_path": path}, {"originalFile": None}), (0, ""))
+        lines = [user("フックを足して")] + self.write(".claude/skills/x/hooks/a.py", None, SWALLOW) + [say("★ フック: 足しました。")]
+        self.assertEqual(self.gate(lines)[0], 0)
+        self.put("scripts/validate.sh", "#!/usr/bin/env bash\n# skill validator\n")
+        self.assertIn("握りつぶし", self.nudge("Write", {"file_path": path}, {"originalFile": None})[1])
+        self.assertEqual(self.gate(lines)[0], 2)
+
     def test_javascript_and_shell(self):
         path = self.put("src/a.ts", "export async function load() {\n  try {\n    return await get();\n  } catch (e) {}\n}\n")
         self.assertIn("4 行 握りつぶし", self.nudge("Write", {"file_path": path}, {"originalFile": None})[1])

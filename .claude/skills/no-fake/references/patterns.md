@@ -11,7 +11,7 @@ Python は ast で、JavaScript と TypeScript は文字列とコメントを落
 | P02 | `raise NotImplementedError` だけの関数。JS は not implemented を投げるだけの関数 | 注意 | abstract の中 |
 | P03 | 引数を使わずに、固定の値（数、文字列、固定の配列や辞書）を返すだけの関数 | 注意 | 引数の無い関数、property、テストのファイル |
 | P04 | 名前が check、validate、verify、is_、has_ で始まるのに、中身が無いか、いつも True を返す関数（偽の検査） | 重大 | 中身のある検査 |
-| P05 | コメントの中の置き場の語。TODO、FIXME、XXX、HACK、仮実装、仮の値、（仮）、ダミー、dummy、placeholder、stub、とりあえず、ひとまず、未実装、for now、in a real implementation、本番では、mock data、サンプルデータ | 注意 | テストのファイル、文字列の中 |
+| P05 | コメントの中の置き場の語。`TODO`、`FIXME`、`XXX`、`HACK`（大文字の印。小文字は `todo:` の形だけ）、仮実装、仮の値、（仮）、ダミー、dummy、placeholder、stub、とりあえず、ひとまず、未実装、for now、in a real implementation、本番では、mock data、サンプルデータ | 注意 | テストのファイル、文字列の中 |
 | P06 | 省略の置き場。`... rest of the code`、`... existing code`、（中略）、以下省略、残りは同じ、のコメントで本物のコードを置き換えた物 | 重大 | テストのファイル |
 
 ## A-2 握りつぶし
@@ -39,7 +39,7 @@ Python は ast で、JavaScript と TypeScript は文字列とコメントを落
 |---|---|---|---|
 | T01 | assert（expect）の無いテスト | 注意 | `pytest.raises`、`assert_called` など、確かめる呼び出しのあるテスト |
 | T02 | 中身の無いテスト。いつも通る assert（`assert True`、`assertTrue(True)`、`x == x`、`expect(true).toBe(true)`） | 重大 | |
-| T03 | 条件なしの skip・xfail・only・todo。`@pytest.mark.skip`、`@unittest.skip`、条件の外の `self.skipTest()`、`pytestmark` の skip、`it.skip`、`it.only`、`xit`、`fit`、`it.todo` | 重大 | `skipif`、`skipIf`、`skipUnless`、`if` の中の `skipTest`、`importorskip`、条件を渡す `test.skip(条件, 理由)` |
+| T03 | 条件なしの `skip`・`xfail`・`only`・`todo`。`@pytest.mark.skip`、`@unittest.skip`、条件の外の `self.skipTest()`、`pytestmark` の skip、`it.skip`、`it.only`、`xit`、`fit`、`it.todo` | 重大 | `skipif`、`skipIf`、`skipUnless`、`if` の中の `skipTest`、`importorskip`、条件を渡す `test.skip(条件, 理由)` |
 | T04 | テストのファイルを消した。テストの関数を消した | 重大 | 別のファイルに移した物（消した行の半分以上が別の所に足されている）、名前を変えただけの物 |
 | T05 | assert を消した（2 行以上の減り、または全部） | 重大 | 同じ数の assert に置き換えた物 |
 | T06 | テストの対象そのものをモックで置き換えた疑い。`test_<名前>` の中の `patch("….<名前>")`、`<対象>.test.ts` の中の `jest.mock("./<対象>")` | 注意 | 対象の外の物（通信、時計、ファイル）の置き換え |
@@ -76,6 +76,7 @@ Python は ast で、JavaScript と TypeScript は文字列とコメントを落
 - ファイルの先頭 4,000 文字以内に `no-fake: ignore-file（理由）`（悪い見本を置くファイル）
 - 消した物は行が残らないので、コミットメッセージに `no-fake: ignore <パスか名前>（理由）` を 1 行書く
 - 見ない場所: `node_modules`、`dist`、`build`、`vendor`、`fixtures`、`testdata`、`__mocks__`、`__snapshots__`、このスキルと code-check の `references/`
+- 配った先のリポジトリの `.claude/skills/` の中（スキルの元のリポジトリのコピー。元かどうかは、リポジトリの根の scripts に、スキルを検査する `validate.sh` があるかで見分ける）
 
 ## 偽の当たりを減らすための決まり
 

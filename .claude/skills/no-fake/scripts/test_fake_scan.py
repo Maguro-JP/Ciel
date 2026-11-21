@@ -303,9 +303,10 @@ class Diff(unittest.TestCase):
         self.assertEqual(r.diff_ids(), [])
 
     def test_changes_on_the_base_branch_are_not_mine(self):
-        r = Repo({"app/a.py": "x = 1\n"})
+        # base の先頭と比べると、base が足したテストは「私が消した」に、base が消した握りつぶしは「私が足した」に見える。分かれ目と比べる
+        r = Repo({"app/a.py": "x = 1\n", "app/old.py": "try:\n    go()\nexcept Exception:\n    pass\n"})
         sh(r.dir, "git", "checkout", "-q", "main")
-        r.write({"app/theirs.py": "try:\n    go()\nexcept Exception:\n    pass\n"})
+        r.write({"tests/test_theirs.py": OLD_TEST, "app/old.py": None})
         r.commit("base が進んだ")
         sh(r.dir, "git", "checkout", "-q", "work")
         r.write({"app/a.py": "x = 2\n"})
@@ -380,6 +381,19 @@ class Diff(unittest.TestCase):
         self.assertEqual(got, [("U01", "注意"), ("U01", "注意"), ("U04", "注意")])
         r.write({"app/main.py": "from app import util, lonely\n\n\ndef main():\n    return util.used(1) + util.orphan(2) + lonely.other(3)\n"})
         self.assertEqual(r.diff_ids(), [])
+
+    def test_copies_of_skills_are_judged_only_at_their_home(self):
+        swallow = "try:\n    go()\nexcept Exception:\n    pass\n"
+        # 配った先（スキルの検査の台本が無い）: .claude/skills/ の中はコピーなので、差分でも全体でも見ない
+        r = Repo({"README.md": "# x\n"})
+        r.write({".claude/skills/x/hooks/a.py": swallow})
+        self.assertEqual(r.diff_ids(), [])
+        self.assertEqual(r.scan()[0], 0)
+        # スキルの元のリポジトリ: 同じ場所を見る
+        r = Repo({"scripts/validate.sh": "#!/usr/bin/env bash\n# skill validator\n"})
+        r.write({".claude/skills/x/hooks/a.py": swallow})
+        self.assertEqual(r.diff_ids(), [("S01", "重大")])
+        self.assertEqual(r.scan()[0], 1)
 
     def test_new_shell_noise_is_counted_only_in_a_diff(self):
         r = Repo({"scripts/a.sh": "ls /nope 2>/dev/null\n"})

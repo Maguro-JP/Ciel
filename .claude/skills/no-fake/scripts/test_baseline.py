@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""baseline.py を、実際に流して取った出力の写しと、一時のリポジトリで確かめる。
+"""baseline.py を、実際に流して取った出力のコピーと、一時のリポジトリで確かめる。
 
 出力の見本は、pytest 9.1、Python 3.11 の unittest、jest 29.7、vitest 2.1、mocha 10.8、Node 22 の node:test を流して取った物を短くした。
 記憶で書いた形は、本物と違っていた（unittest の subTest の行、jest の ● の行、mocha の落ちた物の番号）。
@@ -7,6 +7,7 @@
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -215,6 +216,22 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertRegex(out.strip().splitlines()[-1], r"^変える前の記録: 通った 2 / 落ちた 0$")
         self.assertIn("変える前の記録:", self.call("show")[1])
+
+    def test_copies_of_skill_tests_are_not_this_repositorys_tests(self):
+        dest = Path(tempfile.mkdtemp())
+        skill = dest / ".claude" / "skills" / "x" / "scripts"
+        skill.mkdir(parents=True)
+        (skill / "test_x.py").write_text(GOOD + "\n\nif __name__ == '__main__':\n    unittest.main()\n", encoding="utf-8")
+        self.assertEqual(baseline.detect(dest), [])  # 配った先: コピーのテストは数えない（テストの無いリポジトリとして黙る）
+        r = subprocess.run([sys.executable, "-I", str(SCRIPT), "save", "--root", str(dest)], capture_output=True, text=True, timeout=120, env=dict(os.environ, NO_FAKE_STATE=self.state))
+        self.assertEqual((r.returncode, r.stdout, r.stderr), (0, "", ""))
+        home = Path(tempfile.mkdtemp())
+        shutil.copytree(dest / ".claude", home / ".claude")
+        (home / "scripts").mkdir()
+        (home / "scripts" / "validate.sh").write_text("#!/usr/bin/env bash\n# skill validator\n", encoding="utf-8")
+        self.assertEqual([prefix for prefix, _ in baseline.detect(home)], ["x/"])
+        r = subprocess.run([sys.executable, "-I", str(SCRIPT), "save", "--root", str(home)], capture_output=True, text=True, timeout=120, env=dict(os.environ, NO_FAKE_STATE=self.state))
+        self.assertEqual(r.stdout.strip().splitlines()[-1], "変える前の記録: 通った 2 / 落ちた 0")
 
     def test_output_file_can_be_given(self):
         log = self.root / "out.log"

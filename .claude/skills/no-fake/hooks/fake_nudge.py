@@ -33,7 +33,7 @@ def change(d: dict):
     if not path or not os.path.isfile(path):
         return None
     rel = fs.rel_to_root(path)
-    if not rel or fs.is_skipped(rel) or not fs.is_scanned(rel):
+    if not rel or fs.is_skipped(rel) or not fs.is_scanned(rel) or fs.is_vendored(fs.repo_root(path), rel):
         return None
     now = fs.read_text(Path(path))
     if now is None or fs.file_ignored(now):
