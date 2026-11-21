@@ -55,6 +55,7 @@ Python は ast で、JavaScript と TypeScript は文字列とコメントを落
 | U03 | 中身の無いハンドラ（`onClick={() => {}}`、`onclick=""`） | 注意 | |
 | U04 | 新しいファイルが、ほかのどのファイルからも読まれていない | 注意 | 入口のファイル（main、index、app、cli、設定）、実行できるスクリプト、テスト、ルートになる場所（pages、app、routes） |
 | U05 | 登録されていないルートの束（Blueprint、APIRouter、express.Router） | 注意 | 同じファイルか別のファイルで登録している物 |
+| U06 | 足した設定のキー（`config*.json`、`settings*.yml`、`.env.example` など）を、コードのどこも読んでいない | 注意 | 前からあるキー、ハイフンのあるキー、`.claude/` の中の設定（差分のときだけ数える） |
 
 ## 検査を弱める形
 

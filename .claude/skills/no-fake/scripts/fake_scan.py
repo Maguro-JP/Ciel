@@ -121,6 +121,9 @@ ENTRY_NAMES = {"main", "setup", "teardown", "handler", "lambda_handler", "defaul
                "middleware", "config", "metadata", "activate", "deactivate", "setUp", "tearDown", "setUpModule", "tearDownModule", "run", "cli", "app"}
 ENTRY_FILES = re.compile(r"(?:^|/)(?:__init__|__main__|main|index|app|cli|setup|conftest|manage|wsgi|asgi|settings|config|preload|renderer|background|sw|worker)\.\w+$"
                          r"|\.config\.[cm]?[jt]s$|\.d\.ts$|(?:^|/)(?:migrations|bin|hooks|\.github|\.husky|public|static)/")
+# 設定のファイルと、その中のキー。ハイフンのあるキーは、コードの中の名前と突き合わせられないので見ない
+CONF_FILE = re.compile(r"(?:^|/)(?:\.env\.(?:example|sample|template)|(?:config|settings|defaults?)[\w.-]*\.(?:json|ya?ml|toml|ini)|[\w-]+\.config\.json)$")
+CONF_KEY = re.compile(r"^[ \t]*(?:export\s+)?[\"']?([A-Za-z_]\w{3,})[\"']?\s*[:=]")
 ROUTE_DIRS = re.compile(r"(?:^|/)(?:pages|app|routes)/")  # ファイルの場所がそのままルートになる枠組み（JS・TS だけ）
 
 
@@ -981,13 +984,18 @@ def _defs(rel: str, text: str) -> list:
 
 
 def scan_wiring(root: Path, files: list, only: dict = None) -> list:
-    """定義しただけで、どこからも呼ばれない関数と、どこからも読まれない新しいファイル。only は {パス: 足した行の集合}（差分のとき）。"""
+    """定義しただけで、どこからも呼ばれない関数と、どこからも読まれない新しいファイルと、どこも読んでいない足した設定。
+    only は {パス: 足した行の集合}（差分のとき）。"""
     root = Path(root)
     targets = [f for f in files if ext_of(f) in PY | JS and not is_test(f) and not is_skipped(f)]
     targets = [f for f in targets if only is None or f in only]
-    if not targets:
-        return []
-    cands, new_files = {}, []
+    cands, new_files, keys = {}, [], {}
+    for rel in [f for f in files if only is not None and f in only and CONF_FILE.search("/" + norm(f)) and not norm(f).startswith(".claude/") and not is_skipped(f)]:
+        text = read_text(root / rel)  # 足した設定のキー（差分のときだけ。前からあるキーは見ない）
+        for no, line in enumerate((text or "").splitlines(), 1):
+            m = CONF_KEY.match(line)
+            if m and (only[rel] is None or no in only[rel]) and IGNORE_LINE not in line:
+                keys.setdefault(m.group(1), (rel, no))
     for rel in targets:
         text = read_text(root / rel)
         if text is None or file_ignored(text):
@@ -1004,14 +1012,14 @@ def scan_wiring(root: Path, files: list, only: dict = None) -> list:
         routed = ext_of(rel) in JS and ROUTE_DIRS.search("/" + rel)
         if only is not None and only[rel] is None and not ENTRY_FILES.search("/" + rel) and not runnable and not routed:
             new_files.append((rel, "新しいファイル", "U04"))
-    if not cands and not new_files:
+    if not cands and not new_files and not keys:
         return []
     code, out = git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard")
     tracked = [p for p in out.split("\0") if p and not is_skipped(p)] if code == 0 else list(files)
     if len(tracked) > 6000:
         NOTES.append(f"配線は数えていない（追跡しているファイルが {len(tracked)} 件で多い）")
         return []
-    names = Counter()
+    names, read_keys = Counter(), set()
     stems = {Path(rel).stem: 0 for rel, _, _ in new_files}
     word = re.compile(r"[A-Za-z_$][\w$]*")
     for rel in tracked:
@@ -1022,6 +1030,8 @@ def scan_wiring(root: Path, files: list, only: dict = None) -> list:
             continue
         if ext_of(rel) != ".md":
             names.update(w for w in word.findall(text) if w in cands)
+        if keys and ext_of(rel) in PY | JS | MARKUP | SH:
+            read_keys.update(k for k in keys if k not in read_keys and k in text)
         for stem in stems:
             if stem in text and norm(rel) not in [r for r, _, _ in new_files if Path(r).stem == stem]:
                 stems[stem] += 1
@@ -1030,6 +1040,9 @@ def scan_wiring(root: Path, files: list, only: dict = None) -> list:
         if names[name] <= len(places):
             for rel, line in places:
                 out.append(Finding("注意", rel, line, "U01", "配線", f"定義しただけで、どこからも呼ばれていない疑い {name}()", "呼ぶ所をつなぐ。使わないなら足さない"))
+    for key, (rel, line) in keys.items():
+        if key not in read_keys:
+            out.append(Finding("注意", rel, line, "U06", "配線", f"足した設定 {key} を、コードのどこも読んでいない疑い", "読む所をつなぐ。使わないなら足さない"))
     for rel, what, pid in new_files:
         if stems.get(Path(rel).stem, 1) == 0:
             msg = "どこにも登録されていない疑い" if pid == "U05" else "どこからも読まれていない疑い"

@@ -398,6 +398,14 @@ class Diff(unittest.TestCase):
         self.assertEqual(r.diff_ids(), [("S01", "重大")])
         self.assertEqual(r.scan()[0], 1)
 
+    def test_added_setting_that_nothing_reads(self):
+        r = Repo({"config.json": '{\n  "timeout": 30\n}\n', "app/main.py": "import json\n\n\ndef main():\n    return json.load(open('config.json'))['timeout']\n"})
+        r.write({"config.json": '{\n  "timeout": 30,\n  "retry_limit": 3,\n  "cache_size": 10\n}\n',
+                 "app/main.py": "import json\n\n\ndef main():\n    c = json.load(open('config.json'))\n    return c['timeout'] * c['retry_limit']\n"})
+        code, out = r.scan("--diff", "main")
+        self.assertEqual(r.diff_ids(), [("U06", "注意")])
+        self.assertIn("config.json:4  U06 配線: 足した設定 cache_size を、コードのどこも読んでいない疑い", out)
+
     def test_new_shell_noise_is_counted_only_in_a_diff(self):
         r = Repo({"scripts/a.sh": "ls /nope 2>/dev/null\n"})
         r.write({"scripts/a.sh": "ls /nope 2>/dev/null\ngrep -q x f || true\n"})
