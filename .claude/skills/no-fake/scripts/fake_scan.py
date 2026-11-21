@@ -61,7 +61,7 @@ CHECK_CMD = (r"(?:pytest|unittest|tox|nox|ruff|flake8|mypy|pyright|pylint|bandit
 
 # コメントの中の、置き場の語。テストのファイルでは見ない（stub や dummy は、テストでは普通の語）
 PLACE_WORDS = re.compile(
-    r"\b(?:TODO|FIXME|XXX|HACK)\b|仮実装|仮置き|仮の(?:実装|値|データ|処理|対応|もの|物)|[（(]仮[）)]|ダミー|\bdummy\b|\bplaceholder\b|\bstub(?:bed)?\b"
+    r"(?-i:\b(?:TODO|FIXME|XXX|HACK)\b)|\btodo\s*[:：]|仮実装|仮置き|仮の(?:実装|値|データ|処理|対応|もの|物)|[（(]仮[）)]|ダミー|\bdummy\b|\bplaceholder\b|\bstub(?:bed)?\b"
     r"|とりあえず|ひとまず|未実装|(?:あと|後)で(?:実装|直す|書く)|\bnot (?:yet )?implemented\b|\bto be implemented\b|\bfor now\b"
     r"|\bin a real (?:implementation|app|application|scenario|system|world)\b|本番では|\b(?:mock|fake|sample) data\b|サンプルデータ", re.I)
 # 省略の置き場。本物のコードが消えて、コメントだけが残る
@@ -113,6 +113,7 @@ ASSERT_LINE = re.compile(r"\bassert\w*\b|\bexpect\s*\(|\.should\b|\bt\.(?:Error|
 SNAPSHOT = re.compile(r"(?:^|/)__snapshots__/|\.snap$|\.ambr$|(?:^|/)snapshots?/")
 THRESH_KEY = re.compile(r"(fail_under|fail-under|cov-fail-under|coverageThreshold|min(?:imum)?[_-]?coverage|\b(?:branches|functions|lines|statements)\b|threshold|max-warnings|maxWarnings)", re.I)
 HOOK_REG = re.compile(r"\"command\"\s*:\s*\"(.+)\"\s*,?\s*$")
+HOOK_SCRIPT = re.compile(r"[\w-][\w.-]*\.[A-Za-z]{1,5}\b")  # フックの登録の中の、ファイルの名前（スクリプトと、その場で読むファイル）
 ROUTER_DEF = re.compile(r"^(\w+)\s*=\s*(?:\w+\.)?(?:Blueprint|APIRouter)\(|\b(?:const|let|var)\s+(\w+)\s*=\s*(?:express\.)?Router\(\)", re.M)
 ROUTER_USE = r"(?:register_blueprint|include_router|\.use|\.route|mount)\([^)\n]*\b{name}\b"
 ENTRY_NAMES = {"main", "setup", "teardown", "handler", "lambda_handler", "default", "App", "Page", "Layout", "GET", "POST", "PUT", "PATCH", "DELETE", "HEAD",
@@ -912,11 +913,17 @@ def scan_removed(diffs: list) -> list:
                     if looser and IGNORE_LINE not in a:
                         out.append(Finding("重大", rel, 0, "W04", "弱めた", f"しきい値を緩めた（{k.group(1)}: {rn[0]} を {an[0]} に）", "戻す。緩める理由があるなら ❕ 弱めた: に書く", key=rel))
         if re.search(r"(?:^|/)settings(?:\.local)?\.json$", rel) or name == ".pre-commit-config.yaml":
+            # 登録は、動かすスクリプトの名前で突き合わせる。書き方を変えただけ（起動役を通す形にした、並べ替えた）の登録は、消した物に数えない
+            kept = {s for _, t, _ in fd.added for s in HOOK_SCRIPT.findall(t)}
             gone = []
             for _, t, _ in fd.removed:
                 m = HOOK_REG.search(t) or re.search(r"^\s*-\s*id:\s*(\S+)", t)
-                if m and t.strip().rstrip(",") not in readded_bare:
-                    gone.append(re.sub(r".*[/ ]", "", m.group(1).replace('\\"', "").strip())[:40])
+                if not m or t.strip().rstrip(",") in readded_bare:
+                    continue
+                scripts = [s for s in HOOK_SCRIPT.findall(m.group(1)) if not s.endswith("run.sh")]
+                if scripts and all(s in kept for s in scripts):
+                    continue
+                gone.append((scripts[-1] if scripts else m.group(1).replace('\\"', "").strip())[:40])
             if gone:
                 out.append(Finding("重大", rel, 0, "W05", "弱めた", f"フックの登録を消した（{'、'.join(gone[:3])}）", "戻す。外すのはユーザーが決める", key=gone[0]))
         if fd.status == "D" and (re.search(r"(?:^|/)\.github/workflows/[^/]+\.ya?ml$|(?:^|/)\.husky/[^/._][^/]*$|(?:^|/)\.pre-commit-config\.yaml$", rel)):

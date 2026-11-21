@@ -8,7 +8,8 @@ HEAD ごとの結果を ~/.claude/state/pr-gate/<repo>.json に残す。pr_gate.
 動かすもの（あるものだけ）: コミットメッセージの ID・URL・メールの検査、git diff --check、./scripts/validate.sh、.claude/skills/*/scripts/test_*.py、
 .claude/hooks/test.sh（リポジトリ自身のテストの台本。無ければ pytest）、
 ja-proofread・content-audit・secret-leak-check・user-terms・ui-design・readme・knowledge の差分（base から。user-terms と ui-design と readme と knowledge は注意で、落とさない）、
-code-check の crash・vuln・info の差分（バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩。重大で落とす）、npm test（package.json に test があり node_modules があるとき）。
+code-check の crash・vuln・info の差分（バグやクラッシュ・不具合や脆弱性・情報の扱いや漏洩。重大で落とす）、
+no-fake の fake_scan の差分（見せかけの形、握りつぶし、弱めた検査、消したテスト。重大で落とし、注意は数だけ出す）、npm test（package.json に test があり node_modules があるとき）。
 
 使い方: precheck.py [--base <ref>]   base の既定は origin のデフォルトブランチ
 環境変数: PR_GATE_STATE=dir  記録の保存先（既定は ~/.claude/state/pr-gate）
@@ -96,6 +97,9 @@ def main() -> int:
                               ("info", ".claude/skills/code-check/scripts/info_scan.py", "")):
         if Path(path).exists():
             steps.append((name, f"{sys.executable} {path} --diff {base}{extra}"))
+    # no-fake の差分の検査（見せかけの形、握りつぶし、弱めた検査、消したテスト）。重大で NG。注意は、最後の行に数だけ出る
+    if Path(".claude/skills/no-fake/scripts/fake_scan.py").exists():
+        steps.append(("no-fake", f"{sys.executable} .claude/skills/no-fake/scripts/fake_scan.py . --diff {base}"))
     if Path("package.json").exists() and Path("node_modules").is_dir():
         try:
             if "test" in json.loads(Path("package.json").read_text(encoding="utf-8")).get("scripts", {}):

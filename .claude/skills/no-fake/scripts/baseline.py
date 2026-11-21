@@ -33,7 +33,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import fake_scan as fs  # noqa: E402
 
-# 出力の形は、実際に流して確かめた（pytest 9.1、Python 3.11 の unittest、jest 29.7、vitest 2.1、mocha 10.8、Node 22 の node:test。2026-11-20）
+# 出力の形は、実際に流して確かめた（pytest 9.1、Python 3.11 の unittest、jest 29.7、vitest 2.1、mocha 10.8、Node 22 の node:test。2026-11-21）
 PYTEST_V = re.compile(r"^(\S+::\S+)\s+(PASSED|FAILED|ERROR|XPASS)\b")
 PYTEST_R = re.compile(r"^(PASSED|FAILED|ERROR|SUBFAILED(?:\([^)]*\))?)\s+(\S+::\S+)")   # SUBFAILED は subTest の中の失敗
 UNITTEST = re.compile(r"^\s*(\w+) \(([\w.]+)\)(?: \([^)]*\))?(?: \[[^\]]*\])?(?: \.\.\.\s*(.*))?$")

@@ -161,13 +161,21 @@ def edits_of(turn: dict) -> dict:
     return files
 
 
-def file_change(path: str, rec: dict):
-    """(相対パス, 状態, 前の中身, 今の中身, 足した行と消した行)。見ない物は None。"""
+def disk(path: str):
+    """今のファイルの中身。(あるか, 中身)。大きすぎるか文字ではないファイルは、中身が None。"""
+    if not os.path.isfile(path):
+        return False, None
+    return True, fs.read_text(Path(path))
+
+
+def file_change(path: str, rec: dict, reader=disk):
+    """(相対パス, 状態, 前の中身, 今の中身, 足した行と消した行)。見ない物は None。
+    reader は、今の中身の読み方（実際の記録に当てるときは、そのターンの終わりの中身を渡す）。"""
     rel = fs.rel_to_root(path)
     if not rel or fs.is_skipped(rel):
         return None
-    now = fs.read_text(Path(path)) if os.path.isfile(path) else None
-    if os.path.isfile(path) and now is None:
+    exists, now = reader(path)
+    if exists and now is None:
         return None  # 大きすぎるか、文字ではないファイル
     orig = rec["original"]
     if orig is None or isinstance(orig, str):  # 記録に書く前の中身がある（None は、このターンで作ったファイル）
@@ -212,12 +220,12 @@ def bash_deleted(turn: dict, cwd: str, created: set) -> list:
     return out
 
 
-def judge(turn: dict, reply: str, cwd: str):
+def judge(turn: dict, reply: str, cwd: str, reader=disk):
     """(差し戻しの文の一覧, 数えた物)。"""
     files = edits_of(turn)
     changes, diffs, texts = [], [], {}
     for path, rec in files.items():
-        got = file_change(path, rec)
+        got = file_change(path, rec, reader)
         if got is None:
             continue
         rel, status, old, now, fd = got

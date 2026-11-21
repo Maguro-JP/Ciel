@@ -307,6 +307,16 @@ class Turns(Case):
         lines = [user("load を足して")] + self.write("app/a.py", None, SWALLOW) + [say("★ load: 足しました。")]
         self.assertEqual(self.gate(lines, hooks=alone / "hooks"), (0, ""))
 
+    def test_all_four_reasons_fit_in_one_short_line(self):
+        skipped = src("import pytest", "", "", "@pytest.mark.skip", "def test_add():", "    assert add(1, 2) == 3")
+        lines = [user("load を直して")] + self.write("app/a.py", Removed.OLD, SWALLOW) + self.write("tests/test_calc.py", TESTS, skipped) + [say("★ load: 直しました。")]
+        code, out = self.gate(lines)
+        self.assertEqual(code, 2)
+        self.assertEqual(len(out.strip().splitlines()), 1)
+        for part in ("見せかけの形が残っている", "テストか検査を弱めた", "消した物がある", "1 回も動かしていない"):
+            self.assertIn(part, out)
+        self.assertLess(len(out), 700)
+
 
 class Nudge(Case):
     def test_new_swallow_is_told_with_its_line(self):

@@ -90,6 +90,9 @@ class PythonShapes(unittest.TestCase):
         self.assertEqual(found("app/a.py", "def f():\n    # ... rest of the code unchanged\n    return g()\n"), [("P06", "重大")])
         self.assertEqual(found("app/a.py", "class A:\n    # （中略）\n    x = 1\n"), [("P06", "重大")])
         self.assertEqual(found("app/a.py", "# 既存のコードの呼び出しを壊さないために残す\nx = 1\n"), [])
+        # 実際の差分で偽の当たりになった形。小文字の todo は、印ではなく普通の語として出てくる（TAP の「# todo」の説明など）
+        self.assertEqual(found("app/a.py", "# skip と todo の印が付いた物は数えない\nx = 1\n"), [])
+        self.assertEqual(found("app/a.py", "x = 1  # todo: 直す\n"), [("P05", "注意")])
         # テストのファイルでは、stub や dummy は普通の語
         self.assertEqual(found("tests/test_a.py", "# dummy の値を渡す\ndef test_a():\n    assert f(1) == 2\n"), [])
 
@@ -352,6 +355,16 @@ class Diff(unittest.TestCase):
         r = Repo({".claude/settings.json": settings % (hook % "a" + ",\n" + hook % "b")})
         r.write({".claude/settings.json": settings % (hook % "b" + ",\n" + hook % "a" + ",\n" + hook % "c")})
         self.assertEqual(r.diff_ids(), [])
+
+    def test_rewritten_hook_registrations_are_not_removed(self):
+        # 実際の履歴で偽の当たりになった形。登録の書き方（起動役を通す、cd を前に付ける）を変えただけで、動かす物は同じ
+        settings = '{\n  "hooks": {\n    "Stop": [\n      {\n        "hooks": [\n          {\n            "command": "%s"\n          },\n          {\n            "command": "%s"\n          }\n        ]\n      }\n    ]\n  }\n}\n'
+        r = Repo({".claude/settings.json": settings % (".claude/hooks/lang-rule.sh", "awk '{print}' .claude/skills/work-style/SKILL.md || true")})
+        r.write({".claude/settings.json": settings % ('\\"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/run.sh\\" .claude/hooks/lang-rule.sh',
+                                                      'cd \\"${CLAUDE_PROJECT_DIR:-.}\\" && awk \'{print}\' .claude/skills/work-style/SKILL.md || true')})
+        self.assertEqual(r.diff_ids(), [])
+        r.write({".claude/settings.json": settings % ('\\"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/run.sh\\" .claude/hooks/other.sh', "true")})
+        self.assertEqual(r.diff_ids(), [("W05", "重大")])
 
     def test_ignore_in_the_commit_message(self):
         r = Repo({"tests/test_calc.py": OLD_TEST, "app/a.py": "x = 1\n"})
