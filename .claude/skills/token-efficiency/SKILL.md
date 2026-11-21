@@ -122,3 +122,14 @@ CLAUDE.md、全スキルの description、フックの出力を数え、300 文�
 毎ターン同じ決まりを差し込むと、それ自体が無駄になる。`scripts/measure_hooks.py` が settings.json のフックを無害な入力で 2 回動かし、
 2 ターン目の文字数を出す。目安は UserPromptSubmit の合計 1,200 文字、SessionStart の合計 5,000 文字。超えたら出す頻度を落とすか短くする。
 lang-rule は 10 ターンに 1 回と止められた直後だけ、CORE は 10 ターンに 1 回、directives は 3 件 80 文字、focus は 300 文字、lessons は新しい 12 件。
+PostToolUse と Stop は、知らせと差し戻しが出る見本で 1 回動かし、見本ごとの合計を 1 ターンの目安（1,200 文字）と比べる。
+無害な入力では何も出ないので、長さを測れないため。
+
+| イベント | 見本 |
+|---|---|
+| PostToolUse | 同じ失敗が並ぶ Bash の出力、クラッシュの出力、push のあと、握りつぶしと外の依存のあるコードの書き込み |
+| Stop | 根拠の無い完了と推測の語で終える返答 |
+
+数えるのは、Claude の文脈に入る文だけにする。`additionalContext` と、止めるフックの `reason` と標準エラーを数える。
+素の標準出力は、SessionStart と UserPromptSubmit の分だけを数え、端末に出るだけの `systemMessage` は数えない。
+測定は一時の HOME で動かし、本物の `~/.claude/state/` には書かない。テストは `scripts/test_measure_hooks.py`。
